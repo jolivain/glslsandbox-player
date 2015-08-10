@@ -1,0 +1,25 @@
+#! /bin/bash
+
+set -e
+set -u
+
+if [[ $# -ne 1 ]] ; then
+    echo "Usage: $0 <glslsandbox-shader-id-or-url>" >&2
+    exit 1
+fi
+
+BASENAME="$(dirname "$0")"
+SHADER_ID="$(sed -r 's@^http://(www\.)?glslsandbox\.com/e#@@' <<< "$1")"
+URL_PREFIX="http://glslsandbox.com/item/"
+CURL="curl"
+JSON2FRAG="${BASENAME}/json2code"
+USER_AGENT="glslsandbox-player/1.0"
+SHADER_URL="${URL_PREFIX}/${SHADER_ID}"
+
+CURL_OPTS="--silent "
+CURL_OPTS+="--user-agent ${USER_AGENT}"
+
+${CURL} ${CURL_OPTS} "${SHADER_URL}" | "${JSON2FRAG}"
+
+# Do not flood glslsandbox.com in case of a long list of download
+sleep 0.5

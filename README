@@ -1,0 +1,354 @@
+glslsandbox-player
+==================
+
+
+Quick Start
+-----------
+
+  GLSL Sandbox standalone player allow one to run and render (most of)
+nice shaders available online on the http://glslsandbox.com/ website,
+but without the need of an Internet connection, a web browser or any
+of its dependencies. Instead, the only requirement of
+glslsandbox-player is a working EGL and GLESv2 libraries.
+
+  Quick instructions for the impatient wanting to test on X11:
+
+Install dependencies:
+
+* For Ubuntu 14.04.2:
+
+    sudo apt-get install \
+      git curl make gcc autoconf automake libx11-dev \
+      libegl1-mesa-dev libgles2-mesa-dev
+
+* For Ubuntu 12.04.5:
+
+    sudo apt-get install \
+      git curl make gcc autoconf automake libx11-dev \
+      libegl1-mesa-dev-lts-trusty libgles2-mesa-dev-lts-trusty
+
+* For Fedora (tested on 21 and 22):
+
+    sudo yum install \
+      git curl make gcc autoconf automake libX11-devel \
+      mesa-libEGL-devel mesa-libGLES-devel
+
+Build:
+    git clone https://github.com/jolivain/glslsandbox-player.git
+    cd glslsandbox-player
+    autoreconf -vfi
+    ./configure
+    make
+
+Run a demo:
+    ./scripts/run-demo-random.sh
+or:
+    ./scripts/run-demo.sh
+
+  For the less impatient user, continue reading...
+
+
+Introduction
+------------
+
+  The http://glslsandbox.com/ website (and all its shaders) is using
+WebGL (See https://www.khronos.org/webgl/) and JavaScript for the
+rendering which are now available in common web browsers. Those web
+browsers are generally using X11. All of this pulls a lot of
+dependencies, which generally requires a full desktop system. It also
+require a working Internet connection. Since WebGL 1.0 is based on
+OpenGL ES 2.0, it's relatively straightforward to run those shaders
+directly on an OpenGL ES 2.0 driver.
+
+  The goal of this program is to stress OpenGL ES 2.0 and greater
+drivers (and its online shader compiler) on very restricted embedded
+environment (i.e. a boot-loader, a kernel, the GL ES driver and this
+program, no network connectivity, no file-system, no input devices)
+with unusual shader load or program constructions.
+
+  To overcome the lack of a network connectivity and a file-system on
+a target device, the code of a selection of fragment shaders is
+downloaded at compilation time, processed and then compiled inside the
+final binary. The list of shader code to embed into the binary is
+maintained in the file "shader.list", in the root of this source
+package. The source distribution includes a ready to use "shader.list"
+file of an arbitrary pseudo-random selection of nice looking shaders.
+
+  One would be tempted to include all available shaders on the website
+(after all, more tests would mean more chances to find bugs). Users
+should be aware that a lot of glslsandbox.com shaders are forks and
+have a lot of similitude. Moreover some shaders just include syntax
+error or typos (e.g. 8477.0). Some other shaders, may include driver
+workaround that may not be fully GLSL compliant (e.g. shader 2606.0
+with OS X AMD cos workaround that redefine the cos() function). Other
+compilation failures may be due to garbage after #else or #endif
+preprocesor directive present in some shaders (e.g. shader
+26529.0). Finally, some shaders can be GPU-time consuming depending of
+the GPU being tested. This is why a relevant selection of shader
+suited for your driver and GPU would be better that a bare dump of the
+whole glslsandbox.com site.
+
+  The original player at http://glslsandbox.com/ is interactive, and
+reacts to user mouse interactions. The glslsandbox-player instead can
+emulates mouse movements by updating the shader uniforms and varying.
+
+
+Supported glslsandbox Features
+------------------------------
+
+  The supported features of the original http://glslsandbox.com/
+shader player are:
+
+- the "time" float uniform is set to the number of seconds since the
+  beginning of the rendering.
+
+- the "mouse" vec2 uniform is updated with cyclic movement (two
+  components of the vec2 encodes the mouse coordinates as float
+  [-1.0:1.0]).
+
+- the "resolution" vec2 uniform, which encodes the dimension of the
+  surface in pixel to render.
+
+- the "surfacePosition" vec2 varying, which define the viewport of the
+  quad surface to be rendered (default is -1,-1 for lower left corner,
+  1,1 for the upper right). This varying is used for the pan/zoom
+  feature of the mouse (in the original http://glslsandbox.com/
+  player). In glslsandbox-player, this varying is updated with cyclic
+  movements of pan/zoom.
+
+Unsupported features:
+
+- Fragment shader is rendered directly to screen (instead of an FBO),
+  so it's not possible to reduce the resolution. But it's possible to
+  reduce the window though (with the -W -H command line
+  arguments). Shaders with the uniform sampler2D "backbuffer" (to
+  access the back buffer as a texture) won't render properly in
+  glslsandbox-player.
+
+
+Building glslsandbox-player
+---------------------------
+
+The build dependencies of glslsandbox are:
+- a C compiler (gcc and clang are good candidates)
+- GNU Make (an old Posix make isn't enough)
+- curl (for downloading shaders)
+- sed
+- awk
+- grep
+- coreutils (sort, cat)
+- Python 2.6 or greater (also works with Python 3.x)
+- Development files for an OpenGL ES 2.0 and EGL library
+- One of the following native window library: X11, Vivante/libGAL
+
+  Compiling glslsandbox-player should be straightforward if all
+dependencies are present since it's an autotools package (aka
+"./configure && make"). Make sure to enable/disable the proper native
+windowing library for your system.
+
+
+Important Note about Shader Copyright, Licenses and Author Credits
+------------------------------------------------------------------
+
+  Users of glslsandbox-player should be aware and very careful about
+the fact that the produced binary may include the source code (as a
+character string) of fragment shaders that could be distributed under
+various licenses. Also, please don't forget to give credit to original
+shader code author(s), or original code URL.
+
+  Also note that the glslsandbox-player source distribution does not
+include any fragment shader source itself. It only include a file
+containing a list pointing to online code. The downloading will be
+done at compilation time.
+
+
+Running glslsandbox-player
+--------------------------
+
+  If glslsandbox-player is executed without any option, it will run
+infinitely the builtin shader id 0, on a full screen window. It will
+render 3 warmup frames (defined later in "Note about Performance
+Counting" section) and will report frame rate every 100 frames. By
+default, the program is started with a verbosity level 1, which means
+info messages will be printed. Original URL of the shader is also
+printed to easily check the rendering from a WebGL enabled web
+browser.
+
+  Command line arguments of glslsandbox-player are:
+
+    Usage: glslsandbox-player [options]
+     -h: show this help
+     -l: list builtin shaders and exit
+     -L: list builtin shaders URLs and exit
+     -S <shader-name>: select the shader to be rendered by nickname
+     -i <shader-id>: select the shader by internal id
+     -I <shader-glslid>: select the shader by glslsandbox.com id
+     -F <file>: run glslsandbox shader from file
+     -p: print builtin shader code
+     -f <n>: run n frames of shader(s)
+     -t <n>: run n seconds of shader(s)
+     -m: disable mouse movement emulation
+     -M <f>: set mouse movement speed factor
+     -s <f>: set time speed factor
+     -u: disable surfacePosition varying animation
+     -U <f>: set surfacePosittion animation speed factor
+     -W <n>: set window width to n
+     -H <n>: set window height to n
+     -r <n>: report frame rate every n frames
+     -w <n>: set the number of warmup frames
+     -v: increase verbosity level
+     -q: run quietly
+
+  In case -t and -f are used in the same command line, the program
+will terminate when the first condition is satisfied.
+
+Command line examples:
+
+List builtin shader, sorted by internal id:
+    glslsandbox-player -l
+
+List builtin shader, sorted by glslsandbox id:
+    glslsandbox-player -l | sort -k2 -n
+
+List the 20 biggest builtin shader:
+    glslsandbox-player -l | sort -k5 -r -n | head -20
+
+Render 5000 frames of the shader id 109 in a 128x128 window and report
+frame rate every 500 frames:
+    glslsandbox-player -W128 -H128 -f5000 -r500 -i109
+
+  Since glslsandbox-player was designed for testing purposes, it will
+execute one shader per process execution. This initial design choice
+is to easily catch driver crash without interrupting a test sequence
+(provided the kernel driver and GPU hardware are able to recover the
+crash). A caller script is needed to run all the shaders embedded in
+the program. For this purpose, two demo scripts are provided
+"scripts/run-demo.sh" and "scripts/run-demo-random.sh".
+
+  The script "scripts/run-url.sh" is also provided to show how to run
+a shader directly from the http://glslsandbox.com/ website that was
+not embedded in the binary at compilation time.
+
+  Since glslsandbox-player could use a lot of resources (CPU time or
+RAM for shader compilation, or GPU time), it could make the computer
+running it unstable. Make sure to close no important application are
+running in case of a crash. When running glslsandbox-player, it could
+be safe to use resources limits. See the "ulimit" bash builtin and the
+"timeout" command (see "scripts/run-demo.sh" for an example how to use
+those).
+
+
+Note about Performance Counting
+-------------------------------
+
+  glslsandbox-player can also be used to benchmark a GLESv2 driver and
+its corresponding GPU. It will report by default some timings about
+setup calls (including shader compilation), then frame rate during
+rendering.
+
+  It can also be useful benchmark the shader compiler, or detect
+bottlenecks in it. For example shader 25424.0 "MonaLisa" may reveal
+long compilation times if compiler is inlining/unrolling too
+aggressively. Another example is the shader 4285.0 "Commodore64Heavy"
+that could reach a high memory usage at compilation time.
+
+  Some driver implementation may have a big command pipeline,
+dedicated thread for command dispatch, command buffers, etc. This may
+result to variation of frame rate at the beginning of the rendering
+(faster if the driver is accepting command faster while the pipe
+buffers are filling, or slower if there is some deferred
+initialization).
+
+  In order to give some idea of this special case, glslsandbox-player
+renders some "warmup" frames which will not be counted for the average
+frame rate estimation. Moreover, the very first frame can also be
+special. This is because some GLES drivers could do lazy
+initialization. The rendering time of this first frame could be bigger
+than the average time of other frames. This is why when warmup frames
+are enabled, the rendering time of the first frame is displayed apart.
+
+  By default, there is 3 warmup frames. The number of warmup frames
+can be changed with the "-w" command line argument. When warmup frames
+are enabled, the "time" uniform is not updated between the first two
+frames (i.e. the first frame is rendered twice), in case the rendering
+time of the first frame is long, it will not create a big visual
+discontinuity in the animation.
+
+  Finally, at the end of setup, there is always a black frame which is
+rendered. This frame will make sure all the setup commands will be
+flushed, and the first frame timing will not be mixed with setup
+calls.
+
+  In case an accurate time measurement is needed, make sure to check
+if computer running glslsandbox-player is doing CPU frequency scaling
+and what is the current strategy.
+
+  Moreover for detailed frame analysis, glslsandbox-player can be used
+with apitrace (the profiling with GLES is not supported though):
+
+Usage example:
+    apitrace trace --api=egl glslsandbox-player -H256 -W256 -i0 -f30
+then:
+    qapitrace glslsandbox-player.trace
+
+For more details, refer to apitrace documentation:
+http://apitrace.github.io/
+
+
+Adding a New Native Windowing Library to glslsandbox-player
+-----------------------------------------------------------
+
+The code currently only supports two native windowing libraries: X11
+and Vivante/libGAL framebuffer. Adding support to a new native library
+should not be too hard.
+
+Create a file for your native window file
+(e.g. src/native_gfx_mynatwin.c). You could start from an existing one
+(native_gfx_vivfb.c or native_gfx_x11.c).
+
+Declare a native_gfx_s structure that will hold all needed data for
+the new native system.
+
+Implement all the functions declared in "src/native_gfx.h". See this
+file content for function documentation.
+
+Finally, the "configure.ac" file should be adjusted to search for the
+new native library, adjust CFLAGS and LDFLAGS if needed. Your newly
+created "native_gfx_mynatwin.c" also need to be added in the
+"src/Makefile.am" file.
+
+
+Miscellaneous Notes
+-------------------
+
+  In case glslsandbox-player crashes, please make sure to properly
+identify your environment before reporting bugs. For example, Linux
+distributions usually include a specific Mesa release, and the issue
+could be already fixed upstream in a development branch. The source
+archive include the "scripts/bug-report-info.sh" script to help
+gathering some information. There is no sensitive information in
+gathered data, but it's recommended to the user to review information
+before sending it. Moreover, the output of glslsandbox-player
+triggering the issue in verbose mode (-v command line argument) could
+be helpful.
+
+  In case an issue is encountered with Mesa, a software rendering
+backend should be attempted, by setting the environment variable
+"LIBGL_ALWAYS_SOFTWARE=1" alone or with "GALLIUM_DRIVER=swrast" (in
+last change). Refer to the Mesa documentation for details.
+
+  User should be careful when using virtual machines. Various GPU can
+be emulated and could result to a non working configuration. For
+example, running a Ubuntu 12.04.5 LTS guest in a qemu-kvm emulating a
+Cirrus (which is the default on qemu-kvm 2.1.3) will result in a white
+window. Emulating a 'vmware' will workaround the issue (i.e. "qemu-kvm
+-vga vmware").
+
+  Thanks to Sébastien Fagard and Vincent Stehlé for all their
+suggestions and interesting discussions. Many thanks to
+http://glslsandbox.com/ authors and all its contributors.
+
+This glslsandbox-player code is distributed under the 2 clause BSD
+license. See the LICENSE file for details.
+
+Julien Olivain <juju@cotds.org>

@@ -1,0 +1,10 @@
+#! /bin/bash
+
+set -e
+set -u
+
+SHADER_LIST="$1"
+
+grep -vE '^[[:blank:]]*(#|$)' "${SHADER_LIST}" |
+    sort -k2 |
+    awk '{ print $1; }'

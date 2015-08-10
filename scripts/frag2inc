@@ -1,0 +1,33 @@
+#! /bin/bash
+
+set -e
+set -u
+
+if [[ $# -ne 2 ]] ; then
+    echo "Usage: $0 <shader.list> <file.frag>" >&2
+    exit 1
+fi
+
+SHADER_LIST="$1"
+FRAGFILE="$2"
+FRAGSTR="${FRAGFILE%.frag}"
+FRAG_ID="${FRAGSTR%.*}"
+FRAG_REV="${FRAGSTR#*.}"
+FRAG_NICK="$(grep -E "^${FRAGSTR}[[:blank:]]" "${SHADER_LIST}" | sed -r 's/^[0-9]+\.[0-9]+[[:blank:]]+//')"
+
+if [[ -z "${FRAG_NICK}" ]] ; then
+    FRAG_NICK="${FRAGSTR}"
+fi
+
+echo "  {"
+echo "    ${FRAG_ID}, ${FRAG_REV}, \"${FRAG_NICK}\","
+
+sed -r \
+    -e 's/\\/\\\\/g' \
+    -e 's/"/\\"/g' \
+    -e 's/	/        /g' \
+    -e 's/[[:blank:]]*$//' \
+    "${FRAGFILE}" |
+awk '{ printf("\"%-78s\\n\"\n", $0); }'
+
+echo "  },"
