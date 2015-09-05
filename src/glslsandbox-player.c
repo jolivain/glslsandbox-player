@@ -19,6 +19,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <sys/utsname.h>
+#include <limits.h>
 
 #include <time.h>
 #include <errno.h>
@@ -172,6 +173,124 @@ get_shader_code(const context_t *ctx)
   return (glslsandbox_shaders_g[ctx->run_shader].frag);
 }
 
+static void
+convert_rgba_to_rgb_inplace(GLubyte *pixels, GLint pixel_count)
+{
+  GLint p;
+
+  for (p = 1; p < pixel_count; ++p) {
+    memcpy(&pixels[p * 3],
+           &pixels[p * 4],
+           3 * sizeof (GLubyte));
+  }
+}
+
+static void
+vflip_rgb_pixels_inplace(GLubyte *pixels, GLint width, GLint height)
+{
+    GLint x, y, flip_y;
+    GLint height_2;
+    GLubyte tmp_pixel[3];
+
+    height_2 = height / 2;
+
+    for (y = 0; y < height_2; ++y) {
+        flip_y = height - y - 1;
+        for (x = 0; x < width; ++x) {
+            memcpy(tmp_pixel, &pixels[ (y * width + x) * 3], sizeof (tmp_pixel));
+            memcpy(&pixels[ (y * width + x) * 3], &pixels[ (flip_y * width + x) * 3], sizeof (tmp_pixel));
+            memcpy(&pixels[ (flip_y * width + x) * 3], tmp_pixel, sizeof (tmp_pixel));
+        }
+    }
+}
+
+static void
+fwrite_framebuffer(FILE *fp)
+{
+  GLint viewport[4];
+  GLint x, y, w, h;
+  GLint pixel_count;
+  GLubyte *pixels;
+  GLsizei pixels_rgba_sz;
+  GLsizei pixels_rgb_sz;
+  size_t ret;
+
+  glGetIntegerv(GL_VIEWPORT, viewport);
+  assert( gles_no_error() );
+
+  x = viewport[0];
+  y = viewport[1];
+  w = viewport[2];
+  h = viewport[3];
+
+  pixel_count = w * h;
+
+  pixels_rgba_sz = pixel_count * 4 * sizeof (GLubyte);
+
+  pixels = malloc(pixels_rgba_sz);
+  if (pixels == NULL) {
+    fprintf(stderr, "fwrite_framebuffer(): malloc(): ERROR %i: %s\n", errno, strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  /*
+   * We use GL_RGBA/GL_UNSIGNED_BYTE here because it's always
+   * supported, by specification.  Sicne we are not in a critical
+   * computation path (due to other IO), we prefer portability here.
+   */
+  glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  assert( gles_no_error() );
+
+  convert_rgba_to_rgb_inplace(pixels, pixel_count);
+  vflip_rgb_pixels_inplace(pixels, w, h);
+
+  pixels_rgb_sz = w * h * 3 * sizeof (GLubyte);
+
+  fprintf(fp, "P6\n%d %d\n255\n", w, h);
+
+  ret = fwrite(pixels, pixels_rgb_sz, 1, fp);
+  if (ret != 1) {
+    fprintf(stderr, "fwrite_framebuffer(): fwrite(): could not write data.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  free(pixels);
+}
+
+static void
+dump_framebuffer_to_ppm_file(const char *file)
+{
+  FILE *fp;
+  int ret;
+
+  fp = fopen(file, "w");
+  if (fp == NULL) {
+    fprintf(stderr, "dump_framebuffer_to_ppm_file(): fopen(): ERROR %i: %s.\n", errno, strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  fwrite_framebuffer(fp);
+
+  ret = fclose(fp);
+  if (ret != 0) {
+    fprintf(stderr, "dump_framebuffer_to_ppm_file(): fclose(): ERROR %i: %s.\n", errno, strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+}
+
+static void
+dump_framebuffer_to_ppm(const context_t *ctx)
+{
+  char fname[PATH_MAX];
+
+  if (is_using_builtin_shader(ctx))
+    snprintf(fname, sizeof (fname), "%s-%05i.ppm", glslsandbox_shaders_g[ctx->run_shader].nick, ctx->frame);
+  else
+    snprintf(fname, sizeof (fname), "output-%05i.ppm", ctx->frame);
+
+  dump_framebuffer_to_ppm_file(fname);
+}
+
 static GLuint
 load_shader(GLenum type, const char *shaderSrc)
 {
@@ -218,7 +337,6 @@ load_shader(GLenum type, const char *shaderSrc)
 
   return (shader);
 }
-
 
 static void
 load_program(context_t *ctx,
@@ -297,10 +415,18 @@ load_program(context_t *ctx,
 }
 
 static void
-setup(context_t *ctx)
+swap_buffers(const context_t *ctx)
 {
   EGLBoolean ret;
 
+  ret = eglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
+  assert( ret == EGL_TRUE );
+  assert( egl_no_error() );
+}
+
+static void
+setup(context_t *ctx)
+{
   load_program(ctx,
                vertex_shader_g, get_shader_code(ctx));
   if (ctx->gl_prog == 0) {
@@ -360,9 +486,7 @@ setup(context_t *ctx)
   glClear(GL_COLOR_BUFFER_BIT);
   assert( gles_no_error() );
 
-  ret = eglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
-  assert( ret == EGL_TRUE );
-  assert( egl_no_error() );
+  swap_buffers(ctx);
 }
 
 
@@ -387,7 +511,6 @@ compute_surface_position(GLfloat surfPos[8],
 static void
 draw(context_t *ctx)
 {
-  EGLBoolean ret;
   GLfloat surfPos[8] = {
     -1.0,  1.0,
      1.0,  1.0,
@@ -440,10 +563,6 @@ draw(context_t *ctx)
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   assert( gles_no_error() );
-
-  ret = eglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
-  assert( ret == EGL_TRUE );
-  assert( egl_no_error() );
 }
 
 static int
@@ -558,6 +677,8 @@ player_usage(void)
   fprintf(stderr, "  -H <n>: set window height to n\n");
   fprintf(stderr, "  -r <n>: report frame rate every n frames\n");
   fprintf(stderr, "  -w <n>: set the number of warmup frames\n");
+  fprintf(stderr, "  -d: dump each frame as PPM\n");
+  fprintf(stderr, "  -D: dump only the last frame as PPM\n");
   fprintf(stderr, "  -v: increase verbosity level\n");
   fprintf(stderr, "  -q: run quietly\n");
   fprintf(stderr, "\n");
@@ -570,9 +691,17 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "f:F:hH:i:I:lLmM:pqr:s:S:t:uU:vw:W:")) != -1) {
+  while ((opt = getopt(argc, argv, "dDf:F:hH:i:I:lLmM:pqr:s:S:t:uU:vw:W:")) != -1) {
 
     switch (opt) {
+
+    case 'd':
+      ctx->dump_frame = DUMP_FRAME_ALL;
+      break ;
+
+    case 'D':
+      ctx->dump_frame = DUMP_FRAME_LAST;
+      break ;
 
     case 'f':
       i = atoi(optarg);
@@ -965,6 +1094,8 @@ player_render_loop_warmup(context_t *ctx)
 
     draw(ctx);
 
+    swap_buffers(ctx);
+
     if (ctx->frame > 0)
       update_time(ctx);
 
@@ -1001,18 +1132,35 @@ player_render_loop_warmup(context_t *ctx)
   }
 }
 
+static int
+is_last_frame(const context_t *ctx)
+{
+  if ((ctx->frames > 0) && ((ctx->frame + 1) >= ctx->frames))
+    return (1) ;
+
+  if ((ctx->run_time > 1e-3f) && (ctx->time >= ctx->run_time))
+    return (1);
+
+  return (0);
+}
+
 static void
 player_render_loop(context_t *ctx)
 {
+  int last_frame;
+
+  last_frame = 0;
   for (;;) {
 
-    if ((ctx->frames > 0) && (ctx->frame >= ctx->frames))
-      break ;
-
-    if ((ctx->run_time > 1e-3f) && (ctx->time >= ctx->run_time))
-      break ;
+    last_frame = is_last_frame(ctx);
 
     draw(ctx);
+
+    if ((ctx->dump_frame == DUMP_FRAME_ALL)
+        || ((ctx->dump_frame == DUMP_FRAME_LAST) && last_frame))
+      dump_framebuffer_to_ppm(ctx);
+
+    swap_buffers(ctx);
 
     update_time(ctx);
 
@@ -1020,6 +1168,9 @@ player_render_loop(context_t *ctx)
       report_fps(stderr, ctx);
 
     ctx->frame++;
+
+    if (last_frame)
+      break ;
   }
 
   if (ctx->verbose > 0) {

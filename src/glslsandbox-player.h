@@ -28,6 +28,10 @@
         } \
     } while (0)
 
+#define DUMP_FRAME_NONE 0
+#define DUMP_FRAME_ALL  1
+#define DUMP_FRAME_LAST 2
+
 typedef struct context_s context_t;
 struct context_s {
   egl_t *egl;
@@ -50,6 +54,7 @@ struct context_s {
   int report_fps_count;
   int verbose;
   int print_shader;
+  int dump_frame;
   int enable_mouse_emu;
   float mouse_emu_speed;
   int enable_surfpos_anim;

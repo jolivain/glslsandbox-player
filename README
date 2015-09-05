@@ -200,6 +200,8 @@ browser.
      -H <n>: set window height to n
      -r <n>: report frame rate every n frames
      -w <n>: set the number of warmup frames
+     -d: dump each frame as PPM
+     -D: dump only the last frame as PPM
      -v: increase verbosity level
      -q: run quietly
 
