@@ -32,7 +32,7 @@ typedef struct context_s context_t;
 struct context_s {
   egl_t *egl;
   GLint a_pos, a_uv, a_surfacePosition;
-  GLint u_time, u_mouse, u_resolution;
+  GLint u_time, u_mouse, u_resolution, u_surfaceSize;
   GLuint gl_prog;
   GLuint vertex_shader;
   GLuint fragment_shader;

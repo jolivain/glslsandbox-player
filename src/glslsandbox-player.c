@@ -338,6 +338,14 @@ setup(context_t *ctx)
     assert( gles_no_error() );
   }
 
+  ctx->u_surfaceSize = glGetUniformLocation(ctx->gl_prog, "surfaceSize");
+  assert( gles_no_error() );
+
+  if (ctx->u_surfaceSize >= 0) {
+    glUniform2f(ctx->u_surfaceSize, (float)ctx->width / (float)ctx->height, 1.0f);
+    assert( gles_no_error() );
+  }
+
   ctx->u_mouse = glGetUniformLocation(ctx->gl_prog, "mouse");
   assert( gles_no_error() );
 

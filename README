@@ -116,6 +116,10 @@ shader player are:
   player). In glslsandbox-player, this varying is updated with cyclic
   movements of pan/zoom.
 
+- the "surfaceSize" vec2 uniform, which defines the relative size
+  ratio of the surface. It's value is:
+  vec2(resolution.x / resolution.y, 1.0)
+
 Unsupported features:
 
 - Fragment shader is rendered directly to screen (instead of an FBO),
