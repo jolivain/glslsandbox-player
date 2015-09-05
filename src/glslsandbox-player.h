@@ -46,6 +46,7 @@ struct context_s {
   struct timespec warmup_end_time;
   struct timespec last_fps_count_time;
   float time;
+  float time_offset;
   float time_factor;
   float time_step;
   int use_time_step;

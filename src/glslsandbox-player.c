@@ -525,14 +525,14 @@ draw(context_t *ctx)
   };
 
   if (ctx->u_time >= 0) {
-    glUniform1f(ctx->u_time, ctx->time * ctx->time_factor);
+    glUniform1f(ctx->u_time, ctx->time_offset + ctx->time * ctx->time_factor);
     assert( gles_no_error() );
   }
 
   if (ctx->u_mouse >= 0 && ctx->enable_mouse_emu) {
     float m;
 
-    m = M_PI * ctx->time * ctx->mouse_emu_speed;
+    m = M_PI * (ctx->time_offset + ctx->time * ctx->mouse_emu_speed);
     glUniform2f(ctx->u_mouse,
                 0.5f + sinf(0.125f * m) * 0.4f,
                 0.5f + sinf(0.250f * m) * 0.4f);
@@ -550,7 +550,7 @@ draw(context_t *ctx)
     if (ctx->enable_surfpos_anim) {
       float sp;
 
-      sp = M_PI * ctx->time * ctx->surfpos_anim_speed;
+      sp = M_PI * (ctx->time_offset + ctx->time * ctx->surfpos_anim_speed);
       compute_surface_position(surfPos,
                                sinf(0.125f * sp),
                                sinf(0.250f * sp),
@@ -669,6 +669,7 @@ player_usage(void)
   fprintf(stderr, "  -f <n>: run n frames of shader(s)\n");
   fprintf(stderr, "  -t <n>: run n seconds of shader(s)\n");
   fprintf(stderr, "  -T <f>: time step at each frame instead of using real time\n");
+  fprintf(stderr, "  -O <f>: time offset for the animation\n");
   fprintf(stderr, "  -m: disable mouse movement emulation\n");
   fprintf(stderr, "  -M <f>: set mouse movement speed factor\n");
   fprintf(stderr, "  -s <f>: set time speed factor\n");
@@ -692,7 +693,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "dDf:F:hH:i:I:lLmM:pqr:s:S:t:T:uU:vw:W:")) != -1) {
+  while ((opt = getopt(argc, argv, "dDf:F:hH:i:I:lLmM:O:pqr:s:S:t:T:uU:vw:W:")) != -1) {
 
     switch (opt) {
 
@@ -773,6 +774,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 'M':
       ctx->mouse_emu_speed = atof(optarg);
+      break ;
+
+    case 'O':
+      ctx->time_offset = atof(optarg);
       break ;
 
     case 'p':

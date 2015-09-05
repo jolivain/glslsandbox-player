@@ -194,6 +194,7 @@ browser.
      -f <n>: run n frames of shader(s)
      -t <n>: run n seconds of shader(s)
      -T <f>: time step at each frame instead of using real time
+     -O <f>: time offset for the animation
      -m: disable mouse movement emulation
      -M <f>: set mouse movement speed factor
      -s <f>: set time speed factor
