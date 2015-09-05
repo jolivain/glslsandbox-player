@@ -1,5 +1,28 @@
 # ID      Nickname
 
+27547.4   WavyTunnel
+27539.0   LightProjection
+27512.36  GSLRotoZoom
+27518.1   SierpinskyRayCast
+27511.0   ColorRotatingTunnel
+27501.0   FastFlyingBalls
+27499.0   Heart
+27463.1   FractalAnxiety
+27391.2   BlueLines
+27387.0   Radioactive
+27365.0   CheckerboardDeformation2
+27362.0   SpinningCircles
+27353.2   CircleBlob
+27339.3   VoronoiPortal
+27309.1   ColorfulVoronoi
+27279.4   BinaryAndGrayCode
+27248.2   CheckerboardDeformation
+27204.0   SoftMinTest
+27200.0   FlyingPixels
+27178.0   BlurryLights
+27154.13  16SegmentsDisplay
+27147.2   IsometricRayMarching
+27133.1   AsciiPlasma
 27028.0   GLSLDemo
 27009.0   NewtonFractal
 26988.20  NeonSpinner
@@ -31,7 +54,7 @@
 26569.0   BouncingLines
 26568.0   GreyWavyPixels
 26562.2   SquareTwist
-26545.0   MovingCheckboard
+26545.0   MovingCheckerboard
 26539.1   AshimaNoise3D
 26537.55  BlueDots
 26536.0   RedCircles
@@ -46,7 +69,7 @@
 26462.0   TerrainView
 26458.0   AnimatedTexture
 26451.0   Groovymap
-26430.0   WavyCheckboard
+26430.0   WavyCheckerboard
 26413.7   Pixelization
 26379.0   GLSLSandbox
 26367.0   QuadraticBezierCurve
@@ -155,17 +178,17 @@
 12883.0   PacMan
 12878.0   4DNoise
 12705.0   MarsRover
-12202.1   WavyBlurryCheckboard
+12202.1   WavyBlurryCheckerboard
 12064.0   ColorCircles
 11773.0   MonsterInc
 11755.0   Fire
 11746.0   FlowerWhrils
-11556.0   InsaneRecursion
 10863.0   RaymarchingExperiment2
 10779.0   FlyingCubes
 10777.0   HyperbolicSpace
 10730.0   Flames
 10662.0   Einstein
+10544.6   InfiniteColumns
 10449.0   Mountains
 10370.1   Buildings
 10263.0   Voronoi
@@ -217,7 +240,7 @@
 4285.0    Commodore64Heavy
 4278.1    CubeColorLight
 4272.1    Blox
-4254.0    InsaneRecusrion
+4254.0    InsaneRecursion
 4040.0    CheckerLight
 4029.1    BlobySphere
 3933.0    Focus
