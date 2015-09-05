@@ -668,6 +668,7 @@ player_usage(void)
   fprintf(stderr, "  -p: print builtin shader code\n");
   fprintf(stderr, "  -f <n>: run n frames of shader(s)\n");
   fprintf(stderr, "  -t <n>: run n seconds of shader(s)\n");
+  fprintf(stderr, "  -T <f>: time step at each frame instead of using real time\n");
   fprintf(stderr, "  -m: disable mouse movement emulation\n");
   fprintf(stderr, "  -M <f>: set mouse movement speed factor\n");
   fprintf(stderr, "  -s <f>: set time speed factor\n");
@@ -691,7 +692,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "dDf:F:hH:i:I:lLmM:pqr:s:S:t:uU:vw:W:")) != -1) {
+  while ((opt = getopt(argc, argv, "dDf:F:hH:i:I:lLmM:pqr:s:S:t:T:uU:vw:W:")) != -1) {
 
     switch (opt) {
 
@@ -807,6 +808,11 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 't':
       ctx->run_time = atof(optarg);
+      break ;
+
+    case 'T':
+      ctx->use_time_step = 1;
+      ctx->time_step = atof(optarg);
       break ;
 
     case 'u':
@@ -927,7 +933,10 @@ init_first_frame_time(context_t *ctx)
 static void
 update_time(context_t *ctx)
 {
-  ctx->time = get_float_reltime(&ctx->first_frame_time);
+  if (ctx->use_time_step)
+    ctx->time = (float)(ctx->frame + 1) * ctx->time_step;
+  else
+    ctx->time = get_float_reltime(&ctx->first_frame_time);
 }
 
 static void

@@ -100,7 +100,9 @@ Supported glslsandbox Features
 shader player are:
 
 - the "time" float uniform is set to the number of seconds since the
-  beginning of the rendering.
+  beginning of the rendering. In case the -T command line argument is
+  used, the time is increased with this step at each frame, regardless
+  the frame rate and computation time.
 
 - the "mouse" vec2 uniform is updated with cyclic movement (two
   components of the vec2 encodes the mouse coordinates as float
@@ -191,6 +193,7 @@ browser.
      -p: print builtin shader code
      -f <n>: run n frames of shader(s)
      -t <n>: run n seconds of shader(s)
+     -T <f>: time step at each frame instead of using real time
      -m: disable mouse movement emulation
      -M <f>: set mouse movement speed factor
      -s <f>: set time speed factor

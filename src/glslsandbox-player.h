@@ -47,6 +47,8 @@ struct context_s {
   struct timespec last_fps_count_time;
   float time;
   float time_factor;
+  float time_step;
+  int use_time_step;
   float run_time;
   unsigned int frame;
   unsigned int frames;
