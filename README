@@ -82,7 +82,7 @@ error or typos (e.g. 8477.0). Some other shaders, may include driver
 workaround that may not be fully GLSL compliant (e.g. shader 2606.0
 with OS X AMD cos workaround that redefine the cos() function). Other
 compilation failures may be due to garbage after #else or #endif
-preprocesor directive present in some shaders (e.g. shader
+preprocessor directive present in some shaders (e.g. shader
 26529.0). Finally, some shaders can be GPU-time consuming depending of
 the GPU being tested. This is why a relevant selection of shader
 suited for your driver and GPU would be better that a bare dump of the
@@ -227,6 +227,17 @@ Render 5000 frames of the shader id 109 in a 128x128 window and report
 frame rate every 500 frames:
     glslsandbox-player -W128 -H128 -f5000 -r500 -i109
 
+Render a frozen animation when time=100:
+    glslsandbox-player -S Mountains -w0 -W720 -H480 -s0 -O100
+or
+    glslsandbox-player -S Mountains -w0 -W720 -H480 -T0 -O100
+
+Render and save a frame of an animation when time=100:
+    glslsandbox-player -S Mountains -w0 -W720 -H480 -s0 -O100 -f1 -D
+
+Generate 100 PPM frames of an animation at 20fps:
+    glslsandbox-player -S BouncingBalls -W720 -H480 -w0 -T0.05 -f100 -d
+
   Since glslsandbox-player was designed for testing purposes, it will
 execute one shader per process execution. This initial design choice
 is to easily catch driver crash without interrupting a test sequence
@@ -246,6 +257,63 @@ running in case of a crash. When running glslsandbox-player, it could
 be safe to use resources limits. See the "ulimit" bash builtin and the
 "timeout" command (see "scripts/run-demo.sh" for an example how to use
 those).
+
+
+Using glslsandbox-player for Automatic Testing
+----------------------------------------------
+
+  In addition to the "scripts/run-demo.sh" and
+"scripts/run-demo-random.sh" demo scripts which are more for
+demonstrating the player, another helper script example is provided in
+"scripts/run-tests.sh". It will use a Makefile to run tests and
+collect results, which is more suited for automated testing.
+
+  When called without any argument, it will run all builtin shaders in
+the binary, collect the output in a log file, render 3 frames and save
+the last one in a PPM file. The computation is not time dependent: it
+will render frames for time=3,4,5. Parameters can be adjusted in the
+"scripts/tests/Makefile" file. This time invariance will make output
+comparison easier. Once all tests are executed, all PPM images are
+converted to PNG to save some space using ImageMagick "convert".
+
+  All the generated output will be stored in the
+"scripts/tests/output/" directory by default. For each shader, output
+is stored in files the shader name as a base name. Each execution is
+marked with a ".done" file whatever the success or failure of the
+execution. This is for preventing to retest again all failed tests
+when interrupting the execution. In case the execution succeed, a
+".passed" file is created. Otherwise, a ".failed" file is created
+containing the error code. Since the execution is made in a "timeout"
+command, a return code of "124" means a timeout. Standard output
+(stdout and stderr) is saved in the ".log" file. The last frame is
+saved as a ".ppm" file. When all shaders are executed, all the PPM
+files are converted to ".png".
+
+  When using the "scripts/run-tests.sh" script, a test execution can
+be named to save result in another directory, for comparison.
+
+  For example, it can be useful when modifying an OpenGL ES
+implementation. Before change, run:
+
+    ./scripts/run-tests.sh run before-change
+
+Then make your changes in the GLESv2 library, then run:
+
+    ./scripts/run-tests.sh run after-change
+
+Those commands will respectively put results in directories:
+"./scripts/tests/{before,after}-change/". Then, output logs can be
+compared to check for regressions or unexpected behavior. Then output
+PNG images can be compared with the script:
+
+    ./scripts/compare-images.sh \
+        ./scripts/tests/before-change/ \
+        ./scripts/tests/after-change/ \
+        /var/tmp/before-after-compare/
+
+Those scripts are provided as an example working out of the box
+without any fancy dependencies. They will probably need to be adjusted
+to specific needs or test framework.
 
 
 Note about Performance Counting
@@ -328,6 +396,71 @@ created "native_gfx_mynatwin.c" also need to be added in the
 "src/Makefile.am" file.
 
 
+Notes About Image Comparison
+----------------------------
+
+  glslsandbox-player can be used to check non-regression of rendering of
+a driver. Command line arguments -d and -D can be used to dump
+reference and test frames as PPM files.
+
+  This section describes several ways to compare frames, and how to track
+down image content differences.
+
+  First, PPM files generated with glslsandbox-player does not include
+any varying content between different executions (no timestamp, no
+random). So if two image content are the same (bit correct), both
+generated PPM will be the same. So files can by compared with standard
+tools like cmp or md5sum and other check-summing tools. For performing
+reproducible animation, it's important to take care that configuration
+should also be the same (display resolution, color depth, etc.) and
+also glslsandbox-player does not rely on unstable parameters (see -d,
+-f, -T and -O command line arguments).
+
+For comparing rendered output, there is various ways to track
+differences. Standard tools are good starting points (coreutils,
+ImageMagick and GraphicsMagick, netpbm-progs, ...)
+
+ImageMagick examples to compare rendering:
+http://www.imagemagick.org/Usage/compare/
+http://www.imagemagick.org/script/compare.php
+
+GraphicsMagick equivalent:
+http://www.graphicsmagick.org/compare.html
+
+Relevant Netpbm programs:
+http://netpbm.sourceforge.net/doc/directory.html
+http://netpbm.sourceforge.net/doc/pamarith.html
+http://netpbm.sourceforge.net/doc/ppmhist.html
+
+For visually comparing two PPM images, producing the result in
+img1-img2-diff.png:
+    compare img1.ppm img2.ppm img1-img2-diff.png
+
+For using the absolute error metric, returning the number of different
+pixels:
+    compare -metric ae img1.ppm img2.ppm img1-img2-diff.png
+
+For generating the mask of changed pixels, for overlaying in Gimp, for
+example:
+    compare -compose src -metric ae -lowlight-color none \
+            img1.png img2.png PNG32:img1-img2-diff.png
+
+For automatically comparing images, ImageMagick compare returns 0 for
+identical images or 1 when they are different:
+    compare -metric ae -quiet \
+            img1.png img2.png /dev/null 2> /dev/null \
+                    && echo SAME || echo different
+
+Raw image content can also be check-summed:
+    convert img1.png -depth 8 RGBA: | md5sum
+
+Counting differences with netpbm-progs:
+    pnmarith -difference img1.ppm img2.ppm | pnmhist
+
+Using pnmpsnr:
+    pnmpsnr img1.ppm img2.ppm
+
+
 Miscellaneous Notes
 -------------------
 
@@ -341,6 +474,15 @@ gathered data, but it's recommended to the user to review information
 before sending it. Moreover, the output of glslsandbox-player
 triggering the issue in verbose mode (-v command line argument) could
 be helpful.
+
+  An easy way to chase down a shader compiler issue is to get the
+shader code generating the error (either with the -p command line
+argument, using the "dl-shader" script or directly from the
+glslsandbox.com website), then to modify it a bit (commenting parts,
+rewriting differently, ...) then reload the modified code with the -F
+command line argument to see what changed. You can also use the -T and
+-d command line arguments to generate images for comparing the
+results.
 
   In case an issue is encountered with Mesa, a software rendering
 backend should be attempted, by setting the environment variable
