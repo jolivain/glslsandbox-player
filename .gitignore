@@ -1,6 +1,7 @@
 *.a
 *.o
 .deps/
+/Makefile
 /aclocal.m4
 /ar-lib
 /autom4te.cache/
@@ -14,6 +15,10 @@
 /depcomp
 /install-sh
 /missing
+/src/*.frag
+/src/*.inc
+/src/Makefile
+/src/glslsandbox-player
+/src/glslsandbox-shaders.c
 /stamp-h1
-Makefile
 Makefile.in
