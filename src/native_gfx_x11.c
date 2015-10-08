@@ -104,6 +104,9 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
   r = XMapWindow(gfx->disp, gfx->win);
   assert(r);
 
+  r = XStoreName(gfx->disp, gfx->win, "glslsandbox-player");
+  assert(r);
+
   XNextEvent(gfx->disp, &e);        // Dummy call to make window appear (fails).
 
   // The window manager may have resized us; query our actual dimensions.
