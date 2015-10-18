@@ -27,7 +27,8 @@ sed -r \
     -e 's/"/\\"/g' \
     -e 's/	/        /g' \
     -e 's/[[:blank:]]*$//' \
-    "${FRAGFILE}" |
-awk '{ printf("\"%-78s\\n\"\n", $0); }'
+    -e 's/^/"/' \
+    -e 's/$/\\n"/' \
+    "${FRAGFILE}"
 
 echo "  },"
