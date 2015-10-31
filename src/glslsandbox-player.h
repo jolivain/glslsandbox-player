@@ -35,7 +35,7 @@
 typedef struct context_s context_t;
 struct context_s {
   egl_t *egl;
-  GLint a_pos, a_uv, a_surfacePosition;
+  GLint a_pos, a_surfacePosition;
   GLint u_time, u_mouse, u_resolution, u_surfaceSize;
   GLuint gl_prog;
   GLuint vertex_shader;
@@ -65,7 +65,20 @@ struct context_s {
   int run_shader;
   int height;
   int width;
+  int shader_width;
+  int shader_height;
   char *user_shader;
+  int use_fbo;
+  int fbo_width;
+  int fbo_height;
+  int fbo_nearest;
+  GLuint fbo_texid;
+  GLuint fbo_id;
+  GLuint fbo_vsh;
+  GLuint fbo_fsh;
+  GLuint fbo_prog;
+  GLint fbo_a_pos;
+  GLint fbo_a_surfpos;
 };
 
 #endif /* GLSLSANDBOX_PLAYER_H */

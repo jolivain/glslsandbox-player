@@ -45,6 +45,17 @@ vertex_shader_g =
   "}                         \n"
 ;
 
+static const char *
+fbo_frag_shader_g =
+  "precision mediump float;  \n"
+  "uniform sampler2D u_tex;  \n"
+  "varying vec2 surfacePosition;\n"
+  "                          \n"
+  "void main( void ) {       \n"
+  "  gl_FragColor = texture2D(u_tex, surfacePosition);\n"
+  "}                         \n"
+;
+
 static void
 player_cleanup(context_t *ctx)
 {
@@ -339,8 +350,8 @@ load_shader(GLenum type, const char *shaderSrc)
 }
 
 static void
-load_program(context_t *ctx,
-             const char *v_shader_src, const char *f_shader_src)
+load_program(const char *v_shader_src, const char *f_shader_src,
+	     GLuint *vshader, GLuint *fshader, GLuint *program)
 {
   GLuint vsh;
   GLuint fsh;
@@ -409,9 +420,9 @@ load_program(context_t *ctx,
     assert( gles_no_error() );
   }
 
-  ctx->vertex_shader = vsh;
-  ctx->fragment_shader = fsh;
-  ctx->gl_prog = prog;
+  *vshader = vsh;
+  *fshader = fsh;
+  *program = prog;
 }
 
 static void
@@ -425,10 +436,76 @@ swap_buffers(const context_t *ctx)
 }
 
 static void
+setup_fbo(context_t *ctx)
+{
+  GLenum s;
+  GLint filter;
+
+  load_program(vertex_shader_g, fbo_frag_shader_g,
+	       &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
+  if (ctx->fbo_prog == 0) {
+    fprintf(stderr, "ERROR: while loading FBO shaders and program.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  ctx->fbo_a_pos = glGetAttribLocation(ctx->fbo_prog, "a_pos");
+  assert( gles_no_error() );
+
+  ctx->fbo_a_surfpos = glGetAttribLocation(ctx->fbo_prog, "a_surfacePosition");
+  assert( gles_no_error() );
+
+  glGenTextures(1, &ctx->fbo_texid);
+  assert( gles_no_error() );
+
+  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid);
+  assert( gles_no_error() );
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+	       ctx->fbo_width, ctx->fbo_height,
+	       0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  assert( gles_no_error() );
+
+  if (ctx->fbo_nearest)
+    filter = GL_NEAREST;
+  else
+    filter = GL_LINEAR;
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+  assert( gles_no_error() );
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+  assert( gles_no_error() );
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  assert( gles_no_error() );
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  assert( gles_no_error() );
+
+  glGenFramebuffers(1, &ctx->fbo_id);
+  assert( gles_no_error() );
+
+  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id);
+  assert( gles_no_error() );
+
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			 GL_TEXTURE_2D, ctx->fbo_texid, 0);
+  assert( gles_no_error() );
+
+  s = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  assert( gles_no_error() );
+
+  if (s != GL_FRAMEBUFFER_COMPLETE) {
+    fprintf(stderr, "ERROR! glCheckFramebufferStatus() is not COMPLETE\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
+static void
 setup(context_t *ctx)
 {
-  load_program(ctx,
-               vertex_shader_g, get_shader_code(ctx));
+  load_program(vertex_shader_g, get_shader_code(ctx),
+	       &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog);
   if (ctx->gl_prog == 0) {
     fprintf(stderr, "ERROR: while loading shaders and program.\n");
     exit(EXIT_FAILURE);
@@ -436,6 +513,7 @@ setup(context_t *ctx)
 
   glUseProgram(ctx->gl_prog);
   assert( gles_no_error() );
+
   ctx->a_pos = glGetAttribLocation(ctx->gl_prog, "a_pos");
   assert( gles_no_error() );
 
@@ -460,7 +538,8 @@ setup(context_t *ctx)
   assert( gles_no_error() );
 
   if (ctx->u_resolution >= 0) {
-    glUniform2f(ctx->u_resolution, (float)ctx->width, (float)ctx->height);
+    glUniform2f(ctx->u_resolution,
+		(GLfloat)ctx->shader_width, (GLfloat)ctx->shader_height);
     assert( gles_no_error() );
   }
 
@@ -468,7 +547,8 @@ setup(context_t *ctx)
   assert( gles_no_error() );
 
   if (ctx->u_surfaceSize >= 0) {
-    glUniform2f(ctx->u_surfaceSize, (float)ctx->width / (float)ctx->height, 1.0f);
+    glUniform2f(ctx->u_surfaceSize,
+		(GLfloat)ctx->shader_width / (GLfloat)ctx->shader_height, 1.0f);
     assert( gles_no_error() );
   }
 
@@ -480,8 +560,11 @@ setup(context_t *ctx)
     assert( gles_no_error() );
   }
 
-  glViewport(0, 0, ctx->width, ctx->height);
+  glViewport(0, 0, ctx->shader_width, ctx->shader_height);
   assert( gles_no_error() );
+
+  if (ctx->use_fbo)
+    setup_fbo(ctx);
 
   glClear(GL_COLOR_BUFFER_BIT);
   assert( gles_no_error() );
@@ -509,7 +592,7 @@ compute_surface_position(GLfloat surfPos[8],
 }
 
 static void
-draw(context_t *ctx)
+draw_frame(context_t *ctx)
 {
   GLfloat surfPos[8] = {
     -1.0,  1.0,
@@ -563,6 +646,89 @@ draw(context_t *ctx)
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   assert( gles_no_error() );
+}
+
+static void
+prepare_fbo(context_t *ctx)
+{
+  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id);
+  assert( gles_no_error() );
+
+  glViewport(0, 0, ctx->fbo_width, ctx->fbo_height);
+  assert( gles_no_error() );
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  assert( gles_no_error() );
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  assert( gles_no_error() );
+}
+
+static void
+draw_fbo(context_t *ctx)
+{
+  static const GLfloat plane[] = {
+    -1.0,  1.0,
+     1.0,  1.0,
+    -1.0, -1.0,
+     1.0, -1.0
+  };
+  static const GLfloat tcoords[] = {
+     0.0,  1.0,
+     1.0,  1.0,
+     0.0,  0.0,
+     1.0,  0.0
+  };
+
+  glUseProgram(ctx->fbo_prog);
+  assert( gles_no_error() );
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  assert( gles_no_error() );
+
+  glViewport(0, 0, ctx->width, ctx->height);
+  assert( gles_no_error() );
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  assert( gles_no_error() );
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  assert( gles_no_error() );
+
+  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid);
+  assert( gles_no_error() );
+
+  glEnableVertexAttribArray(ctx->fbo_a_pos);
+  assert( gles_no_error() );
+
+  glVertexAttribPointer(ctx->fbo_a_pos, 2, GL_FLOAT, GL_FALSE,
+                        0, plane);
+  assert( gles_no_error() );
+
+  glEnableVertexAttribArray(ctx->fbo_a_surfpos);
+  assert( gles_no_error() );
+
+  glVertexAttribPointer(ctx->fbo_a_surfpos, 2, GL_FLOAT, GL_FALSE,
+                          0, tcoords);
+  assert( gles_no_error() );
+
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  assert( gles_no_error() );
+
+  glUseProgram(ctx->gl_prog);
+  assert( gles_no_error() );
+}
+
+static void
+draw(context_t *ctx)
+{
+  if (ctx->use_fbo)
+    prepare_fbo(ctx);
+
+  draw_frame(ctx);
+
+  if (ctx->use_fbo)
+    draw_fbo(ctx);
 }
 
 static int
@@ -677,6 +843,10 @@ player_usage(void)
   fprintf(stderr, "  -U <f>: set surfacePosittion animation speed factor\n");
   fprintf(stderr, "  -W <n>: set window width to n\n");
   fprintf(stderr, "  -H <n>: set window height to n\n");
+  fprintf(stderr, "  -B: Enable FBO usage (default to window size)\n");
+  fprintf(stderr, "  -N: Set FBO filtering to NEAREST instead of LINEAR\n");
+  fprintf(stderr, "  -X <n>: set FBO height to n pixels\n");
+  fprintf(stderr, "  -Y <n>: set FBO height to n pixels\n");
   fprintf(stderr, "  -r <n>: report frame rate every n frames\n");
   fprintf(stderr, "  -w <n>: set the number of warmup frames\n");
   fprintf(stderr, "  -d: dump each frame as PPM\n");
@@ -693,9 +863,13 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "dDf:F:hH:i:I:lLmM:O:pqr:s:S:t:T:uU:vw:W:")) != -1) {
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:s:S:t:T:uU:vw:W:X:Y:")) != -1) {
 
     switch (opt) {
+
+    case 'B':
+      ctx->use_fbo = 1;
+      break ;
 
     case 'd':
       ctx->dump_frame = DUMP_FRAME_ALL;
@@ -776,6 +950,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       ctx->mouse_emu_speed = atof(optarg);
       break ;
 
+    case 'N':
+      ctx->fbo_nearest = 1;
+      break ;
+
     case 'O':
       ctx->time_offset = atof(optarg);
       break ;
@@ -845,6 +1023,16 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 'W':
       ctx->width = atoi(optarg);
+      break ;
+
+    case 'X':
+      ctx->use_fbo = 1;
+      ctx->fbo_width = atoi(optarg);
+      break ;
+
+    case 'Y':
+      ctx->use_fbo = 1;
+      ctx->fbo_height = atoi(optarg);
       break ;
 
     default:
@@ -1227,6 +1415,19 @@ main(int argc, char *argv[])
   ctx->width = ctx->egl->width;
   ctx->height = ctx->egl->height;
 
+  if (ctx->use_fbo) {
+    if (ctx->fbo_width == 0)
+      ctx->fbo_width = ctx->width;
+    if (ctx->fbo_height == 0)
+      ctx->fbo_height = ctx->height;
+    ctx->shader_width = ctx->fbo_width;
+    ctx->shader_height = ctx->fbo_height;
+  }
+  else {
+    ctx->shader_width = ctx->width;
+    ctx->shader_height = ctx->height;
+  }
+
   if (ctx->verbose > 1) {
     fprintf_sysinfo(stderr);
     fprintf_info(stderr);
@@ -1252,6 +1453,9 @@ main(int argc, char *argv[])
             ctx->report_fps_count);
 
     fprintf(stderr, "Rendering on a %ix%i window\n", ctx->width, ctx->height);
+
+    if (ctx->use_fbo)
+      fprintf(stderr, "Using a %ix%i FBO\n", ctx->fbo_width, ctx->fbo_height);
   }
 
   setup(ctx);

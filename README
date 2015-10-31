@@ -124,12 +124,8 @@ shader player are:
 
 Unsupported features:
 
-- Fragment shader is rendered directly to screen (instead of an FBO),
-  so it's not possible to reduce the resolution. But it's possible to
-  reduce the window though (with the -W -H command line
-  arguments). Shaders with the uniform sampler2D "backbuffer" (to
-  access the back buffer as a texture) won't render properly in
-  glslsandbox-player.
+- Shaders with the uniform sampler2D "backbuffer" (to access the back
+  buffer as a texture) are not supported.
 
 
 Building glslsandbox-player
@@ -202,6 +198,10 @@ browser.
      -U <f>: set surfacePosittion animation speed factor
      -W <n>: set window width to n
      -H <n>: set window height to n
+     -B: Enable FBO usage (default to window size)
+     -N: Set FBO filtering to NEAREST instead of LINEAR
+     -X <n>: set FBO height to n pixels
+     -Y <n>: set FBO height to n pixels
      -r <n>: report frame rate every n frames
      -w <n>: set the number of warmup frames
      -d: dump each frame as PPM
@@ -226,6 +226,10 @@ List the 20 biggest builtin shader:
 Render 5000 frames of the shader id 109 in a 128x128 window and report
 frame rate every 500 frames:
     glslsandbox-player -W128 -H128 -f5000 -r500 -i109
+
+Renders shader id 123 in a 256x256 window using a 64x64 FBO (reduce
+resolution by 4):
+    glslsandbox-player -W256 -H256 -i123 -X64 -Y64
 
 Render a frozen animation when time=100:
     glslsandbox-player -S Mountains -w0 -W720 -H480 -s0 -O100
@@ -257,6 +261,20 @@ running in case of a crash. When running glslsandbox-player, it could
 be safe to use resources limits. See the "ulimit" bash builtin and the
 "timeout" command (see "scripts/run-demo.sh" for an example how to use
 those).
+
+  By default, glslsandbox-player renders the selected shader code
+directly on the screen. There is options to change this behavior and
+render to an off-screen frame buffer object (FBO) instead, then render
+this buffer on screen. The main purpose of this feature is to reduce
+the shader resolution without actually reducing the displayed
+surface. This rendered FBO is textured on the whole window
+surface. The FBO usage can be enabled with the -B command line
+argument, in which case it will be sized to the same size of the
+rendering window. The FBO size can be set with the -X and -Y command
+line arguments, which respectively sets its width and height. By
+default, the FBO is textured on screen with linear filtering, which
+can produce a blurred result. This filter can be changed to a nearest
+neighbor using the -N command line option.
 
 
 Using glslsandbox-player for Automatic Testing
