@@ -256,7 +256,7 @@ not embedded in the binary at compilation time.
 
   Since glslsandbox-player could use a lot of resources (CPU time or
 RAM for shader compilation, or GPU time), it could make the computer
-running it unstable. Make sure to close no important application are
+running it unstable. Make sure there is not important application
 running in case of a crash. When running glslsandbox-player, it could
 be safe to use resources limits. See the "ulimit" bash builtin and the
 "timeout" command (see "scripts/run-demo.sh" for an example how to use
