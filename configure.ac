@@ -30,35 +30,38 @@ AS_IF([test "x$enable_debug" = "xyes"], [
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
-AC_ARG_WITH([x11],
-        AS_HELP_STRING([--with-x11], [Compile with X11 support @<:@default=enabled@:>@]),
-        [], [with_x11=yes])
+AC_ARG_WITH([native-gfx],
+        AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb]),
+        [], [with_native_gfx=x11])
 
-AS_IF([test "x$with_x11" != "xno"], [
+AS_IF([test "x$with_native_gfx" = "xx11"], [
+	native_gfx=x11
         PKG_CHECK_MODULES([x11], [x11 >= 1.4])
         AC_DEFINE([ENABLE_X11], [1], [Enable X11.])
+        AC_MSG_NOTICE([X11 support enabled])
 ], [
         AC_MSG_NOTICE([X11 support disabled])
 ])
-AM_CONDITIONAL([ENABLE_X11], [test x$with_x11 = xyes])
+AM_CONDITIONAL([ENABLE_X11], [test "x$with_native_gfx" = "xx11"])
 
-AC_ARG_WITH([vivfb],
-        AS_HELP_STRING([--with-vivfb], [Compile with (i.MX6 / Vivante) fb support @<:@default=disabled@:>@]),
-        [], [with_vivfb=no])
-
-AS_IF([test "x$with_vivfb" != "xno"], [
+AS_IF([test "x$with_native_gfx" = "xvivfb"], [
+	native_gfx=vivfb
         AC_DEFINE([ENABLE_VIVFB], [1], [Enable (i.MX6 / Vivante) fb.])
         AC_DEFINE([EGL_API_FB], [1], [Enable Vivante EGL FB])
         AC_DEFINE([LINUX], [1], [Vivante EGL FB needs LINUX to be defined])
+        AC_MSG_NOTICE([VivanteFB support enabled])
 ], [
-        AC_MSG_NOTICE([Fb support disabled])
+        AC_MSG_NOTICE([VivanteFB support disabled])
 ])
-AM_CONDITIONAL([ENABLE_VIVFB], [test x$with_vivfb = xyes])
+AM_CONDITIONAL([ENABLE_VIVFB], [test "x$with_native_gfx" = "xvivfb"])
+
+AS_IF([test "x$native_gfx" = "x"], [
+    AC_ERROR([unknown native gfx selected: $with_native_gfx])
+], [])
 
 AC_OUTPUT
 
 AC_MSG_RESULT([
     debug: ${enable_debug}
-    x11:   ${with_x11}
-    vivfb: ${with_vivfb}
+    native-gfx:   ${with_native_gfx}
 ])

@@ -148,6 +148,14 @@ dependencies are present since it's an autotools package (aka
 "./configure && make"). Make sure to enable/disable the proper native
 windowing library for your system.
 
+  The configure script takes an option to select the native windowing
+system:
+
+  --with-native-gfx   Define the native gfx backend: x11(default),vivfb
+
+  For example, compiling for using the the Vivante frame buffer native
+windowing support, use "./configure --with-native-gfx=vivfb".
+
 
 Important Note about Shader Copyright, Licenses and Author Credits
 ------------------------------------------------------------------
