@@ -436,28 +436,11 @@ swap_buffers(const context_t *ctx)
 }
 
 static void
-setup_fbo(context_t *ctx)
+setup_fbo_tex(context_t *ctx, int i)
 {
-  GLenum s;
   GLint filter;
 
-  load_program(vertex_shader_g, fbo_frag_shader_g,
-	       &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
-  if (ctx->fbo_prog == 0) {
-    fprintf(stderr, "ERROR: while loading FBO shaders and program.\n");
-    exit(EXIT_FAILURE);
-  }
-
-  ctx->fbo_a_pos = glGetAttribLocation(ctx->fbo_prog, "a_pos");
-  assert( gles_no_error() );
-
-  ctx->fbo_a_surfpos = glGetAttribLocation(ctx->fbo_prog, "a_surfacePosition");
-  assert( gles_no_error() );
-
-  glGenTextures(1, &ctx->fbo_texid);
-  assert( gles_no_error() );
-
-  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid);
+  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[i]);
   assert( gles_no_error() );
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
@@ -481,15 +464,18 @@ setup_fbo(context_t *ctx)
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   assert( gles_no_error() );
+}
 
-  glGenFramebuffers(1, &ctx->fbo_id);
-  assert( gles_no_error() );
+static void
+setup_fbo_fb(context_t *ctx, int i)
+{
+  GLenum s;
 
-  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[i]);
   assert( gles_no_error() );
 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-			 GL_TEXTURE_2D, ctx->fbo_texid, 0);
+			 GL_TEXTURE_2D, ctx->fbo_texid[i], 0);
   assert( gles_no_error() );
 
   s = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -499,6 +485,44 @@ setup_fbo(context_t *ctx)
     fprintf(stderr, "ERROR! glCheckFramebufferStatus() is not COMPLETE\n");
     exit(EXIT_FAILURE);
   }
+}
+
+static void
+setup_fbo(context_t *ctx)
+{
+  load_program(vertex_shader_g, fbo_frag_shader_g,
+	       &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
+  if (ctx->fbo_prog == 0) {
+    fprintf(stderr, "ERROR: while loading FBO shaders and program.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  glUseProgram(ctx->fbo_prog);
+  assert( gles_no_error() );
+
+  ctx->fbo_a_pos = glGetAttribLocation(ctx->fbo_prog, "a_pos");
+  assert( gles_no_error() );
+
+  ctx->fbo_a_surfpos = glGetAttribLocation(ctx->fbo_prog, "a_surfacePosition");
+  assert( gles_no_error() );
+
+  ctx->fbo_u_tex = glGetUniformLocation(ctx->fbo_prog, "u_tex");
+  assert( gles_no_error() );
+
+  glGenTextures(2, &ctx->fbo_texid[0]);
+  assert( gles_no_error() );
+
+  setup_fbo_tex(ctx, 0);
+  setup_fbo_tex(ctx, 1);
+
+  glGenFramebuffers(2, &ctx->fbo_id[0]);
+  assert( gles_no_error() );
+
+  setup_fbo_fb(ctx, 0);
+  setup_fbo_fb(ctx, 1);
+
+  glUseProgram(ctx->gl_prog);
+  assert( gles_no_error() );
 }
 
 static void
@@ -558,6 +582,22 @@ setup(context_t *ctx)
   if (ctx->u_mouse >= 0) {
     glUniform2f(ctx->u_mouse, 0.5f, 0.5f);
     assert( gles_no_error() );
+  }
+
+  ctx->u_backbuf = glGetUniformLocation(ctx->gl_prog, "backbuffer");
+  assert( gles_no_error() );
+
+  if (ctx->u_backbuf >= 0) {
+    glUniform1i(ctx->u_backbuf, 0);
+    assert( gles_no_error() );
+
+    if (!ctx->use_fbo) {
+      fprintf(stderr,
+	      "\nWARNING: shader includes 'backbuffer' "
+	      "but FBO is inactive\n");
+      fprintf(stderr, "Rendering will probably be incorrect.\n");
+      fprintf(stderr, "Try adding -B or -X/-Y command line options.\n\n");
+    }
   }
 
   glViewport(0, 0, ctx->shader_width, ctx->shader_height);
@@ -644,6 +684,20 @@ draw_frame(context_t *ctx)
     assert( gles_no_error() );
   }
 
+  if (ctx->u_backbuf >= 0) {
+    glUniform1i(ctx->u_backbuf, 0);
+    assert( gles_no_error() );
+
+    glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[(ctx->frame+1) & 1]);
+    assert( gles_no_error() );
+
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+      assert( gles_no_error() );
+
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      assert( gles_no_error() );
+  }
+
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   assert( gles_no_error() );
 }
@@ -651,7 +705,7 @@ draw_frame(context_t *ctx)
 static void
 prepare_fbo(context_t *ctx)
 {
-  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id);
+  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[ctx->frame & 1]);
   assert( gles_no_error() );
 
   glViewport(0, 0, ctx->fbo_width, ctx->fbo_height);
@@ -667,6 +721,7 @@ prepare_fbo(context_t *ctx)
 static void
 draw_fbo(context_t *ctx)
 {
+  GLint filter;
   static const GLfloat plane[] = {
     -1.0,  1.0,
      1.0,  1.0,
@@ -695,7 +750,21 @@ draw_fbo(context_t *ctx)
   glClear(GL_COLOR_BUFFER_BIT);
   assert( gles_no_error() );
 
-  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid);
+  glUniform1i(ctx->fbo_u_tex, 0);
+  assert( gles_no_error() );
+
+  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[ctx->frame & 1]);
+  assert( gles_no_error() );
+
+  if (ctx->fbo_nearest)
+    filter = GL_NEAREST;
+  else
+    filter = GL_LINEAR;
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+  assert( gles_no_error() );
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
   assert( gles_no_error() );
 
   glEnableVertexAttribArray(ctx->fbo_a_pos);

@@ -122,10 +122,10 @@ shader player are:
   ratio of the surface. It's value is:
   vec2(resolution.x / resolution.y, 1.0)
 
-Unsupported features:
-
-- Shaders with the uniform sampler2D "backbuffer" (to access the back
-  buffer as a texture) are not supported.
+- the "backbuffer" uniform sampler2D gives access to the previous
+  frame (back buffer) as a texture. It will work only when the FBO
+  rendering is active (-B or -X/-Y command line arguments). See for
+  example shader 424.12.
 
 
 Building glslsandbox-player

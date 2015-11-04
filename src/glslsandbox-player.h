@@ -37,6 +37,7 @@ struct context_s {
   egl_t *egl;
   GLint a_pos, a_surfacePosition;
   GLint u_time, u_mouse, u_resolution, u_surfaceSize;
+  GLint u_backbuf;
   GLuint gl_prog;
   GLuint vertex_shader;
   GLuint fragment_shader;
@@ -72,11 +73,12 @@ struct context_s {
   int fbo_width;
   int fbo_height;
   int fbo_nearest;
-  GLuint fbo_texid;
-  GLuint fbo_id;
+  GLuint fbo_texid[2];
+  GLuint fbo_id[2];
   GLuint fbo_vsh;
   GLuint fbo_fsh;
   GLuint fbo_prog;
+  GLint fbo_u_tex;
   GLint fbo_a_pos;
   GLint fbo_a_surfpos;
 };
