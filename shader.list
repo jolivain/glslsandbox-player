@@ -1,5 +1,13 @@
 # ID      Nickname
 
+28514.0   PlasmaTriangle
+28511.1   Flower
+28503.0   StarField2
+28497.0   PacMan3D
+28434.0   ByeByeVincent
+28375.1   Outrun
+28373.0   ProgressBar
+28365.0   SandTerrain
 28181.0   CrowdedCubes
 28180.0   TwoTweetsChallenge
 28179.0   QuasiInfiniteZoom
@@ -17,7 +25,7 @@
 27812.0   GLSLNoise
 27811.1   BoxesAndWaves
 27710.1   GreenishCRT
-27706.3   ColorfullTubes
+27706.3   ColorfulTubes
 27687.1   FloatingParticles
 27683.2   WarpedCheckerboard
 27682.0   RotatingHexagonalGrid
@@ -278,8 +286,10 @@
 3466.0    Pattern3
 3452.5    Pattern4
 3109.0    Flags
+3026.0    Spirals
 2985.1    MengerCube
 2922.2    AndroidField
+2795.0    RTape
 2406.0    DodecahedronRayCast
 2080.1    VolumeExplosion
 2027.0    LineRayTracer
@@ -298,4 +308,5 @@
 892.1     Bars
 772.0     XmasParticles
 714.0     Trees
+424.12    ShaderInvaders
 6.0       ColorRipples
