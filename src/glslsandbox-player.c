@@ -914,6 +914,7 @@ player_usage(void)
   fprintf(stderr, "  -H <n>: set window height to n\n");
   fprintf(stderr, "  -B: Enable FBO usage (default to window size)\n");
   fprintf(stderr, "  -N: Set FBO filtering to NEAREST instead of LINEAR\n");
+  fprintf(stderr, "  -R <n>: set FBO size to the window size divided by n\n");
   fprintf(stderr, "  -X <n>: set FBO height to n pixels\n");
   fprintf(stderr, "  -Y <n>: set FBO height to n pixels\n");
   fprintf(stderr, "  -r <n>: report frame rate every n frames\n");
@@ -932,7 +933,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:s:S:t:T:uU:vw:W:X:Y:")) != -1) {
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vw:W:X:Y:")) != -1) {
 
     switch (opt) {
 
@@ -1046,6 +1047,23 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       ctx->report_fps_count = i;
       break ;
 
+    case 'R':
+      i = atoi(optarg);
+      if (i <= 0) {
+        fprintf(stderr,
+                "ERROR: -R option takes a positive integer argument "
+                "(got %i)\n", i);
+        exit(EXIT_FAILURE);
+      }
+      if ((ctx->fbo_width > 0) || (ctx->fbo_height > 0)) {
+        fprintf(stderr,
+                "ERROR: -R option should not be used with -X/-Y\n");
+        exit(EXIT_FAILURE);
+      }
+      ctx->use_fbo = 1;
+      ctx->fbo_size_div = i;
+      break ;
+
     case 's':
       ctx->time_factor = atof(optarg);
       break ;
@@ -1095,11 +1113,21 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       break ;
 
     case 'X':
+      if (ctx->fbo_size_div >= 0) {
+        fprintf(stderr,
+                "ERROR: -X/-Y options should not be used with -R\n");
+        exit(EXIT_FAILURE);
+      }
       ctx->use_fbo = 1;
       ctx->fbo_width = atoi(optarg);
       break ;
 
     case 'Y':
+      if (ctx->fbo_size_div >= 0) {
+        fprintf(stderr,
+                "ERROR: -X/-Y options should not be used with -R\n");
+        exit(EXIT_FAILURE);
+      }
       ctx->use_fbo = 1;
       ctx->fbo_height = atoi(optarg);
       break ;
@@ -1485,6 +1513,10 @@ main(int argc, char *argv[])
   ctx->height = ctx->egl->height;
 
   if (ctx->use_fbo) {
+    if (ctx->fbo_size_div > 0) {
+      ctx->fbo_width = ctx->width / ctx->fbo_size_div;
+      ctx->fbo_height = ctx->height / ctx->fbo_size_div;
+    }
     if (ctx->fbo_width == 0)
       ctx->fbo_width = ctx->width;
     if (ctx->fbo_height == 0)

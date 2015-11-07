@@ -70,6 +70,7 @@ struct context_s {
   int shader_height;
   char *user_shader;
   int use_fbo;
+  int fbo_size_div;
   int fbo_width;
   int fbo_height;
   int fbo_nearest;

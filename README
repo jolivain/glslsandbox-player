@@ -124,8 +124,8 @@ shader player are:
 
 - the "backbuffer" uniform sampler2D gives access to the previous
   frame (back buffer) as a texture. It will work only when the FBO
-  rendering is active (-B or -X/-Y command line arguments). See for
-  example shader 424.12.
+  rendering is active (-B, -R or -X/-Y command line arguments). See
+  for example shader 424.12.
 
 
 Building glslsandbox-player
@@ -208,6 +208,7 @@ browser.
      -H <n>: set window height to n
      -B: Enable FBO usage (default to window size)
      -N: Set FBO filtering to NEAREST instead of LINEAR
+     -R <n>: set FBO size to the window size divided by n
      -X <n>: set FBO height to n pixels
      -Y <n>: set FBO height to n pixels
      -r <n>: report frame rate every n frames
