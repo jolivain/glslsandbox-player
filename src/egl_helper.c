@@ -78,6 +78,251 @@ _egl_no_error(const char *file, int line)
   return (1); /* TRUE */
 }
 
+#if defined(XEGL_STRICT)
+
+static void
+__xegl_on_error(void)
+{
+  exit(EXIT_FAILURE);
+}
+
+void
+__xegl_check_error(const char *file, int line, const char *func)
+{
+  EGLint egl_error;
+
+  egl_error = eglGetError();
+
+  if (egl_error != EGL_SUCCESS) {
+    fprintf(stderr, "%s:%i: %s(): eglGetError(): 0x%x (%i): %s\n",
+            file, line, func,
+            egl_error, egl_error,
+            streglerror(egl_error));
+    __xegl_on_error();
+  }
+}
+
+
+EGLDisplay
+__xegl_eglGetDisplay(const char *file, int line,
+                     EGLNativeDisplayType display_id)
+{
+  EGLDisplay ret;
+
+  ret = eglGetDisplay(display_id);
+  __xegl_check_error(file, line, "eglGetDisplay");
+
+  if (ret == EGL_NO_DISPLAY) {
+    fprintf(stderr, "%s:%i: eglGetDisplay(): returned EGL_NO_DISPLAY\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglChooseConfig(const char *file, int line,
+                       EGLDisplay dpy, const EGLint *attrib_list,
+                       EGLConfig *configs, EGLint config_size, EGLint *num_config)
+{
+  EGLBoolean ret;
+
+  ret = eglChooseConfig(dpy, attrib_list, configs, config_size, num_config);
+  __xegl_check_error(file, line, "eglChooseConfig");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglChooseConfig(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLContext
+__xegl_eglCreateContext(const char *file, int line,
+			EGLDisplay dpy, EGLConfig config, EGLContext share_context,
+			const EGLint *attrib_list)
+{
+  EGLContext ret;
+
+  ret = eglCreateContext(dpy, config, share_context, attrib_list);
+  __xegl_check_error(file, line, "eglCreateContext");
+
+  if (ret == EGL_NO_CONTEXT) {
+    fprintf(stderr, "%s:%i: eglCreateContext(): returned EGL_NO_CONTEXT\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLSurface
+__xegl_eglCreateWindowSurface(const char *file, int line,
+			      EGLDisplay dpy, EGLConfig config,
+			      EGLNativeWindowType win, const EGLint *attrib_list)
+{
+  EGLSurface ret;
+
+  ret = eglCreateWindowSurface(dpy, config, win, attrib_list);
+  __xegl_check_error(file, line, "eglCreateWindowSurface");
+
+  if (ret == EGL_NO_SURFACE) {
+    fprintf(stderr, "%s:%i: eglCreateWindowSurface(): returned EGL_NO_SURFACE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglDestroyContext(const char *file, int line,
+                         EGLDisplay dpy, EGLContext ctx)
+{
+  EGLBoolean ret;
+
+  ret = eglDestroyContext(dpy, ctx);
+  __xegl_check_error(file, line, "eglDestroyContext");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglDestroyContext(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglDestroySurface(const char *file, int line,
+                         EGLDisplay dpy, EGLSurface surface)
+{
+  EGLBoolean ret;
+
+  ret = eglDestroySurface(dpy, surface);
+  __xegl_check_error(file, line, "eglDestroySurface");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglDestroySurface(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglInitialize(const char *file, int line,
+                     EGLDisplay dpy, EGLint *major, EGLint *minor)
+{
+  EGLBoolean ret;
+
+  ret = eglInitialize(dpy, major, minor);
+  __xegl_check_error(file, line, "eglInitialize");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglInitialize(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglMakeCurrent(const char *file, int line,
+		      EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx)
+{
+  EGLBoolean ret;
+
+  ret = eglMakeCurrent(dpy, draw, read, ctx);
+  __xegl_check_error(file, line, "eglMakeCurrent");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglMakeCurrent(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglReleaseThread(const char *file, int line)
+{
+  EGLBoolean ret;
+
+  ret = eglReleaseThread();
+  __xegl_check_error(file, line, "eglReleaseThread");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglReleaseThread(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglSwapBuffers(const char *file, int line,
+		      EGLDisplay dpy, EGLSurface surface)
+{
+  EGLBoolean ret;
+
+  ret = eglSwapBuffers(dpy, surface);
+  __xegl_check_error(file, line, "eglSwapBuffers");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglSwapBuffers(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglSwapInterval(const char *file, int line,
+                       EGLDisplay dpy, EGLint interval)
+{
+  EGLBoolean ret;
+
+  ret = eglSwapInterval(dpy, interval);
+  __xegl_check_error(file, line, "eglSwapInterval");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglSwapInterval(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
+__xegl_eglTerminate(const char *file, int line,
+		    EGLDisplay dpy)
+{
+  EGLBoolean ret;
+
+  ret = eglTerminate(dpy);
+  __xegl_check_error(file, line, "eglTerminate");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglTerminate(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+#endif /* defined(XEGL_STRICT) */
+
 egl_t *
 init_egl(int width, int height)
 {
@@ -114,7 +359,6 @@ init_egl(int width, int height)
     EGL_NONE
   };
 
-  EGLBoolean ret;
   NativeDisplayType egl_native_disp;
   NativeWindowType egl_native_win;
 
@@ -133,31 +377,18 @@ init_egl(int width, int height)
   egl->height = native_gfx_get_window_height(egl->native_gfx);
 
   egl_native_disp = native_gfx_get_egl_native_display(egl->native_gfx);
-  egl->dpy = eglGetDisplay(egl_native_disp);
-  assert( egl->dpy != EGL_NO_DISPLAY );
-  assert( egl_no_error() );
+  egl->dpy = XeglGetDisplay(egl_native_disp);
+  XeglInitialize(egl->dpy, &egl->major, &egl->minor);
 
-  ret = eglInitialize(egl->dpy, &egl->major, &egl->minor);
-  assert( ret == EGL_TRUE );
-  assert( egl_no_error() );
-
-  ret = eglChooseConfig(egl->dpy, conf_attribList, configs, NUM_CONFIGS, &num_configs);
+  XeglChooseConfig(egl->dpy, conf_attribList, configs, NUM_CONFIGS, &num_configs);
   assert( num_configs == 1 );
-  assert( ret == EGL_TRUE );
-  assert( egl_no_error() );
 
   egl_native_win = native_gfx_get_egl_native_window(egl->native_gfx);
-  egl->surf = eglCreateWindowSurface(egl->dpy, configs[0], egl_native_win, win_attribList);
-  assert( egl->surf != EGL_NO_SURFACE );
-  assert( egl_no_error() );
+  egl->surf = XeglCreateWindowSurface(egl->dpy, configs[0], egl_native_win, win_attribList);
 
-  egl->ctx = eglCreateContext(egl->dpy, configs[0], EGL_NO_CONTEXT, ctx_attribList);
-  assert( egl->ctx != EGL_NO_CONTEXT );
-  assert( egl_no_error() );
+  egl->ctx = XeglCreateContext(egl->dpy, configs[0], EGL_NO_CONTEXT, ctx_attribList);
 
-  ret = eglMakeCurrent(egl->dpy, egl->surf, egl->surf, egl->ctx);
-  assert( ret == EGL_TRUE );
-  assert( egl_no_error() );
+  XeglMakeCurrent(egl->dpy, egl->surf, egl->surf, egl->ctx);
 
   return (egl);
 }
@@ -165,36 +396,24 @@ init_egl(int width, int height)
 void
 clean_egl(egl_t *egl)
 {
-  EGLBoolean ret;
-
   if (egl->dpy != EGL_NO_DISPLAY) {
 
-    ret = eglMakeCurrent(egl->dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-    assert( ret == EGL_TRUE );
-    assert( egl_no_error() );
+    XeglMakeCurrent(egl->dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
     if (egl->ctx != EGL_NO_CONTEXT) {
-      ret = eglDestroyContext(egl->dpy, egl->ctx);
-      assert( ret == EGL_TRUE );
-      assert( egl_no_error() );
+      XeglDestroyContext(egl->dpy, egl->ctx);
       egl->ctx = EGL_NO_CONTEXT;
     }
 
     if (egl->surf != EGL_NO_SURFACE) {
-      ret = eglDestroySurface(egl->dpy, egl->surf);
-      assert( ret == EGL_TRUE );
-      assert( egl_no_error() );
+      XeglDestroySurface(egl->dpy, egl->surf);
       egl->surf = EGL_NO_SURFACE;
     }
 
-    ret = eglTerminate(egl->dpy);
-    assert( ret == EGL_TRUE );
-    assert( egl_no_error() );
+    XeglTerminate(egl->dpy);
     egl->dpy = EGL_NO_DISPLAY;
 
-    ret = eglReleaseThread();
-    assert( ret == EGL_TRUE );
-    assert( egl_no_error() );
+    XeglReleaseThread();
   }
 
   native_gfx_destroy_window(egl->native_gfx);

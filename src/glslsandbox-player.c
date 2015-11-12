@@ -59,26 +59,13 @@ fbo_frag_shader_g =
 static void
 player_cleanup(context_t *ctx)
 {
-  glFinish();
-  assert( gles_no_error() );
-
-  glUseProgram(0);
-  assert( gles_no_error() );
-
-  glDetachShader(ctx->gl_prog, ctx->vertex_shader);
-  assert( gles_no_error() );
-
-  glDetachShader(ctx->gl_prog, ctx->fragment_shader);
-  assert( gles_no_error() );
-
-  glDeleteShader(ctx->vertex_shader);
-  assert( gles_no_error() );
-
-  glDeleteShader(ctx->fragment_shader);
-  assert( gles_no_error() );
-
-  glDeleteProgram(ctx->gl_prog);
-  assert( gles_no_error() );
+  XglFinish();
+  XglUseProgram(0);
+  XglDetachShader(ctx->gl_prog, ctx->vertex_shader);
+  XglDetachShader(ctx->gl_prog, ctx->fragment_shader);
+  XglDeleteShader(ctx->vertex_shader);
+  XglDeleteShader(ctx->fragment_shader);
+  XglDeleteProgram(ctx->gl_prog);
 }
 
 static void
@@ -226,8 +213,7 @@ fwrite_framebuffer(FILE *fp)
   GLsizei pixels_rgb_sz;
   size_t ret;
 
-  glGetIntegerv(GL_VIEWPORT, viewport);
-  assert( gles_no_error() );
+  XglGetIntegerv(GL_VIEWPORT, viewport);
 
   x = viewport[0];
   y = viewport[1];
@@ -249,8 +235,7 @@ fwrite_framebuffer(FILE *fp)
    * supported, by specification.  Sicne we are not in a critical
    * computation path (due to other IO), we prefer portability here.
    */
-  glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-  assert( gles_no_error() );
+  XglReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
   convert_rgba_to_rgb_inplace(pixels, pixel_count);
   vflip_rgb_pixels_inplace(pixels, w, h);
@@ -308,40 +293,28 @@ load_shader(GLenum type, const char *shaderSrc)
   GLuint shader;
   GLint compiled;
 
-  shader = glCreateShader(type);
-  assert( gles_no_error() );
-
+  shader = XglCreateShader(type);
   if (shader == 0)
     return (0);
 
-  glShaderSource(shader, 1, &shaderSrc, NULL);
-  assert( gles_no_error() );
-
-  glCompileShader(shader);
-  assert( gles_no_error() );
-
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-  assert( gles_no_error() );
+  XglShaderSource(shader, 1, &shaderSrc, NULL);
+  XglCompileShader(shader);
+  XglGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 
   if ( ! compiled ) {
     GLint infoLen = 0;
 
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-    assert( gles_no_error() );
+    XglGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
 
     if (infoLen > 1) {
       char* infoLog = malloc(infoLen);
 
-      glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-      assert( gles_no_error() );
-
+      XglGetShaderInfoLog(shader, infoLen, NULL, infoLog);
       fprintf(stderr, "Error compiling shader:\n%s\n", infoLog);
-
       free(infoLog);
     }
 
-    glDeleteShader ( shader );
-    assert( gles_no_error() );
+    XglDeleteShader(shader);
 
     return (0);
   }
@@ -364,38 +337,26 @@ load_program(const char *v_shader_src, const char *f_shader_src,
 
   fsh = load_shader(GL_FRAGMENT_SHADER, f_shader_src);
   if (fsh == 0) {
-    glDeleteShader(vsh);
-    assert( gles_no_error() );
+    XglDeleteShader(vsh);
     return ;
   }
 
-  prog = glCreateProgram();
+  prog = XglCreateProgram();
   if (prog == 0) {
-    glDeleteShader(vsh);
-    assert( gles_no_error() );
-    glDeleteShader(fsh);
-    assert( gles_no_error() );
+    XglDeleteShader(vsh);
+    XglDeleteShader(fsh);
     return ;
   }
 
-  glAttachShader(prog, vsh);
-  assert( gles_no_error() );
+  XglAttachShader(prog, vsh);
+  XglAttachShader(prog, fsh);
+  XglLinkProgram(prog);
 
-  glAttachShader(prog, fsh);
-  assert( gles_no_error() );
-
-  glLinkProgram(prog);
-  assert( gles_no_error() );
-
-  glGetProgramiv(prog, GL_LINK_STATUS, &linked);
-  assert( gles_no_error() );
-
+  XglGetProgramiv(prog, GL_LINK_STATUS, &linked);
   if ( linked != GL_TRUE ) {
     GLint info_len = 0;
 
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &info_len);
-    assert( gles_no_error() );
-
+    XglGetProgramiv(prog, GL_INFO_LOG_LENGTH, &info_len);
     if (info_len > 1) {
       char* info_log = malloc(info_len);
       if (info_log == NULL) {
@@ -404,20 +365,14 @@ load_program(const char *v_shader_src, const char *f_shader_src,
         exit(EXIT_FAILURE);
       }
 
-      glGetProgramInfoLog(prog, info_len, NULL, info_log);
-      assert( gles_no_error() );
-
+      XglGetProgramInfoLog(prog, info_len, NULL, info_log);
       fprintf(stderr, "Error linking program:\n%s\n", info_log);
-
       free(info_log);
     }
 
-    glDeleteShader(vsh);
-    assert( gles_no_error() );
-    glDeleteShader(fsh);
-    assert( gles_no_error() );
-    glDeleteProgram(prog);
-    assert( gles_no_error() );
+    XglDeleteShader(vsh);
+    XglDeleteShader(fsh);
+    XglDeleteProgram(prog);
   }
 
   *vshader = vsh;
@@ -426,44 +381,24 @@ load_program(const char *v_shader_src, const char *f_shader_src,
 }
 
 static void
-swap_buffers(const context_t *ctx)
-{
-  EGLBoolean ret;
-
-  ret = eglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
-  assert( ret == EGL_TRUE );
-  assert( egl_no_error() );
-}
-
-static void
 setup_fbo_tex(context_t *ctx, int i)
 {
   GLint filter;
 
-  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[i]);
-  assert( gles_no_error() );
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-	       ctx->fbo_width, ctx->fbo_height,
-	       0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-  assert( gles_no_error() );
+  XglBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[i]);
+  XglTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+		ctx->fbo_width, ctx->fbo_height,
+		0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
   if (ctx->fbo_nearest)
     filter = GL_NEAREST;
   else
     filter = GL_LINEAR;
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-  assert( gles_no_error() );
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-  assert( gles_no_error() );
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  assert( gles_no_error() );
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  assert( gles_no_error() );
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 static void
@@ -471,16 +406,10 @@ setup_fbo_fb(context_t *ctx, int i)
 {
   GLenum s;
 
-  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[i]);
-  assert( gles_no_error() );
-
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-			 GL_TEXTURE_2D, ctx->fbo_texid[i], 0);
-  assert( gles_no_error() );
-
-  s = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-  assert( gles_no_error() );
-
+  XglBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[i]);
+  XglFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			  GL_TEXTURE_2D, ctx->fbo_texid[i], 0);
+  s = XglCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (s != GL_FRAMEBUFFER_COMPLETE) {
     fprintf(stderr, "ERROR! glCheckFramebufferStatus() is not COMPLETE\n");
     exit(EXIT_FAILURE);
@@ -497,32 +426,23 @@ setup_fbo(context_t *ctx)
     exit(EXIT_FAILURE);
   }
 
-  glUseProgram(ctx->fbo_prog);
-  assert( gles_no_error() );
+  XglUseProgram(ctx->fbo_prog);
 
-  ctx->fbo_a_pos = glGetAttribLocation(ctx->fbo_prog, "a_pos");
-  assert( gles_no_error() );
+  ctx->fbo_a_pos = XglGetAttribLocation(ctx->fbo_prog, "a_pos");
+  ctx->fbo_a_surfpos = XglGetAttribLocation(ctx->fbo_prog, "a_surfacePosition");
+  ctx->fbo_u_tex = XglGetUniformLocation(ctx->fbo_prog, "u_tex");
 
-  ctx->fbo_a_surfpos = glGetAttribLocation(ctx->fbo_prog, "a_surfacePosition");
-  assert( gles_no_error() );
-
-  ctx->fbo_u_tex = glGetUniformLocation(ctx->fbo_prog, "u_tex");
-  assert( gles_no_error() );
-
-  glGenTextures(2, &ctx->fbo_texid[0]);
-  assert( gles_no_error() );
+  XglGenTextures(2, &ctx->fbo_texid[0]);
 
   setup_fbo_tex(ctx, 0);
   setup_fbo_tex(ctx, 1);
 
-  glGenFramebuffers(2, &ctx->fbo_id[0]);
-  assert( gles_no_error() );
+  XglGenFramebuffers(2, &ctx->fbo_id[0]);
 
   setup_fbo_fb(ctx, 0);
   setup_fbo_fb(ctx, 1);
 
-  glUseProgram(ctx->gl_prog);
-  assert( gles_no_error() );
+  XglUseProgram(ctx->gl_prog);
 }
 
 static void
@@ -531,12 +451,10 @@ validate_shader_program(const context_t * ctx)
   GLint valid;
   GLint info_len;
 
-  glValidateProgram(ctx->gl_prog);
-  assert( gles_no_error() );
-
   info_len = 0;
-  glGetProgramiv(ctx->gl_prog, GL_INFO_LOG_LENGTH, &info_len);
-  assert( gles_no_error() );
+
+  XglValidateProgram(ctx->gl_prog);
+  XglGetProgramiv(ctx->gl_prog, GL_INFO_LOG_LENGTH, &info_len);
 
   if (ctx->verbose > 0) {
     if (info_len > 1) {
@@ -547,8 +465,7 @@ validate_shader_program(const context_t * ctx)
           exit(EXIT_FAILURE);
       }
 
-      glGetProgramInfoLog(ctx->gl_prog, info_len, NULL, info_log);
-      assert( gles_no_error() );
+      XglGetProgramInfoLog(ctx->gl_prog, info_len, NULL, info_log);
 
       fprintf(stderr, "INFO: glValidateProgram(): program info log: validate status:\n%s\n", info_log);
 
@@ -556,8 +473,7 @@ validate_shader_program(const context_t * ctx)
     }
   }
 
-  glGetProgramiv(ctx->gl_prog, GL_VALIDATE_STATUS, &valid);
-  assert( gles_no_error() );
+  XglGetProgramiv(ctx->gl_prog, GL_VALIDATE_STATUS, &valid);
 
   if (valid != GL_TRUE) {
     fprintf(stderr, "ERROR: glValidateProgram(): GL_VALIDATE_STATUS != GL_TRUE: "
@@ -576,61 +492,44 @@ setup(context_t *ctx)
     exit(EXIT_FAILURE);
   }
 
-  glUseProgram(ctx->gl_prog);
-  assert( gles_no_error() );
+  XglUseProgram(ctx->gl_prog);
+  ctx->a_pos = XglGetAttribLocation(ctx->gl_prog, "a_pos");
 
-  ctx->a_pos = glGetAttribLocation(ctx->gl_prog, "a_pos");
-  assert( gles_no_error() );
+  XglEnableVertexAttribArray(ctx->a_pos);
 
-  glEnableVertexAttribArray(ctx->a_pos);
-  assert( gles_no_error() );
-
-  ctx->a_surfacePosition = glGetAttribLocation(ctx->gl_prog, "a_surfacePosition");
-  assert( gles_no_error() );
+  ctx->a_surfacePosition = XglGetAttribLocation(ctx->gl_prog, "a_surfacePosition");
 
   if (ctx->a_surfacePosition >= 0) {
-    glEnableVertexAttribArray(ctx->a_surfacePosition);
-    assert( gles_no_error() );
+    XglEnableVertexAttribArray(ctx->a_surfacePosition);
   }
 
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  assert( gles_no_error() );
+  XglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-  ctx->u_time = glGetUniformLocation(ctx->gl_prog, "time");
-  assert( gles_no_error() );
-
-  ctx->u_resolution = glGetUniformLocation(ctx->gl_prog, "resolution");
-  assert( gles_no_error() );
+  ctx->u_time = XglGetUniformLocation(ctx->gl_prog, "time");
+  ctx->u_resolution = XglGetUniformLocation(ctx->gl_prog, "resolution");
 
   if (ctx->u_resolution >= 0) {
-    glUniform2f(ctx->u_resolution,
-		(GLfloat)ctx->shader_width, (GLfloat)ctx->shader_height);
-    assert( gles_no_error() );
+    XglUniform2f(ctx->u_resolution,
+		 (GLfloat)ctx->shader_width, (GLfloat)ctx->shader_height);
   }
 
-  ctx->u_surfaceSize = glGetUniformLocation(ctx->gl_prog, "surfaceSize");
-  assert( gles_no_error() );
+  ctx->u_surfaceSize = XglGetUniformLocation(ctx->gl_prog, "surfaceSize");
 
   if (ctx->u_surfaceSize >= 0) {
-    glUniform2f(ctx->u_surfaceSize,
-		(GLfloat)ctx->shader_width / (GLfloat)ctx->shader_height, 1.0f);
-    assert( gles_no_error() );
+    XglUniform2f(ctx->u_surfaceSize,
+		 (GLfloat)ctx->shader_width / (GLfloat)ctx->shader_height, 1.0f);
   }
 
-  ctx->u_mouse = glGetUniformLocation(ctx->gl_prog, "mouse");
-  assert( gles_no_error() );
+  ctx->u_mouse = XglGetUniformLocation(ctx->gl_prog, "mouse");
 
   if (ctx->u_mouse >= 0) {
-    glUniform2f(ctx->u_mouse, 0.5f, 0.5f);
-    assert( gles_no_error() );
+    XglUniform2f(ctx->u_mouse, 0.5f, 0.5f);
   }
 
-  ctx->u_backbuf = glGetUniformLocation(ctx->gl_prog, "backbuffer");
-  assert( gles_no_error() );
+  ctx->u_backbuf = XglGetUniformLocation(ctx->gl_prog, "backbuffer");
 
   if (ctx->u_backbuf >= 0) {
-    glUniform1i(ctx->u_backbuf, 0);
-    assert( gles_no_error() );
+    XglUniform1i(ctx->u_backbuf, 0);
 
     if (!ctx->use_fbo) {
       fprintf(stderr,
@@ -641,18 +540,16 @@ setup(context_t *ctx)
     }
   }
 
-  glViewport(0, 0, ctx->shader_width, ctx->shader_height);
-  assert( gles_no_error() );
+  XglViewport(0, 0, ctx->shader_width, ctx->shader_height);
 
   validate_shader_program(ctx);
 
   if (ctx->use_fbo)
     setup_fbo(ctx);
 
-  glClear(GL_COLOR_BUFFER_BIT);
-  assert( gles_no_error() );
+  XglClear(GL_COLOR_BUFFER_BIT);
 
-  swap_buffers(ctx);
+  XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
 }
 
 
@@ -691,26 +588,21 @@ draw_frame(context_t *ctx)
   };
 
   if (ctx->u_time >= 0) {
-    glUniform1f(ctx->u_time, ctx->time_offset + ctx->time * ctx->time_factor);
-    assert( gles_no_error() );
+    XglUniform1f(ctx->u_time, ctx->time_offset + ctx->time * ctx->time_factor);
   }
 
   if (ctx->u_mouse >= 0 && ctx->enable_mouse_emu) {
     float m;
 
     m = M_PI * (ctx->time_offset + ctx->time * ctx->mouse_emu_speed);
-    glUniform2f(ctx->u_mouse,
+    XglUniform2f(ctx->u_mouse,
                 0.5f + sinf(0.125f * m) * 0.4f,
                 0.5f + sinf(0.250f * m) * 0.4f);
-    assert( gles_no_error() );
   }
 
-  glClear(GL_COLOR_BUFFER_BIT);
-  assert( gles_no_error() );
+  XglClear(GL_COLOR_BUFFER_BIT);
 
-  glVertexAttribPointer(ctx->a_pos, 2, GL_FLOAT, GL_FALSE,
-                        0, plane);
-  assert( gles_no_error() );
+  XglVertexAttribPointer(ctx->a_pos, 2, GL_FLOAT, GL_FALSE, 0, plane);
 
   if (ctx->a_surfacePosition >= 0) {
     if (ctx->enable_surfpos_anim) {
@@ -722,43 +614,27 @@ draw_frame(context_t *ctx)
                                sinf(0.250f * sp),
                                1.0f + sinf(0.05f * sp) * 0.75f);
     }
-    glVertexAttribPointer(ctx->a_surfacePosition, 2, GL_FLOAT, GL_FALSE,
-                          0, surfPos);
-    assert( gles_no_error() );
+    XglVertexAttribPointer(ctx->a_surfacePosition, 2, GL_FLOAT, GL_FALSE,
+			   0, surfPos);
   }
 
   if (ctx->u_backbuf >= 0) {
-    glUniform1i(ctx->u_backbuf, 0);
-    assert( gles_no_error() );
-
-    glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[(ctx->frame+1) & 1]);
-    assert( gles_no_error() );
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      assert( gles_no_error() );
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      assert( gles_no_error() );
+    XglUniform1i(ctx->u_backbuf, 0);
+    XglBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[(ctx->frame+1) & 1]);
+    XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   }
 
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  assert( gles_no_error() );
+  XglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 static void
 prepare_fbo(context_t *ctx)
 {
-  glBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[ctx->frame & 1]);
-  assert( gles_no_error() );
-
-  glViewport(0, 0, ctx->fbo_width, ctx->fbo_height);
-  assert( gles_no_error() );
-
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  assert( gles_no_error() );
-
-  glClear(GL_COLOR_BUFFER_BIT);
-  assert( gles_no_error() );
+  XglBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[ctx->frame & 1]);
+  XglViewport(0, 0, ctx->fbo_width, ctx->fbo_height);
+  XglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  XglClear(GL_COLOR_BUFFER_BIT);
 }
 
 static void
@@ -778,57 +654,27 @@ draw_fbo(context_t *ctx)
      1.0,  0.0
   };
 
-  glUseProgram(ctx->fbo_prog);
-  assert( gles_no_error() );
-
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  assert( gles_no_error() );
-
-  glViewport(0, 0, ctx->width, ctx->height);
-  assert( gles_no_error() );
-
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  assert( gles_no_error() );
-
-  glClear(GL_COLOR_BUFFER_BIT);
-  assert( gles_no_error() );
-
-  glUniform1i(ctx->fbo_u_tex, 0);
-  assert( gles_no_error() );
-
-  glBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[ctx->frame & 1]);
-  assert( gles_no_error() );
-
   if (ctx->fbo_nearest)
     filter = GL_NEAREST;
   else
     filter = GL_LINEAR;
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-  assert( gles_no_error() );
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-  assert( gles_no_error() );
-
-  glEnableVertexAttribArray(ctx->fbo_a_pos);
-  assert( gles_no_error() );
-
-  glVertexAttribPointer(ctx->fbo_a_pos, 2, GL_FLOAT, GL_FALSE,
-                        0, plane);
-  assert( gles_no_error() );
-
-  glEnableVertexAttribArray(ctx->fbo_a_surfpos);
-  assert( gles_no_error() );
-
-  glVertexAttribPointer(ctx->fbo_a_surfpos, 2, GL_FLOAT, GL_FALSE,
-                          0, tcoords);
-  assert( gles_no_error() );
-
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  assert( gles_no_error() );
-
-  glUseProgram(ctx->gl_prog);
-  assert( gles_no_error() );
+  XglUseProgram(ctx->fbo_prog);
+  XglBindFramebuffer(GL_FRAMEBUFFER, 0);
+  XglViewport(0, 0, ctx->width, ctx->height);
+  XglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  XglClear(GL_COLOR_BUFFER_BIT);
+  XglUniform1i(ctx->fbo_u_tex, 0);
+  XglBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[ctx->frame & 1]);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+  XglEnableVertexAttribArray(ctx->fbo_a_pos);
+  XglVertexAttribPointer(ctx->fbo_a_pos, 2, GL_FLOAT, GL_FALSE, 0, plane);
+  XglEnableVertexAttribArray(ctx->fbo_a_surfpos);
+  XglVertexAttribPointer(ctx->fbo_a_surfpos, 2, GL_FLOAT, GL_FALSE,
+			 0, tcoords);
+  XglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  XglUseProgram(ctx->gl_prog);
 }
 
 static void
@@ -1370,22 +1216,19 @@ fprintf_gles_info(FILE *fp, int verbose)
   const char *slver;
   const char *exts;
 
-  vendor = (const char *)glGetString(GL_VENDOR);
-  assert( gles_no_error() );
+  vendor = (const char *)XglGetString(GL_VENDOR);
   if (vendor == NULL) {
     fprintf(stderr, "ERROR: glGetString(GL_VENDOR) returned NULL\n");
     exit(EXIT_FAILURE);
   }
 
-  version = (const char *)glGetString(GL_VERSION);
-  assert( gles_no_error() );
+  version = (const char *)XglGetString(GL_VERSION);
   if (version == NULL) {
     fprintf(stderr, "ERROR: glGetString(GL_VERSION) returned NULL\n");
     exit(EXIT_FAILURE);
   }
 
-  slver = (const char *)glGetString(GL_SHADING_LANGUAGE_VERSION);
-  assert( gles_no_error() );
+  slver = (const char *)XglGetString(GL_SHADING_LANGUAGE_VERSION);
   if (slver == NULL) {
     fprintf(stderr, "ERROR: glGetString(GL_SHADING_LANGUAGE_VERSION) returned NULL\n");
     exit(EXIT_FAILURE);
@@ -1397,8 +1240,7 @@ fprintf_gles_info(FILE *fp, int verbose)
   fprintf(fp, "GL_SHADING_LANGUAGE_VERSION : %s\n", slver);
 
   if (verbose > 1) {
-    exts = (const char *)glGetString(GL_EXTENSIONS);
-    assert( gles_no_error() );
+    exts = (const char *)XglGetString(GL_EXTENSIONS);
     if (exts == NULL) {
       fprintf(stderr, "ERROR: glGetString(GL_EXTENSIONS) returned NULL\n");
       exit(EXIT_FAILURE);
@@ -1449,7 +1291,7 @@ player_render_loop_warmup(context_t *ctx)
 
     draw(ctx);
 
-    swap_buffers(ctx);
+    XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
 
     if (ctx->frame > 0)
       update_time(ctx);
@@ -1515,7 +1357,7 @@ player_render_loop(context_t *ctx)
         || ((ctx->dump_frame == DUMP_FRAME_LAST) && last_frame))
       dump_framebuffer_to_ppm(ctx);
 
-    swap_buffers(ctx);
+    XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
 
     update_time(ctx);
 
@@ -1569,10 +1411,7 @@ main(int argc, char *argv[])
   ctx->height = ctx->egl->height;
 
   if (ctx->swap_interval >= 0) {
-    EGLBoolean ret;
-    ret = eglSwapInterval(ctx->egl->dpy, ctx->swap_interval);
-    assert( egl_no_error() );
-    assert( ret == EGL_TRUE );
+    XeglSwapInterval(ctx->egl->dpy, ctx->swap_interval);
   }
 
   if (ctx->use_fbo) {
