@@ -10,6 +10,7 @@
 #ifndef GLSLSANDBOX_PLAYER_H
 #define GLSLSANDBOX_PLAYER_H
 
+#include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <time.h>
 
@@ -35,6 +36,7 @@
 typedef struct context_s context_t;
 struct context_s {
   egl_t *egl;
+  EGLint swap_interval;
   GLint a_pos, a_surfacePosition;
   GLint u_time, u_mouse, u_resolution, u_surfaceSize;
   GLint u_backbuf;

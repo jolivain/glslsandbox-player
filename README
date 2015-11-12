@@ -213,6 +213,7 @@ browser.
      -Y <n>: set FBO height to n pixels
      -r <n>: report frame rate every n frames
      -w <n>: set the number of warmup frames
+     -V <n>: set EGL swap interval to n
      -d: dump each frame as PPM
      -D: dump only the last frame as PPM
      -v: increase verbosity level
@@ -284,6 +285,13 @@ line arguments, which respectively sets its width and height. By
 default, the FBO is textured on screen with linear filtering, which
 can produce a blurred result. This filter can be changed to a nearest
 neighbor using the -N command line option.
+
+  By default, glslsandbox-player does not call eglSwapInterval() EGL
+function. It will default to 1 (as per EGL specification). The -V
+command line argument will set the swap interval by calling
+eglSwapInterval(). Some EGL implementation will return a failure if it
+cannot be set. If glslsandbox-player is built with strict EGL/GLES
+error checking (which is the default), it will abort execution.
 
 
 Using glslsandbox-player for Automatic Testing

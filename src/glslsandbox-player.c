@@ -919,6 +919,7 @@ player_usage(void)
   fprintf(stderr, "  -Y <n>: set FBO height to n pixels\n");
   fprintf(stderr, "  -r <n>: report frame rate every n frames\n");
   fprintf(stderr, "  -w <n>: set the number of warmup frames\n");
+  fprintf(stderr, "  -V <n>: set EGL swap interval to n\n");
   fprintf(stderr, "  -d: dump each frame as PPM\n");
   fprintf(stderr, "  -D: dump only the last frame as PPM\n");
   fprintf(stderr, "  -v: increase verbosity level\n");
@@ -933,7 +934,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vw:W:X:Y:")) != -1) {
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:")) != -1) {
 
     switch (opt) {
 
@@ -1097,6 +1098,17 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       ctx->verbose++;
       break ;
 
+    case 'V':
+      i = atoi(optarg);
+      if (i < 0) {
+        fprintf(stderr,
+                "ERROR: -V option takes a non-negative integer argument "
+                "(got %i)\n", i);
+        exit(EXIT_FAILURE);
+      }
+      ctx->swap_interval = i;
+      break ;
+
     case 'w':
       i = atoi(optarg);
       if (i < 0) {
@@ -1234,6 +1246,7 @@ init_ctx(context_t *ctx)
 {
   memset(ctx, 0, sizeof (*ctx));
 
+  ctx->swap_interval = -1;
   ctx->verbose = 1;
   ctx->time_factor = 1.0f;
   ctx->enable_mouse_emu = 1;
@@ -1511,6 +1524,13 @@ main(int argc, char *argv[])
   ctx->egl = init_egl(ctx->width, ctx->height);
   ctx->width = ctx->egl->width;
   ctx->height = ctx->egl->height;
+
+  if (ctx->swap_interval >= 0) {
+    EGLBoolean ret;
+    ret = eglSwapInterval(ctx->egl->dpy, ctx->swap_interval);
+    assert( egl_no_error() );
+    assert( ret == EGL_TRUE );
+  }
 
   if (ctx->use_fbo) {
     if (ctx->fbo_size_div > 0) {
