@@ -83,10 +83,26 @@ workaround that may not be fully GLSL compliant (e.g. shader 2606.0
 with OS X AMD cos workaround that redefine the cos() function). Other
 compilation failures may be due to garbage after #else or #endif
 preprocessor directive present in some shaders (e.g. shader
-26529.0). Finally, some shaders can be GPU-time consuming depending of
-the GPU being tested. This is why a relevant selection of shader
-suited for your driver and GPU would be better that a bare dump of the
-whole glslsandbox.com site.
+26529.0). Moreover, some web browsers are using OpenGL to implement
+WebGL (instead of OpenGL ES). There is slight differences in the GL
+shading language between ES and non-ES version, that could make a
+glslsandbox shader work in such a browser, but fail on a conformant
+GLES2 driver. For example, GLSL ES 1.0.17 explicitly forbids the usage
+of a user-defined function as a constant expression initializer (even
+if the function evaluates to something constant). This is the case for
+several glslsandbox shaders (for example 4040.0), which should be seen
+as non-conformant shaders with respect to the WebGL 1.0, OpenGL ES 2.0
+and GLSL 1.0.17 specifications. Such shaders should not be used for
+testing a driver without a correction. Use the online Khronos WebGL
+conformance to check is the implementation of a web browser, for this
+case:
+
+https://www.khronos.org/registry/webgl/sdk/tests/conformance/glsl/misc/global-variable-init.html
+
+  Finally, some shaders can be GPU-time consuming depending of the GPU
+being tested. This is why a relevant selection of shader suited for
+your driver and GPU would be better that a bare dump of the whole
+glslsandbox.com site.
 
   The original player at http://glslsandbox.com/ is interactive, and
 reacts to user mouse interactions. The glslsandbox-player instead can
