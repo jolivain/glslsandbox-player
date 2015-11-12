@@ -27,7 +27,7 @@ Install dependencies:
       git curl make gcc autoconf automake libx11-dev \
       libegl1-mesa-dev-lts-trusty libgles2-mesa-dev-lts-trusty
 
-* For Fedora (tested on 21 and 22):
+* For Fedora (tested on 21, 22 and 23):
 
     sudo yum install \
       git curl make gcc autoconf automake libX11-devel \
