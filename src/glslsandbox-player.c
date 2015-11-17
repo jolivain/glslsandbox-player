@@ -526,6 +526,47 @@ setup_fbo(context_t *ctx)
 }
 
 static void
+validate_shader_program(const context_t * ctx)
+{
+  GLint valid;
+  GLint info_len;
+
+  glValidateProgram(ctx->gl_prog);
+  assert( gles_no_error() );
+
+  info_len = 0;
+  glGetProgramiv(ctx->gl_prog, GL_INFO_LOG_LENGTH, &info_len);
+  assert( gles_no_error() );
+
+  if (ctx->verbose > 0) {
+    if (info_len > 1) {
+      char* info_log = malloc(info_len);
+      if (info_log == NULL) {
+          fprintf(stderr, "ERROR: malloc(): errno %i: %s\n",
+                  errno, strerror(errno));
+          exit(EXIT_FAILURE);
+      }
+
+      glGetProgramInfoLog(ctx->gl_prog, info_len, NULL, info_log);
+      assert( gles_no_error() );
+
+      fprintf(stderr, "INFO: glValidateProgram(): program info log: validate status:\n%s\n", info_log);
+
+      free(info_log);
+    }
+  }
+
+  glGetProgramiv(ctx->gl_prog, GL_VALIDATE_STATUS, &valid);
+  assert( gles_no_error() );
+
+  if (valid != GL_TRUE) {
+    fprintf(stderr, "ERROR: glValidateProgram(): GL_VALIDATE_STATUS != GL_TRUE: "
+            "could not validate shader program\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
+static void
 setup(context_t *ctx)
 {
   load_program(vertex_shader_g, get_shader_code(ctx),
@@ -602,6 +643,8 @@ setup(context_t *ctx)
 
   glViewport(0, 0, ctx->shader_width, ctx->shader_height);
   assert( gles_no_error() );
+
+  validate_shader_program(ctx);
 
   if (ctx->use_fbo)
     setup_fbo(ctx);
