@@ -1,5 +1,13 @@
 # ID      Nickname
 
+29149.10  Explosion
+29082.0   MarbleLevels
+29050.0   MetalicStructure
+29031.1   Labyrinth
+28898.1   NixieTube
+28681.1   Rain
+28814.9   LightTunnel
+28672.0   SixteenSegmentDisplayV4
 28514.0   PlasmaTriangle
 28511.1   Flower
 28503.0   StarField2
@@ -16,7 +24,7 @@
 28063.0   SimpleStarField2
 28044.1   PrintShader
 28039.1   NotWasteBlood
-28029.4   16Segment2
+28029.4   SixteenSegmentDisplayV3
 28027.5   TriangleCoordinates
 28020.0   SignalModulation
 27993.1   FractalTiling
@@ -30,6 +38,7 @@
 27683.2   WarpedCheckerboard
 27682.0   RotatingHexagonalGrid
 27678.0   CartoonTunnel
+27651.0   CloudySea
 27610.0   PlayingMarble
 27547.4   WavyTunnel
 27539.11  LightProjection2
@@ -52,7 +61,7 @@
 27204.0   SoftMinTest
 27200.0   FlyingPixels
 27178.0   BlurryLights
-27154.13  16SegmentsDisplay
+27154.13  SixteenSegmentGLSL
 27147.2   IsometricRayMarching
 27133.1   AsciiPlasma
 27059.10  HelloTime
@@ -97,7 +106,7 @@
 26511.0   PinkBrickWall
 26496.4   Mode7
 # BouncingSpheres: Crash on Fedora 22, firefox-39.0-8.fc22.x86_64, mesa-libGLES-10.6.1-1.20150629.fc22.x86_64
-26495.0   BouncingSpheres
+26493.0   BouncingSpheres
 26494.0   Chains
 26462.0   TerrainView
 26458.0   AnimatedTexture
@@ -150,7 +159,6 @@
 23182.0   StarNursery
 23002.0   PepperminCandyRain
 22864.2   CubicEntanglement
-22683.4   FractalCartoon
 22630.0   GoldenDunes
 22499.2   FractalSupernovae
 22497.0   Supernovae
@@ -170,7 +178,7 @@
 20033.1   Doom
 19885.0   Cylinders
 19521.0   SparseMengerCube
-18806.0   Wolfeinstein
+18749.0   Wolfenstein
 18434.0   AfghanGirl
 18431.0   CubesTunnel
 18426.0   Grid3D
@@ -180,6 +188,7 @@
 18248.1   Volutes
 18182.0   Galaxy2
 18138.0   EyeBall
+18109.0   LightBubbles
 17945.0   Tunnel
 17879.0   WaterTurbulence
 17548.0   JuliaOrbitTraps
@@ -202,6 +211,7 @@
 15384.0   MinecraftTunnel
 15072.13  ColorfulTunnel
 14872.21  Objects
+14742.0   FractalCartoon
 13449.2   OilPaintMix
 13442.0   QuadBezierCurve
 13421.0   HelloMorph
