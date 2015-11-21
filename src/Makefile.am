@@ -17,7 +17,7 @@ SHADER_CFILES = $(addsuffix .inc,$(SHADER_IDS))
 
 .SECONDARY: $(SHADER_FILES)
 
-%.inc: %.frag
+%.inc: %.frag $(srcdir)/glslsandbox-shaders.h
 	$(FRAG2INC) $(SHADER_LIST) $< > $@
 
 %.frag:
