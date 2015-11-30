@@ -60,6 +60,14 @@ static void
 player_cleanup(context_t *ctx)
 {
   XglFinish();
+
+  if (ctx->use_fbo) {
+    XglBindFramebuffer(GL_FRAMEBUFFER, 0);
+    XglDeleteFramebuffers(2, &ctx->fbo_id[0]);
+    XglBindTexture(GL_TEXTURE_2D, 0);
+    XglDeleteTextures(2, &ctx->fbo_texid[0]);
+  }
+
   XglUseProgram(0);
   XglDetachShader(ctx->gl_prog, ctx->vertex_shader);
   XglDetachShader(ctx->gl_prog, ctx->fragment_shader);
