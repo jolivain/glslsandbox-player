@@ -38,16 +38,19 @@ native_gfx_open_display(void)
 
   gfx = malloc(sizeof (*gfx));
   if (gfx == NULL) {
-    fprintf(stderr, "native_gfx_open_display(): Can't allocate memory: error %i: %s\n", errno, strerror(errno));
+    fprintf(stderr,
+            "native_gfx_open_display(): Can't allocate memory: error %i: %s\n",
+            errno, strerror(errno));
     exit(EXIT_FAILURE);
   }
 
   memset(gfx, 0, sizeof (*gfx));
 
-  gfx->disp = fbGetDisplayByIndex(0);
+  gfx->disp = fbGetDisplay(NULL);
 
   if (gfx->disp == NULL) {
-    fprintf(stderr, "native_gfx_open_display(): fbGetDisplay()\n");
+    fprintf(stderr, "ERROR: native_gfx_open_display(): "
+            "fbGetDisplay() returned NULL\n");
     exit(EXIT_FAILURE);
   }
 
