@@ -45,4 +45,8 @@ if ENABLE_VIVFB
 glslsandbox_player_SOURCES += native_gfx_vivfb.c
 endif
 
+if ENABLE_RPI
+glslsandbox_player_SOURCES += native_gfx_rpi.c
+endif
+
 nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c

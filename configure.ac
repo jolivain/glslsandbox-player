@@ -30,7 +30,7 @@ PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb]),
+        AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb,rpi]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
@@ -53,6 +53,15 @@ AS_IF([test "x$with_native_gfx" = "xvivfb"], [
         AC_MSG_NOTICE([VivanteFB support disabled])
 ])
 AM_CONDITIONAL([ENABLE_VIVFB], [test "x$with_native_gfx" = "xvivfb"])
+
+AS_IF([test "x$with_native_gfx" = "xrpi"], [
+	native_gfx=rpi
+        AC_DEFINE([ENABLE_RPI], [1], [Enable Raspberry Pi])
+        AC_MSG_NOTICE([Raspberry Pi support enabled])
+], [
+        AC_MSG_NOTICE([Raspberry Pi support disabled])
+])
+AM_CONDITIONAL([ENABLE_RPI], [test "x$with_native_gfx" = "xrpi"])
 
 AS_IF([test "x$native_gfx" = "x"], [
     AC_ERROR([unknown native gfx selected: $with_native_gfx])

@@ -157,7 +157,8 @@ The build dependencies of glslsandbox are:
 - coreutils (sort, cat)
 - Python 2.6 or greater (also works with Python 3.x)
 - Development files for an OpenGL ES 2.0 and EGL library
-- One of the following native window library: X11, Vivante/libGAL
+- One of the following native window library: X11, Vivante/libGAL,
+  Raspberry Pi
 
   Compiling glslsandbox-player should be straightforward if all
 dependencies are present since it's an autotools package (aka
@@ -167,7 +168,7 @@ windowing library for your system.
   The configure script takes an option to select the native windowing
 system:
 
-  --with-native-gfx   Define the native gfx backend: x11(default),vivfb
+  --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi
 
   For example, compiling for using the the Vivante frame buffer native
 windowing support, use "./configure --with-native-gfx=vivfb".
