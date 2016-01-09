@@ -17,8 +17,7 @@ AC_CONFIG_FILES([
 
 AC_CHECK_HEADERS([stddef.h stdlib.h string.h])
 AC_TYPE_SIZE_T
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([clock_gettime memset strerror strtol uname])
+AC_CHECK_FUNCS([clock_gettime malloc memset strerror strtol uname])
 
 AC_ARG_ENABLE([debug],
         AS_HELP_STRING([--enable-debug], [enable debug messages @<:@default=disabled@:>@]),
