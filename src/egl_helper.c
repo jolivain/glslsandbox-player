@@ -372,16 +372,16 @@ init_egl(int width, int height)
   memset(egl, 0, sizeof (*egl));
 
   egl->native_gfx = native_gfx_open_display();
-  native_gfx_create_window(egl->native_gfx, width, height);
-  egl->width = native_gfx_get_window_width(egl->native_gfx);
-  egl->height = native_gfx_get_window_height(egl->native_gfx);
-
   egl_native_disp = native_gfx_get_egl_native_display(egl->native_gfx);
   egl->dpy = XeglGetDisplay(egl_native_disp);
   XeglInitialize(egl->dpy, &egl->major, &egl->minor);
 
   XeglChooseConfig(egl->dpy, conf_attribList, configs, NUM_CONFIGS, &num_configs);
   assert( num_configs == 1 );
+
+  native_gfx_create_window(egl->native_gfx, width, height);
+  egl->width = native_gfx_get_window_width(egl->native_gfx);
+  egl->height = native_gfx_get_window_height(egl->native_gfx);
 
   egl_native_win = native_gfx_get_egl_native_window(egl->native_gfx);
   egl->surf = XeglCreateWindowSurface(egl->dpy, configs[0], egl_native_win, win_attribList);
