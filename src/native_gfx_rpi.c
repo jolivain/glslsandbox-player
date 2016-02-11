@@ -90,17 +90,41 @@ native_gfx_get_egl_native_window(const native_gfx_t *gfx)
   return (gfx->win);
 }
 
+static int32_t
+get_dispman_layer(void)
+{
+  int32_t layer;
+  char *layer_str;
+
+  layer = 0;
+
+  layer_str = getenv("GLSLSANDBOX_PLAYER_RPI_LAYER");
+  if (layer_str != NULL) {
+    layer = atoi(layer_str);
+    if (layer < 0 || layer >= 128) {
+      fprintf(stderr, "Warning: GLSLSANDBOX_PLAYER_RPI_LAYER must be "
+	      "non-negative and less than 128. Setting to 0.\n");
+      layer = 0;
+    }
+  }
+
+  return (layer);
+}
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height)
 {
   VC_RECT_T dst_rect;
   VC_RECT_T src_rect;
+  int32_t layer;
 
   if (width == 0)
     width = gfx->disp_width;
 
   if (height == 0)
     height = gfx->disp_height;
+
+  layer = get_dispman_layer();
 
   dst_rect.x = 0;
   dst_rect.y = 0;
@@ -116,7 +140,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
   gfx->dispman_update = vc_dispmanx_update_start(0 /*priority*/);
   gfx->dispman_element =
     vc_dispmanx_element_add(gfx->dispman_update, gfx->dispman_display,
-			    0 /*layer*/, &dst_rect, 0 /*src*/,
+			    layer, &dst_rect, 0 /*src*/,
 			    &src_rect, DISPMANX_PROTECTION_NONE,
 			    0 /*alpha*/, 0/*clamp*/, 0/*transform*/);
 
