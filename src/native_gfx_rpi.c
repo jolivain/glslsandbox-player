@@ -140,9 +140,9 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
   gfx->dispman_update = vc_dispmanx_update_start(0 /*priority*/);
   gfx->dispman_element =
     vc_dispmanx_element_add(gfx->dispman_update, gfx->dispman_display,
-			    layer, &dst_rect, 0 /*src*/,
+			    layer, &dst_rect, DISPMANX_NO_HANDLE /*src*/,
 			    &src_rect, DISPMANX_PROTECTION_NONE,
-			    0 /*alpha*/, 0/*clamp*/, 0/*transform*/);
+			    NULL /*alpha*/, NULL /*clamp*/, DISPMANX_NO_ROTATE /*transform*/);
 
   gfx->dispman_window.element = gfx->dispman_element;
   gfx->dispman_window.width = width;
