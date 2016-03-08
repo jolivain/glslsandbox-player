@@ -21,10 +21,31 @@ void
 __xgles_glAttachShader(const char *file, int line, GLuint program, GLuint shader);
 
 void
+__xgles_glBindBuffer(const char *file, int line, GLenum target, GLuint buffer);
+
+void
 __xgles_glBindFramebuffer(const char *file, int line, GLenum target, GLuint framebuffer);
 
 void
 __xgles_glBindTexture(const char *file, int line, GLenum target, GLuint texture);
+
+void
+__xgles_glBlendColor(const char *file, int line, GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+
+void
+__xgles_glBlendEquation(const char *file, int line, GLenum mode);
+
+void
+__xgles_glBlendEquationSeparate(const char *file, int line, GLenum modeRGB, GLenum modeAlpha);
+
+void
+__xgles_glBlendFunc(const char *file, int line, GLenum sfactor, GLenum dfactor);
+
+void
+__xgles_glBlendFuncSeparate(const char *file, int line, GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
+
+void
+__xgles_glBufferData(const char *file, int line, GLenum target, GLsizeiptr size, const void *data, GLenum usage);
 
 GLenum
 __xgles_glCheckFramebufferStatus(const char *file, int line, GLenum target);
@@ -45,6 +66,9 @@ GLuint
 __xgles_glCreateShader(const char *file, int line, GLenum type);
 
 void
+__xgles_glDeleteBuffers(const char *file, int line, GLsizei n, const GLuint *buffers);
+
+void
 __xgles_glDeleteFramebuffers(const char *file, int line, GLsizei n, const GLuint *framebuffers);
 
 void
@@ -60,7 +84,19 @@ void
 __xgles_glDetachShader(const char *file, int line, GLuint program, GLuint shader);
 
 void
+__xgles_glDepthFunc(const char *file, int line, GLenum func);
+
+void
+__xgles_glDepthMask(const char *file, int line, GLboolean flag);
+
+void
+__xgles_glDepthRangef(const char *file, int line, GLfloat n, GLfloat f);
+
+void
 __xgles_glDisable(const char *file, int line, GLenum cap);
+
+void
+__xgles_glDisableVertexAttribArray(const char *file, int line, GLuint index);
 
 void
 __xgles_glDrawArrays(const char *file, int line, GLenum mode, GLint first, GLsizei count);
@@ -79,6 +115,9 @@ __xgles_glFramebufferTexture2D(const char *file, int line, GLenum target, GLenum
 
 void
 __xgles_glGenFramebuffers(const char *file, int line, GLsizei n, GLuint *framebuffers);
+
+void
+__xgles_glGenBuffers(const char *file, int line, GLsizei n, GLuint *buffers);
 
 void
 __xgles_glGenTextures(const char *file, int line, GLsizei n, GLuint *textures);
@@ -122,8 +161,13 @@ __xgles_glReadPixels(const char *file, int line, GLint x, GLint y, GLsizei width
 void
 __xgles_glReleaseShaderCompiler(const char *file, int line);
 
+#if defined(ENABLE_RPI)
+void
+__xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
+#else
 void
 __xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length);
+#endif /* ENABLE_RPI */
 
 void
 __xgles_glTexImage2D(const char *file, int line, GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
@@ -141,7 +185,13 @@ void
 __xgles_glUniform2f(const char *file, int line, GLint location, GLfloat v0, GLfloat v1);
 
 void
+__xgles_glUniform3f(const char *file, int line, GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+
+void
 __xgles_glUniform4f(const char *file, int line, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+
+void
+__xgles_glUniformMatrix4fv(const char *file, int line, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
 void
 __xgles_glUseProgram(const char *file, int line, GLuint program);
@@ -162,8 +212,29 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglBindFramebuffer(target, framebuffer) \
   __xgles_glBindFramebuffer(__FILE__, __LINE__, target, framebuffer)
 
+#define XglBindBuffer(target, buffer) \
+  __xgles_glBindBuffer(__FILE__, __LINE__, target, buffer)
+
 #define XglBindTexture(target, texture) \
   __xgles_glBindTexture(__FILE__, __LINE__, target, texture)
+
+#define XglBlendColor(red, green, blue, alpha) \
+  __xgles_glBlendColor(__FILE__, __LINE__, red, green, blue, alpha)
+
+#define XglBlendEquation(mode) \
+  __xgles_glBlendEquation(__FILE__, __LINE__, mode)
+
+#define XglBlendEquationSeparate(modeRGB, modeAlpha) \
+  __xgles_glBlendEquationSeparate(__FILE__, __LINE__, modeRGB, modeAlpha)
+
+#define XglBlendFunc(sfactor, dfactor) \
+  __xgles_glBlendFunc(__FILE__, __LINE__, sfactor, dfactor)
+
+#define XglBlendFuncSeparate(sfactorRGB, dfactoAlpha, sfactorAlpha, dfactorAlpha) \
+  __xgles_glBlendFuncSeparate(__FILE__, __LINE__, sfactorRGB, dfactoAlpha, sfactorAlpha, dfactorAlpha)
+
+#define XglBufferData(target, size, data, usage) \
+  __xgles_glBufferData(__FILE__, __LINE__, target, size, data, usage)
 
 #define XglCheckFramebufferStatus(target) \
   __xgles_glCheckFramebufferStatus(__FILE__, __LINE__, target)
@@ -183,6 +254,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglCreateShader(type) \
   __xgles_glCreateShader(__FILE__, __LINE__, type)
 
+#define XglDeleteBuffers(n, buffers) \
+  __xgles_glDeleteBuffers(__FILE__, __LINE__, n, buffers)
+
 #define XglDeleteFramebuffers(n, framebuffers) \
   __xgles_glDeleteFramebuffers(__FILE__, __LINE__, n, framebuffers)
 
@@ -198,8 +272,20 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglDetachShader(program, shader) \
   __xgles_glDetachShader(__FILE__, __LINE__, program, shader)
 
+#define XglDepthFunc(func) \
+  __xgles_glDepthFunc(__FILE__, __LINE__, func)
+
+#define XglDepthMask(flag) \
+  __xgles_glDepthMask(__FILE__, __LINE__, flag)
+
+#define XglDepthRangef(n, f) \
+  __xgles_glDepthRangef(__FILE__, __LINE__, n, f)
+
 #define XglDisable(cap) \
   __xgles_glDisable(__FILE__, __LINE__, cap)
+
+#define XglDisableVertexAttribArray(index) \
+  __xgles_glDisableVertexAttribArray(__FILE__, __LINE__, index)
 
 #define XglDrawArrays(mode, first, count) \
   __xgles_glDrawArrays(__FILE__, __LINE__, mode, first, count)
@@ -215,6 +301,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 
 #define XglFramebufferTexture2D(target, attachment, textarget, texture, level) \
   __xgles_glFramebufferTexture2D(__FILE__, __LINE__, target, attachment, textarget, texture, level)
+
+#define XglGenBuffers(n, buffers) \
+  __xgles_glGenBuffers(__FILE__, __LINE__, n, buffers)
 
 #define XglGenFramebuffers(n, framebuffers) \
   __xgles_glGenFramebuffers(__FILE__, __LINE__, n, framebuffers)
@@ -279,8 +368,14 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglUniform2f(location, v0, v1) \
   __xgles_glUniform2f(__FILE__, __LINE__, location, v0, v1)
 
+#define XglUniform3f(location, v0, v1, v2) \
+  __xgles_glUniform3f(__FILE__, __LINE__, location, v0, v1, v2)
+
 #define XglUniform4f(location, v0, v1, v2, v3) \
   __xgles_glUniform4f(__FILE__, __LINE__, location, v0, v1, v2, v3)
+
+#define XglUniformMatrix4fv(location, count, transpose, value) \
+  __xgles_glUniformMatrix4fv(__FILE__, __LINE__, location, count, transpose, value)
 
 #define XglUseProgram(program) \
   __xgles_glUseProgram(__FILE__, __LINE__, program)
@@ -299,11 +394,32 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglAttachShader(program, shader) \
   glAttachShader(program, shader)
 
+#define XglBlendColor(red, green, blue, alpha) \
+  glBlendColor(red, green, blue, alpha)
+
+#define XglBlendEquation(mode) \
+  glBlendEquation(mode)
+
+#define XglBlendEquationSeparate(modeRGB, modeAlpha) \
+  glBlendEquationSeparate(modeRGB, modeAlpha)
+
+#define XglBlendFunc(sfactor, dfactor) \
+  glBlendFunc(sfactor, dfactor)
+
+#define XglBlendFuncSeparate(sfactorRGB, dfactoAlpha, sfactorAlpha, dfactorAlpha) \
+  glBlendFuncSeparate(sfactorRGB, dfactoAlpha, sfactorAlpha, dfactorAlpha)
+
+#define XglBindBuffer(target, buffer) \
+  glBindBuffer(target, buffer)
+
 #define XglBindFramebuffer(target, framebuffer) \
   glBindFramebuffer(target, framebuffer)
 
 #define XglBindTexture(target, texture) \
   glBindTexture(target, texture)
+
+#define XglBufferData(target, size, data, usage) \
+  glBufferData(target, size, data, usage)
 
 #define XglCheckFramebufferStatus(target) \
   glCheckFramebufferStatus(target)
@@ -323,6 +439,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglCreateShader(type) \
   glCreateShader(type)
 
+#define XglDeleteBuffers(n, buffers) \
+  glDeleteBuffers(n, buffers)
+
 #define XglDeleteFramebuffers(n, framebuffers) \
   glDeleteFramebuffers(n, framebuffers)
 
@@ -338,8 +457,20 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglDetachShader(program, shader) \
   glDetachShader(program, shader)
 
+#define XglDepthFunc(func) \
+  glDepthFunc(func)
+
+#define XglDepthMask(flag) \
+  glDepthMask(flag)
+
+#define XglDepthRangef(n, f) \
+  glDepthRangef(n, f)
+
 #define XglDisable(cap) \
   glDisable(cap)
+
+#define XglDisableVertexAttribArray(index) \
+  glDisableVertexAttribArray(index)
 
 #define XglDrawArrays(mode, first, count) \
   glDrawArrays(mode, first, count)
@@ -355,6 +486,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 
 #define XglFramebufferTexture2D(target, attachment, textarget, texture, level) \
   glFramebufferTexture2D(target, attachment, textarget, texture, level)
+
+#define XglGenBuffers(n, buffers) \
+  glGenBuffers(n, buffers)
 
 #define XglGenFramebuffers(n, framebuffers) \
   glGenFramebuffers(n, framebuffers)
@@ -419,8 +553,14 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglUniform2f(location, v0, v1) \
   glUniform2f(location, v0, v1)
 
+#define XglUniform3f(location, v0, v1, v2) \
+  glUniform3f(location, v0, v1, v2)
+
 #define XglUniform4f(location, v0, v1, v2, v3) \
   glUniform4f(location, v0, v1, v2, v3)
+
+#define XglUniformMatrix4fv(location, count, transpose, value) \
+  glUniformMatrix4fv(location, count, transpose, value)
 
 #define XglUseProgram(program) \
   glUseProgram(program)

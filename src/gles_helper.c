@@ -78,6 +78,20 @@ __xgles_glAttachShader(const char *file, int line, GLuint program, GLuint shader
 }
 
 void
+__xgles_glBufferData(const char *file, int line, GLenum target, GLsizeiptr size, const void *data, GLenum usage)
+{
+  glBufferData(target, size, data, usage);
+  __xgles_check_error(file, line, "glBufferData");
+}
+
+void
+__xgles_glBindBuffer(const char *file, int line, GLenum target, GLuint buffer)
+{
+  glBindBuffer(target, buffer);
+  __xgles_check_error(file, line, "glBindBuffer");
+}
+
+void
 __xgles_glBindFramebuffer(const char *file, int line, GLenum target, GLuint framebuffer)
 {
   glBindFramebuffer(target, framebuffer);
@@ -89,6 +103,41 @@ __xgles_glBindTexture(const char *file, int line, GLenum target, GLuint texture)
 {
   glBindTexture(target, texture);
   __xgles_check_error(file, line, "glBindTexture");
+}
+
+void
+__xgles_glBlendColor(const char *file, int line, GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+{
+  glBlendColor(red, green, blue, alpha);
+  __xgles_check_error(file, line, "glBlendColor");
+}
+
+void
+__xgles_glBlendEquation(const char *file, int line, GLenum mode)
+{
+  glBlendEquation(mode);
+  __xgles_check_error(file, line, "glBlendEquation");
+}
+
+void
+__xgles_glBlendEquationSeparate(const char *file, int line, GLenum modeRGB, GLenum modeAlpha)
+{
+  glBlendEquationSeparate(modeRGB, modeAlpha);
+  __xgles_check_error(file, line, "glBlendEquationSeparate");
+}
+
+void
+__xgles_glBlendFunc(const char *file, int line, GLenum sfactor, GLenum dfactor)
+{
+  glBlendFunc(sfactor, dfactor);
+  __xgles_check_error(file, line, "glBlendFunc");
+}
+
+void
+__xgles_glBlendFuncSeparate(const char *file, int line, GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
+{
+  glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+  __xgles_check_error(file, line, "glBlendFuncSeparate");
 }
 
 GLenum
@@ -156,6 +205,13 @@ __xgles_glCreateShader(const char *file, int line, GLenum type)
 }
 
 void
+__xgles_glDeleteBuffers(const char *file, int line, GLsizei n, const GLuint *buffers)
+{
+  glDeleteBuffers(n, buffers);
+  __xgles_check_error(file, line, "glDeleteBuffers");
+}
+
+void
 __xgles_glDeleteFramebuffers(const char *file, int line, GLsizei n, const GLuint *framebuffers)
 {
   glDeleteFramebuffers(n, framebuffers);
@@ -184,10 +240,31 @@ __xgles_glDeleteTextures(const char *file, int line, GLsizei n, const GLuint *te
 }
 
 void
+__xgles_glDepthFunc(const char *file, int line, GLenum func)
+{
+  glDepthFunc(func);
+  __xgles_check_error(file, line, "glDepthFunc");
+}
+
+void
+__xgles_glDepthMask(const char *file, int line, GLboolean flag)
+{
+  glDepthMask(flag);
+  __xgles_check_error(file, line, "glDepthMask");
+}
+
+void
+__xgles_glDepthRangef(const char *file, int line, GLfloat n, GLfloat f)
+{
+  glDepthRangef(n, f);
+  __xgles_check_error(file, line, "glDepthRangef");
+}
+
+void
 __xgles_glDetachShader(const char *file, int line, GLuint program, GLuint shader)
 {
   glDetachShader(program, shader);
-  __xgles_check_error(file, line, "glDeleteShader");
+  __xgles_check_error(file, line, "glDetachShader");
 }
 
 void
@@ -195,6 +272,13 @@ __xgles_glDisable(const char *file, int line, GLenum cap)
 {
   glDisable(cap);
   __xgles_check_error(file, line, "glDisable");
+}
+
+void
+__xgles_glDisableVertexAttribArray(const char *file, int line, GLuint index)
+{
+  glDisableVertexAttribArray(index);
+  __xgles_check_error(file, line, "glDisableVertexAttribArray");
 }
 
 void
@@ -230,6 +314,13 @@ __xgles_glFramebufferTexture2D(const char *file, int line, GLenum target, GLenum
 {
   glFramebufferTexture2D(target, attachment, textarget, texture, level);
   __xgles_check_error(file, line, "glFramebufferTexture2D");
+}
+
+void
+__xgles_glGenBuffers(const char *file, int line, GLsizei n, GLuint *buffers)
+{
+  glGenBuffers(n, buffers);
+  __xgles_check_error(file, line, "glGenBuffers");
 }
 
 void
@@ -353,8 +444,13 @@ __xgles_glReleaseShaderCompiler(const char *file, int line)
   __xgles_check_error(file, line, "glReleaseShaderCompiler");
 }
 
+#if defined(ENABLE_RPI)
+void
+__xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar **string, const GLint *length)
+#else
 void
 __xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length)
+#endif
 {
   glShaderSource(shader, count, string, length);
   __xgles_check_error(file, line, "glShaderSource");
@@ -396,6 +492,13 @@ __xgles_glUniform2f(const char *file, int line, GLint location, GLfloat v0, GLfl
 }
 
 void
+__xgles_glUniform3f(const char *file, int line, GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+{
+  glUniform3f(location, v0, v1, v2);
+  __xgles_check_error(file, line, "glUniform3f");
+}
+
+void
 __xgles_glUniform4f(const char *file, int line, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 {
   glUniform4f(location, v0, v1, v2, v3);
@@ -403,10 +506,17 @@ __xgles_glUniform4f(const char *file, int line, GLint location, GLfloat v0, GLfl
 }
 
 void
+__xgles_glUniformMatrix4fv(const char *file, int line, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+{
+  glUniformMatrix4fv(location, count, transpose, value);
+  __xgles_check_error(file, line, "glUniformMatrix4fv");
+}
+
+void
 __xgles_glUseProgram(const char *file, int line, GLuint program)
 {
   glUseProgram(program);
-  __xgles_check_error(file, line, "glUniform4f");
+  __xgles_check_error(file, line, "glUseProgram");
 }
 
 void
