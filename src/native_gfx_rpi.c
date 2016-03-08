@@ -111,12 +111,43 @@ get_dispman_layer(void)
   return (layer);
 }
 
+static VC_DISPMANX_ALPHA_T *
+get_dispman_layer_opacity(VC_DISPMANX_ALPHA_T *alpha)
+{
+  int32_t opacity;
+  char *opacity_str;
+  VC_DISPMANX_ALPHA_T *alpha_ptr;
+
+  opacity = 255;
+  alpha_ptr = NULL;
+
+  opacity_str = getenv("GLSLSANDBOX_PLAYER_RPI_LAYER_OPACITY");
+  if (opacity_str != NULL) {
+    opacity = atoi(opacity_str);
+    if (opacity < 0 || opacity >= 256) {
+      fprintf(stderr, "Warning: GLSLSANDBOX_PLAYER_RPI_LAYER_OPACITY must be "
+	      "non-negative and less than 256. Setting to 255.\n");
+      opacity = 255;
+    }
+    alpha->opacity = opacity;
+    alpha_ptr = alpha;
+  }
+
+  return (alpha_ptr);
+}
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height)
 {
   VC_RECT_T dst_rect;
   VC_RECT_T src_rect;
   int32_t layer;
+  VC_DISPMANX_ALPHA_T *alpha_ptr;
+  VC_DISPMANX_ALPHA_T alpha = {
+    DISPMANX_FLAGS_ALPHA_FROM_SOURCE | DISPMANX_FLAGS_ALPHA_FIXED_ALL_PIXELS,
+    255, /* opacity 0->255 */
+    DISPMANX_NO_HANDLE /* mask */
+  };
 
   if (width == 0)
     width = gfx->disp_width;
@@ -125,6 +156,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
     height = gfx->disp_height;
 
   layer = get_dispman_layer();
+  alpha_ptr = get_dispman_layer_opacity(&alpha);
 
   dst_rect.x = 0;
   dst_rect.y = 0;
@@ -142,7 +174,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
     vc_dispmanx_element_add(gfx->dispman_update, gfx->dispman_display,
 			    layer, &dst_rect, DISPMANX_NO_HANDLE /*src*/,
 			    &src_rect, DISPMANX_PROTECTION_NONE,
-			    NULL /*alpha*/, NULL /*clamp*/, DISPMANX_NO_ROTATE /*transform*/);
+			    alpha_ptr, NULL /*clamp*/, DISPMANX_NO_ROTATE /*transform*/);
 
   gfx->dispman_window.element = gfx->dispman_element;
   gfx->dispman_window.width = width;
