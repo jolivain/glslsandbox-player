@@ -40,6 +40,9 @@ struct context_s {
   GLint a_pos, a_surfacePosition;
   GLint u_time, u_mouse, u_resolution, u_surfaceSize;
   GLint u_backbuf;
+  const char *texture0_file;
+  GLint u_texture0;
+  GLuint texture0id;
   GLuint gl_prog;
   GLuint vertex_shader;
   GLuint fragment_shader;

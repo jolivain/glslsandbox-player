@@ -4,7 +4,7 @@ AM_CFLAGS = -W -Wall -Wextra -Wshadow -Wpointer-arith -Wmissing-prototypes -Wcas
 
 LDADD = \
 	${egl_LIBS} ${glesv2_LIBS} \
-	${x11_LIBS} -lm
+	${x11_LIBS} -lm -lpng
 
 GEN_SHADER_IDS = $(top_srcdir)/scripts/gen-shader-ids
 DL_SHADER = $(top_srcdir)/scripts/dl-shader
@@ -34,6 +34,7 @@ glslsandbox_player_SOURCES = \
   glslsandbox-player.c glslsandbox-player.h \
   egl_helper.c egl_helper.h \
   gles_helper.c gles_helper.h \
+  pngio.c \
   glslsandbox-shaders.h \
   native_gfx.h
 

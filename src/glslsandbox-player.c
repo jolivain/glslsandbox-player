@@ -491,6 +491,29 @@ validate_shader_program(const context_t * ctx)
 }
 
 static void
+load_png_texture0(context_t *ctx)
+{
+  unsigned char *img;
+  int width, height, channels;
+
+  read_png_file(ctx->texture0_file, &img, &width, &height, &channels);
+
+  printf("read img %i x %i x %i\n", width, height, channels);
+
+  XglGenTextures(1, &ctx->texture0id);
+
+  XglBindTexture(GL_TEXTURE_2D, ctx->texture0id);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  XglTexImage2D(GL_TEXTURE_2D,
+                0, GL_RGBA, width, height, 0, GL_RGBA,
+                GL_UNSIGNED_BYTE, img);
+}
+
+static void
 setup(context_t *ctx)
 {
   load_program(vertex_shader_g, get_shader_code(ctx),
@@ -546,6 +569,13 @@ setup(context_t *ctx)
       fprintf(stderr, "Rendering will probably be incorrect.\n");
       fprintf(stderr, "Try adding -B or -X/-Y command line options.\n\n");
     }
+  }
+
+  ctx->u_texture0 = XglGetUniformLocation(ctx->gl_prog, "texture0");
+
+  if (ctx->u_texture0 >= 0) {
+    load_png_texture0(ctx);
+    XglUniform1i(ctx->u_texture0, 0);
   }
 
   XglViewport(0, 0, ctx->shader_width, ctx->shader_height);
@@ -831,9 +861,13 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:")) != -1) {
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:0:")) != -1) {
 
     switch (opt) {
+
+    case '0':
+      ctx->texture0_file = optarg;
+      break ;
 
     case 'B':
       ctx->use_fbo = 1;
