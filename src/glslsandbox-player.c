@@ -149,22 +149,22 @@ get_line_counts(const char *str, int *lines, int *statements)
   has_statement = 0;
 
   for ( ; *str != '\0'; ++str) {
-      if (*str == ';') {
-          has_statement = 1;
+    if (*str == ';') {
+      has_statement = 1;
+    }
+    else if (*str == '\n') {
+      ++line_count;
+      if (has_statement != 0) {
+        ++statement_count;
+        has_statement = 0;
       }
-      else if (*str == '\n') {
-          ++line_count;
-          if (has_statement != 0) {
-              ++statement_count;
-              has_statement = 0;
-          }
-      }
+    }
   }
 
   if (lines != NULL)
-      *lines = line_count;
+    *lines = line_count;
   if (statements != NULL)
-      *statements = statement_count;
+    *statements = statement_count;
 }
 
 static const char *
@@ -194,20 +194,20 @@ convert_rgba_to_rgb_inplace(GLubyte *pixels, GLint pixel_count)
 static void
 vflip_rgb_pixels_inplace(GLubyte *pixels, GLint width, GLint height)
 {
-    GLint x, y, flip_y;
-    GLint height_2;
-    GLubyte tmp_pixel[3];
+  GLint x, y, flip_y;
+  GLint height_2;
+  GLubyte tmp_pixel[3];
 
-    height_2 = height / 2;
+  height_2 = height / 2;
 
-    for (y = 0; y < height_2; ++y) {
-        flip_y = height - y - 1;
-        for (x = 0; x < width; ++x) {
-            memcpy(tmp_pixel, &pixels[ (y * width + x) * 3], sizeof (tmp_pixel));
-            memcpy(&pixels[ (y * width + x) * 3], &pixels[ (flip_y * width + x) * 3], sizeof (tmp_pixel));
-            memcpy(&pixels[ (flip_y * width + x) * 3], tmp_pixel, sizeof (tmp_pixel));
-        }
+  for (y = 0; y < height_2; ++y) {
+    flip_y = height - y - 1;
+    for (x = 0; x < width; ++x) {
+      memcpy(tmp_pixel, &pixels[ (y * width + x) * 3], sizeof (tmp_pixel));
+      memcpy(&pixels[ (y * width + x) * 3], &pixels[ (flip_y * width + x) * 3], sizeof (tmp_pixel));
+      memcpy(&pixels[ (flip_y * width + x) * 3], tmp_pixel, sizeof (tmp_pixel));
     }
+  }
 }
 
 static void
@@ -468,9 +468,9 @@ validate_shader_program(const context_t * ctx)
     if (info_len > 1) {
       char* info_log = malloc(info_len);
       if (info_log == NULL) {
-          fprintf(stderr, "ERROR: malloc(): errno %i: %s\n",
-                  errno, strerror(errno));
-          exit(EXIT_FAILURE);
+        fprintf(stderr, "ERROR: malloc(): errno %i: %s\n",
+                errno, strerror(errno));
+        exit(EXIT_FAILURE);
       }
 
       XglGetProgramInfoLog(ctx->gl_prog, info_len, NULL, info_log);
@@ -604,8 +604,8 @@ draw_frame(context_t *ctx)
 
     m = M_PI * (ctx->time_offset + ctx->time * ctx->mouse_emu_speed);
     XglUniform2f(ctx->u_mouse,
-                0.5f + sinf(0.125f * m) * 0.4f,
-                0.5f + sinf(0.250f * m) * 0.4f);
+                 0.5f + sinf(0.125f * m) * 0.4f,
+                 0.5f + sinf(0.250f * m) * 0.4f);
   }
 
   XglClear(GL_COLOR_BUFFER_BIT);
@@ -1055,8 +1055,8 @@ xclock_gettime(clockid_t clk_id, struct timespec *tp)
 
   ret = clock_gettime(clk_id, tp);
   if (ret != 0) {
-      fprintf(stderr, "ERROR: clock_gettime(): error %i: %s\n", errno, strerror(errno));
-      exit(EXIT_FAILURE);
+    fprintf(stderr, "ERROR: clock_gettime(): error %i: %s\n", errno, strerror(errno));
+    exit(EXIT_FAILURE);
   }
 }
 
