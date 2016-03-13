@@ -159,6 +159,7 @@ The build dependencies of glslsandbox are:
 - Development files for an OpenGL ES 2.0 and EGL library
 - One of the following native window library: X11, Vivante/libGAL,
   Raspberry Pi
+- optional: libpng library and header files for texture support
 
   Compiling glslsandbox-player should be straightforward if all
 dependencies are present since it's an autotools package (aka
@@ -233,6 +234,8 @@ browser.
      -V <n>: set EGL swap interval to n
      -d: dump each frame as PPM
      -D: dump only the last frame as PPM
+     -0 <file.png>: Load "file.png" and bind it to TEXTURE0
+     -1 to -7: same as -0 for TEXTUREn
      -v: increase verbosity level
      -q: run quietly
 
@@ -309,6 +312,44 @@ command line argument will set the swap interval by calling
 eglSwapInterval(). Some EGL implementation will return a failure if it
 cannot be set. If glslsandbox-player is built with strict EGL/GLES
 error checking (which is the default), it will abort execution.
+
+
+Additional Features not Present in GLSL Sandbox
+-----------------------------------------------
+
+  For testing purposes, a feature for loading PNG textures is added to
+glslsandbox-player.  This feature is not in the original
+http://glslsandbox.com/ site.
+
+  Using the -0 <file.png> to -7 <file.png> command line option will
+load the "file.png" file and bind it to the texture unit corresponding
+to the number of the option.  Each texture can be accessed in fragment
+shaders through the "textureN" sampler2D uniform, where 'N' is the
+number of the texture.
+
+  Example, for just displaying a PNG image with glslsandbox-player,
+use the following fragment shader, the the file "texture.glslf":
+
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+    
+    uniform vec2 resolution;
+    uniform sampler2D texture0;
+    
+    void main(void) {
+      vec2 uv = gl_FragCoord.xy / resolution.xy;
+      uv.y = 1.0 - uv.y;
+      gl_FragColor = texture2D(texture0, uv);
+    }
+
+  Then, to run glslsandbox-player with the command-line:
+    glslsandbox-player -F texture.glslf -0 image.png
+
+  For now, supported PNG formats are one to four 8-bit channels
+(Luminance, Luminance+Alpha, RGB and RGBA).  Pallete and 16-bit PNG
+files are not supported.  Use an image converter if an image is in an
+unsupported format.
 
 
 Using glslsandbox-player for Automatic Testing

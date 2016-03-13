@@ -25,6 +25,10 @@
 #include <errno.h>
 #include <math.h>
 
+#ifdef HAVE_LIBPNG
+#include "pngio.h"
+#endif
+
 #include "glslsandbox-shaders.h"
 #include "native_gfx.h"
 #include "egl_helper.h"
@@ -55,6 +59,11 @@ fbo_frag_shader_g =
   "  gl_FragColor = texture2D(u_tex, surfacePosition);\n"
   "}                         \n"
 ;
+
+static const GLenum gl_texture_g[] = {
+  GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
+  GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7
+};
 
 static void
 player_cleanup(context_t *ctx)
@@ -491,6 +500,78 @@ validate_shader_program(const context_t * ctx)
 }
 
 static void
+load_png_texture(context_t *ctx, int tex)
+{
+#ifdef HAVE_LIBPNG
+  unsigned char *img;
+  int width, height, channels;
+  GLenum fmt;
+
+  if (ctx->texture[tex].file == NULL) {
+    fprintf(stderr,
+            "WARNING: shader is using uniform \"texture%i\" but no texture\n"
+            "WARNING: was defined on command line with -%i <file.png> option.\n", tex, tex);
+    return ;
+  }
+
+  read_png_file(ctx->texture[tex].file, &img, &width, &height, &channels);
+
+  if (channels == 1) {
+    fmt = GL_LUMINANCE;
+  }
+  else if (channels == 2) {
+    fmt = GL_LUMINANCE_ALPHA;
+  }
+  else if (channels == 3) {
+    fmt = GL_RGB;
+  }
+  else if (channels == 4) {
+    fmt = GL_RGBA;
+  }
+  else {
+    fprintf(stderr, "WARNING: unexpected number of channel %i\n", channels);
+    return ;
+  }
+
+  XglGenTextures(1, &ctx->texture[tex].id);
+
+  XglBindTexture(GL_TEXTURE_2D, ctx->texture[tex].id);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  XglTexImage2D(GL_TEXTURE_2D,
+                0, fmt, width, height, 0, fmt,
+                GL_UNSIGNED_BYTE, img);
+
+  free(img);
+#else
+  fprintf(stderr, "WARNING: libpng support is not was not enabled at compilation.\n");
+#endif /* HAVE_LIBPNG */
+}
+
+static void
+setup_textures(context_t *ctx)
+{
+  char u_name[10];
+  int i;
+
+  for (i = 0; i < MAX_TEXTURES; ++i) {
+
+    snprintf(u_name, sizeof (u_name), "texture%i", i);
+
+    ctx->texture[i].u_tex = XglGetUniformLocation(ctx->gl_prog, u_name);
+
+    if (ctx->texture[i].u_tex >= 0) {
+      glActiveTexture(gl_texture_g[i]);
+      load_png_texture(ctx, i);
+      XglUniform1i(ctx->texture[i].u_tex, i);
+    }
+  }
+}
+
+static void
 setup(context_t *ctx)
 {
   load_program(vertex_shader_g, get_shader_code(ctx),
@@ -548,6 +629,14 @@ setup(context_t *ctx)
     }
   }
 
+  setup_textures(ctx);
+
+  if ((ctx->u_backbuf >= 0) && (ctx->texture[0].u_tex >= 0)) {
+    fprintf(stderr,
+            "WARNING: \"texture0\" sampler2D should not be used "
+            "at the same time with backbuffer.\n\n");
+  }
+
   XglViewport(0, 0, ctx->shader_width, ctx->shader_height);
 
   validate_shader_program(ctx);
@@ -582,6 +671,7 @@ compute_surface_position(GLfloat surfPos[8],
 static void
 draw_frame(context_t *ctx)
 {
+  int i;
   GLfloat surfPos[8] = {
     -1.0,  1.0,
      1.0,  1.0,
@@ -631,6 +721,15 @@ draw_frame(context_t *ctx)
     XglBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[(ctx->frame+1) & 1]);
     XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  }
+
+  for (i = 0; i < MAX_TEXTURES; ++i) {
+    if (ctx->texture[i].u_tex >= 0) {
+      glActiveTexture(gl_texture_g[i]);
+      XglBindTexture(GL_TEXTURE_2D, ctx->texture[i].id);
+      XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
   }
 
   XglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -819,6 +918,8 @@ player_usage(void)
   fprintf(stderr, "  -V <n>: set EGL swap interval to n\n");
   fprintf(stderr, "  -d: dump each frame as PPM\n");
   fprintf(stderr, "  -D: dump only the last frame as PPM\n");
+  fprintf(stderr, "  -0 <file.png>: Load \"file.png\" and bind it to TEXTURE0\n");
+  fprintf(stderr, "  -1 to -7: same as -0 for TEXTUREn\n");
   fprintf(stderr, "  -v: increase verbosity level\n");
   fprintf(stderr, "  -q: run quietly\n");
   fprintf(stderr, "\n");
@@ -831,9 +932,20 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:")) != -1) {
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
+
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+      ctx->texture[(opt - '0')].file = optarg;
+      break ;
 
     case 'B':
       ctx->use_fbo = 1;
@@ -1192,6 +1304,10 @@ fprintf_info(FILE *fp)
   fprintf(fp, "Native window system        : Raspberry Pi\n");
 #else
 # warning "Native window system is not defined in info function"
+#endif
+
+#ifdef HAVE_LIBPNG
+  fprintf(fp, "libpng support version      : %s\n", PNG_LIBPNG_VER_STRING);
 #endif
 
   fprintf(fp, "\n");

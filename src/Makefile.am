@@ -6,6 +6,10 @@ LDADD = \
 	${egl_LIBS} ${glesv2_LIBS} \
 	${x11_LIBS} -lm
 
+if HAVE_LIBPNG
+LDADD += ${libpng_LIBS}
+endif
+
 GEN_SHADER_IDS = $(top_srcdir)/scripts/gen-shader-ids
 DL_SHADER = $(top_srcdir)/scripts/dl-shader
 FRAG2INC = $(top_srcdir)/scripts/frag2inc
@@ -36,6 +40,10 @@ glslsandbox_player_SOURCES = \
   gles_helper.c gles_helper.h \
   glslsandbox-shaders.h \
   native_gfx.h
+
+if HAVE_LIBPNG
+glslsandbox_player_SOURCES += pngio.c pngio.h
+endif
 
 if ENABLE_X11
 glslsandbox_player_SOURCES += native_gfx_x11.c
