@@ -685,6 +685,12 @@ draw_frame(context_t *ctx)
     XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   }
 
+  if (ctx->u_texture0 >= 0) {
+    XglBindTexture(GL_TEXTURE_2D, ctx->texture0id);
+    XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  }
+
   XglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
