@@ -29,6 +29,12 @@ AS_IF([test "x$enable_debug" = "xyes"], [
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
+PKG_CHECK_MODULES([libpng], [libpng], [
+        have_libpng=yes
+        AC_DEFINE(HAVE_LIBPNG, [1], [Have libpng.])
+])
+AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
+
 AC_ARG_WITH([native-gfx],
         AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb,rpi]),
         [], [with_native_gfx=x11])

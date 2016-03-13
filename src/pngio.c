@@ -11,130 +11,6 @@
 #include <zlib.h>
 #include <png.h>
 
-#if 0
-static void
-image_to_png_rgba_rows(const image_t *image, const png_bytep *row_pointers)
-{
-  int x;
-  int y;
-
-  for (y = 0; y < image->height; ++y) {
-    png_byte* row = row_pointers[y];
-    for (x = 0; x < image->width; ++x) {
-      png_byte* ptr = &(row[x*4]);
-      pixel_t col;
-
-      col = image_get_pixel(image, x, y);
-
-      ptr[0] = col.rgba.r;
-      ptr[1] = col.rgba.g;
-      ptr[2] = col.rgba.b;
-      ptr[3] = col.rgba.a;
-    }
-  }
-}
-#endif
-
-#if 0
-static void
-png_rgba_to_image(const png_bytep *row_pointers, const image_t *image)
-{
-  int x;
-  int y;
-
-  for (y = 0; y < image->height; ++y) {
-    png_byte* row = row_pointers[y];
-    for (x = 0; x < image->width; ++x) {
-      png_byte* ptr = &(row[x*4]);
-      pixel_t col;
-
-      col.value = 0;
-
-      col.rgba.r = ptr[0];
-      col.rgba.g = ptr[1];
-      col.rgba.b = ptr[2];
-      col.rgba.a = ptr[3];
-
-      image_set_pixel(image, x, y, col);
-    }
-  }
-}
-#endif
-
-#if 0
-static void
-png_rgb_to_image(const png_bytep *row_pointers, const image_t *image)
-{
-  int x;
-  int y;
-
-  for (y = 0; y < image->height; ++y) {
-    png_byte* row = row_pointers[y];
-    for (x = 0; x < image->width; ++x) {
-      png_byte* ptr = &(row[x*3]);
-      pixel_t col;
-
-      col.value = 0;
-
-      col.rgba.r = ptr[0];
-      col.rgba.g = ptr[1];
-      col.rgba.b = ptr[2];
-      col.rgba.a = 0xFF;
-
-      image_set_pixel(image, x, y, col);
-    }
-  }
-}
-
-static void
-png_gray_to_image(const png_bytep *row_pointers, const image_t *image)
-{
-  int x;
-  int y;
-
-  for (y = 0; y < image->height; ++y) {
-    png_byte* row = row_pointers[y];
-    for (x = 0; x < image->width; ++x) {
-      png_byte* ptr = &(row[x]);
-      pixel_t col;
-
-      col.value = 0;
-
-      col.rgba.r = ptr[0];
-      col.rgba.g = ptr[0];
-      col.rgba.b = ptr[0];
-      col.rgba.a = 0xFF;
-
-      image_set_pixel(image, x, y, col);
-    }
-  }
-}
-
-static void
-png_gray_alpha_to_image(const png_bytep *row_pointers, const image_t *image)
-{
-  int x;
-  int y;
-
-  for (y = 0; y < image->height; ++y) {
-    png_byte* row = row_pointers[y];
-    for (x = 0; x < image->width; ++x) {
-      png_byte* ptr = &(row[x*2]);
-      pixel_t col;
-
-      col.value = 0;
-
-      col.rgba.r = ptr[0];
-      col.rgba.g = ptr[0];
-      col.rgba.b = ptr[0];
-      col.rgba.a = ptr[1];
-
-      image_set_pixel(image, x, y, col);
-    }
-  }
-}
-#endif
-
 void
 read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *img_height, int *img_channels)
 {
@@ -241,46 +117,15 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
     exit(EXIT_FAILURE);
   }
 
-  /// XXX Allocate contiguous
   row_pointers = malloc( sizeof (png_bytep) * height);
   rowbytes = png_get_rowbytes(png_ptr, info_ptr);
-  image_data = malloc( height * rowbytes );
+  image_data = malloc(height * rowbytes);
   for (y = 0; y < height; ++y) {
     row_pointers[y] = &(image_data[y * rowbytes]);
   }
 
   png_read_image(png_ptr, row_pointers);
 
-#if 0
-  image = image_new(width, height);
-
-  switch (color_type) {
-
-  case PNG_COLOR_TYPE_RGB_ALPHA:
-    png_rgba_to_image(row_pointers, image);
-    break ;
-
-  case PNG_COLOR_TYPE_RGB:
-    png_rgb_to_image(row_pointers, image);
-    break ;
-
-  case PNG_COLOR_TYPE_GRAY:
-    png_gray_to_image(row_pointers, image);
-    break ;
-
-  case PNG_COLOR_TYPE_GRAY_ALPHA:
-    png_gray_alpha_to_image(row_pointers, image);
-    break ;
-
-  default:
-    fprintf(stderr, "Unsupported color type %i\n", color_type);
-    break ;
-  }
-
-  for (y = 0; y < height; y++)
-    free(row_pointers[y]);
-  free(row_pointers);
-#endif
   free(row_pointers);
 
   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);

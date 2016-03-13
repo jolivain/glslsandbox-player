@@ -25,6 +25,10 @@
 #include <errno.h>
 #include <math.h>
 
+#ifdef HAVE_LIBPNG
+#include "pngio.h"
+#endif
+
 #include "glslsandbox-shaders.h"
 #include "native_gfx.h"
 #include "egl_helper.h"
@@ -495,10 +499,28 @@ load_png_texture0(context_t *ctx)
 {
   unsigned char *img;
   int width, height, channels;
+  GLenum fmt;
 
   read_png_file(ctx->texture0_file, &img, &width, &height, &channels);
 
   printf("read img %i x %i x %i\n", width, height, channels);
+
+  if (channels == 1) {
+    fmt = GL_LUMINANCE;
+  }
+  else if (channels == 2) {
+    fmt = GL_LUMINANCE_ALPHA;
+  }
+  else if (channels == 3) {
+    fmt = GL_RGB;
+  }
+  else if (channels == 4) {
+    fmt = GL_RGBA;
+  }
+  else {
+    fprintf(stderr, "WARNING: unexpected number of channel %i\n", channels);
+    return ;
+  }
 
   XglGenTextures(1, &ctx->texture0id);
 
@@ -509,7 +531,7 @@ load_png_texture0(context_t *ctx)
   XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   XglTexImage2D(GL_TEXTURE_2D,
-                0, GL_RGBA, width, height, 0, GL_RGBA,
+                0, fmt, width, height, 0, fmt,
                 GL_UNSIGNED_BYTE, img);
 }
 

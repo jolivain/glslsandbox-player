@@ -34,9 +34,12 @@ glslsandbox_player_SOURCES = \
   glslsandbox-player.c glslsandbox-player.h \
   egl_helper.c egl_helper.h \
   gles_helper.c gles_helper.h \
-  pngio.c \
   glslsandbox-shaders.h \
   native_gfx.h
+
+if HAVE_LIBPNG
+glslsandbox_player_SOURCES += pngio.c pngio.h
+endif
 
 if ENABLE_X11
 glslsandbox_player_SOURCES += native_gfx_x11.c
