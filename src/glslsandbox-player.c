@@ -60,6 +60,11 @@ fbo_frag_shader_g =
   "}                         \n"
 ;
 
+static const GLenum gl_texture_g[] = {
+  GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2, GL_TEXTURE3,
+  GL_TEXTURE4, GL_TEXTURE5, GL_TEXTURE6, GL_TEXTURE7
+};
+
 static void
 player_cleanup(context_t *ctx)
 {
@@ -495,14 +500,21 @@ validate_shader_program(const context_t * ctx)
 }
 
 static void
-load_png_texture0(context_t *ctx)
+load_png_texture(context_t *ctx, int tex)
 {
 #ifdef HAVE_LIBPNG
   unsigned char *img;
   int width, height, channels;
   GLenum fmt;
 
-  read_png_file(ctx->texture0_file, &img, &width, &height, &channels);
+  if (ctx->texture[tex].file == NULL) {
+    fprintf(stderr,
+            "WARNING: shader is using uniform \"texture%i\" but no texture\n"
+            "WARNING: was defined on command line with -%i <file.png> option.\n", tex, tex);
+    return ;
+  }
+
+  read_png_file(ctx->texture[tex].file, &img, &width, &height, &channels);
 
   printf("read img %i x %i x %i\n", width, height, channels);
 
@@ -523,9 +535,9 @@ load_png_texture0(context_t *ctx)
     return ;
   }
 
-  XglGenTextures(1, &ctx->texture0id);
+  XglGenTextures(1, &ctx->texture[tex].id);
 
-  XglBindTexture(GL_TEXTURE_2D, ctx->texture0id);
+  XglBindTexture(GL_TEXTURE_2D, ctx->texture[tex].id);
   XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -539,6 +551,26 @@ load_png_texture0(context_t *ctx)
 #else
   fprintf(stderr, "WARNING: libpng support is not was not enabled at compilation.\n");
 #endif /* HAVE_LIBPNG */
+}
+
+static void
+setup_textures(context_t *ctx)
+{
+  char u_name[10];
+  int i;
+
+  for (i = 0; i < MAX_TEXTURES; ++i) {
+
+    snprintf(u_name, sizeof (u_name), "texture%i", i);
+
+    ctx->texture[i].u_tex = XglGetUniformLocation(ctx->gl_prog, u_name);
+
+    if (ctx->texture[i].u_tex >= 0) {
+      glActiveTexture(gl_texture_g[i]);
+      load_png_texture(ctx, i);
+      XglUniform1i(ctx->texture[i].u_tex, i);
+    }
+  }
 }
 
 static void
@@ -599,14 +631,12 @@ setup(context_t *ctx)
     }
   }
 
-  ctx->u_texture0 = XglGetUniformLocation(ctx->gl_prog, "texture0");
+  setup_textures(ctx);
 
-  if (ctx->u_texture0 >= 0) {
+  if ((ctx->u_backbuf >= 0) && (ctx->texture[0].u_tex >= 0)) {
     fprintf(stderr,
             "WARNING: \"texture0\" sampler2D should not be used "
             "at the same time with backbuffer.\n\n");
-    load_png_texture0(ctx);
-    XglUniform1i(ctx->u_texture0, 0);
   }
 
   XglViewport(0, 0, ctx->shader_width, ctx->shader_height);
@@ -643,6 +673,7 @@ compute_surface_position(GLfloat surfPos[8],
 static void
 draw_frame(context_t *ctx)
 {
+  int i;
   GLfloat surfPos[8] = {
     -1.0,  1.0,
      1.0,  1.0,
@@ -694,10 +725,13 @@ draw_frame(context_t *ctx)
     XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   }
 
-  if (ctx->u_texture0 >= 0) {
-    XglBindTexture(GL_TEXTURE_2D, ctx->texture0id);
-    XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  for (i = 0; i < MAX_TEXTURES; ++i) {
+    if (ctx->texture[i].u_tex >= 0) {
+      glActiveTexture(gl_texture_g[i]);
+      XglBindTexture(GL_TEXTURE_2D, ctx->texture[i].id);
+      XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
   }
 
   XglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -898,12 +932,19 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:0:")) != -1) {
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
     case '0':
-      ctx->texture0_file = optarg;
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+      ctx->texture[(opt - '0')].file = optarg;
       break ;
 
     case 'B':

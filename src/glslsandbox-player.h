@@ -33,6 +33,15 @@
 #define DUMP_FRAME_ALL  1
 #define DUMP_FRAME_LAST 2
 
+#define MAX_TEXTURES 8
+
+typedef struct texture_s texture_t;
+struct texture_s {
+  const char *file;
+  GLint u_tex;
+  GLuint id;
+};
+
 typedef struct context_s context_t;
 struct context_s {
   egl_t *egl;
@@ -40,9 +49,7 @@ struct context_s {
   GLint a_pos, a_surfacePosition;
   GLint u_time, u_mouse, u_resolution, u_surfaceSize;
   GLint u_backbuf;
-  const char *texture0_file;
-  GLint u_texture0;
-  GLuint texture0id;
+  texture_t texture[MAX_TEXTURES];
   GLuint gl_prog;
   GLuint vertex_shader;
   GLuint fragment_shader;
