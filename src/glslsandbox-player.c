@@ -497,6 +497,7 @@ validate_shader_program(const context_t * ctx)
 static void
 load_png_texture0(context_t *ctx)
 {
+#ifdef HAVE_LIBPNG
   unsigned char *img;
   int width, height, channels;
   GLenum fmt;
@@ -533,6 +534,11 @@ load_png_texture0(context_t *ctx)
   XglTexImage2D(GL_TEXTURE_2D,
                 0, fmt, width, height, 0, fmt,
                 GL_UNSIGNED_BYTE, img);
+
+  free(img);
+#else
+  fprintf(stderr, "WARNING: libpng support is not was not enabled at compilation.\n");
+#endif /* HAVE_LIBPNG */
 }
 
 static void
@@ -596,6 +602,9 @@ setup(context_t *ctx)
   ctx->u_texture0 = XglGetUniformLocation(ctx->gl_prog, "texture0");
 
   if (ctx->u_texture0 >= 0) {
+    fprintf(stderr,
+            "WARNING: \"texture0\" sampler2D should not be used "
+            "at the same time with backbuffer.\n\n");
     load_png_texture0(ctx);
     XglUniform1i(ctx->u_texture0, 0);
   }
