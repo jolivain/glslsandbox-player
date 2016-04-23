@@ -232,6 +232,7 @@ browser.
      -r <n>: report frame rate every n frames
      -w <n>: set the number of warmup frames
      -V <n>: set EGL swap interval to n
+     -P <n>: sleep n milliseconds between frames
      -d: dump each frame as PPM
      -D: dump only the last frame as PPM
      -0 <file.png>: Load "file.png" and bind it to TEXTURE0
@@ -312,6 +313,11 @@ command line argument will set the swap interval by calling
 eglSwapInterval(). Some EGL implementation will return a failure if it
 cannot be set. If glslsandbox-player is built with strict EGL/GLES
 error checking (which is the default), it will abort execution.
+
+  Since the swap internal can be silently clamped or ignored by some
+implementations, the -P option can be used to virtually slow down the
+frame rate be sleeping for some defined time between frame.  Frames
+will not be synchronized, but this will reduce system load.
 
 
 Additional Features not Present in GLSL Sandbox

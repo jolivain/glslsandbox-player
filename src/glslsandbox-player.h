@@ -67,6 +67,7 @@ struct context_s {
   unsigned int frame;
   unsigned int frames;
   unsigned int warmup_frames;
+  unsigned int frame_sleep;
   int report_fps_count;
   int verbose;
   int print_shader;

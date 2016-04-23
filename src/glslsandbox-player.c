@@ -20,7 +20,7 @@
 #include <string.h>
 #include <sys/utsname.h>
 #include <limits.h>
-
+#include <unistd.h>
 #include <time.h>
 #include <errno.h>
 #include <math.h>
@@ -916,6 +916,7 @@ player_usage(void)
   fprintf(stderr, "  -r <n>: report frame rate every n frames\n");
   fprintf(stderr, "  -w <n>: set the number of warmup frames\n");
   fprintf(stderr, "  -V <n>: set EGL swap interval to n\n");
+  fprintf(stderr, "  -P <n>: sleep n milliseconds between frames\n");
   fprintf(stderr, "  -d: dump each frame as PPM\n");
   fprintf(stderr, "  -D: dump only the last frame as PPM\n");
   fprintf(stderr, "  -0 <file.png>: Load \"file.png\" and bind it to TEXTURE0\n");
@@ -932,7 +933,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pqr:R:s:S:t:T:uU:vV:w:W:X:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabCcEeGgJjKknoQxy89 */
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:X:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -1040,6 +1042,17 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 'p':
       ctx->print_shader = 1;
+      break ;
+
+    case 'P':
+      i = atoi(optarg);
+      if (i <= 0) {
+        fprintf(stderr,
+                "ERROR: -i option takes a positive integer argument "
+                "(got %i)\n", i);
+        exit(EXIT_FAILURE);
+      }
+      ctx->frame_sleep = i * 1000;
       break ;
 
     case 'q':
@@ -1419,6 +1432,9 @@ player_render_loop_warmup(context_t *ctx)
 
     XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
 
+    if (ctx->frame_sleep > 0)
+      usleep(ctx->frame_sleep);
+
     if (ctx->frame > 0)
       update_time(ctx);
 
@@ -1484,6 +1500,9 @@ player_render_loop(context_t *ctx)
       dump_framebuffer_to_ppm(ctx);
 
     XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
+
+    if (ctx->frame_sleep > 0)
+      usleep(ctx->frame_sleep);
 
     update_time(ctx);
 
