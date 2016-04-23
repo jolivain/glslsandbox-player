@@ -231,6 +231,7 @@ browser.
      -r <n>: report frame rate every n frames
      -w <n>: set the number of warmup frames
      -V <n>: set EGL swap interval to n
+     -P <n>: sleep n milliseconds between frames
      -d: dump each frame as PPM
      -D: dump only the last frame as PPM
      -v: increase verbosity level
