@@ -516,8 +516,6 @@ load_png_texture(context_t *ctx, int tex)
 
   read_png_file(ctx->texture[tex].file, &img, &width, &height, &channels);
 
-  printf("read img %i x %i x %i\n", width, height, channels);
-
   if (channels == 1) {
     fmt = GL_LUMINANCE;
   }
