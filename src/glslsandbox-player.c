@@ -908,6 +908,8 @@ player_usage(void)
   fprintf(stderr, "  -U <f>: set surfacePosittion animation speed factor\n");
   fprintf(stderr, "  -W <n>: set window width to n\n");
   fprintf(stderr, "  -H <n>: set window height to n\n");
+  fprintf(stderr, "  -x <n>: set window x position to n (if supported)\n");
+  fprintf(stderr, "  -y <n>: set window y position to n (if supported)\n");
   fprintf(stderr, "  -B: Enable FBO usage (default to window size)\n");
   fprintf(stderr, "  -N: Set FBO filtering to NEAREST instead of LINEAR\n");
   fprintf(stderr, "  -R <n>: set FBO size to the window size divided by n\n");
@@ -933,8 +935,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  /* available short option: AabCcEeGgJjKknoQxy89 */
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:X:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabCcEeGgJjKknoQ89 */
+  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -1146,6 +1148,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       ctx->width = atoi(optarg);
       break ;
 
+    case 'x':
+      ctx->winxpos = atoi(optarg);
+      break ;
+
     case 'X':
       if (ctx->fbo_size_div >= 0) {
         fprintf(stderr,
@@ -1154,6 +1160,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       }
       ctx->use_fbo = 1;
       ctx->fbo_width = atoi(optarg);
+      break ;
+
+    case 'y':
+      ctx->winypos = atoi(optarg);
       break ;
 
     case 'Y':
@@ -1551,7 +1561,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "-------------[ end of shader code ]-------------\n\n");
   }
 
-  ctx->egl = init_egl(ctx->width, ctx->height);
+  ctx->egl = init_egl(ctx->width, ctx->height, ctx->winxpos, ctx->winypos);
   ctx->width = ctx->egl->width;
   ctx->height = ctx->egl->height;
 
