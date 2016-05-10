@@ -74,7 +74,7 @@ native_gfx_get_egl_native_window(const native_gfx_t *gfx)
 }
 
 void
-native_gfx_create_window(native_gfx_t *gfx, int width, int height)
+native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
   if (width == 0)
     width = gfx->disp_width;
@@ -82,7 +82,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
   if (height == 0)
     height = gfx->disp_height;
 
-  gfx->win = fbCreateWindow(gfx->disp, 0, 0, width, height);
+  gfx->win = fbCreateWindow(gfx->disp, xpos, ypos, width, height);
 
   if (gfx->win == NULL) {
     fprintf(stderr, "native_gfx_create_window(): fbCreateWindow(): error\n");

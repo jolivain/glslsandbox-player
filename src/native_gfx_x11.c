@@ -73,7 +73,7 @@ native_gfx_get_egl_native_window(const native_gfx_t *gfx)
 }
 
 void
-native_gfx_create_window(native_gfx_t *gfx, int width, int height)
+native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
   XEvent e;
   int r;
@@ -87,7 +87,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
 
   gfx->win = XCreateSimpleWindow(gfx->disp,
                                  RootWindow(gfx->disp, gfx->scr),
-                                 0, 0, /* x,y pos */
+                                 xpos, ypos,
                                  width, height,
                                  0, // border_width
                                  BlackPixel(gfx->disp, gfx->scr), // border

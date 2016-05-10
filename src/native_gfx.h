@@ -32,7 +32,7 @@ native_gfx_open_display(void);
  */
 void
 native_gfx_create_window(native_gfx_t *gfx,
-                         int width, int height);
+                         int width, int height, int xpos, int ypos);
 
 /*
  * Destroy a native window created with native_gfx_create_window().

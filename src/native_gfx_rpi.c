@@ -137,7 +137,7 @@ get_dispman_layer_opacity(VC_DISPMANX_ALPHA_T *alpha)
 }
 
 void
-native_gfx_create_window(native_gfx_t *gfx, int width, int height)
+native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
   VC_RECT_T dst_rect;
   VC_RECT_T src_rect;
@@ -158,8 +158,8 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height)
   layer = get_dispman_layer();
   alpha_ptr = get_dispman_layer_opacity(&alpha);
 
-  dst_rect.x = 0;
-  dst_rect.y = 0;
+  dst_rect.x = xpos;
+  dst_rect.y = ypos;
   dst_rect.width = width;
   dst_rect.height = height;
 

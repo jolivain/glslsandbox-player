@@ -33,7 +33,7 @@ void
 clean_egl(egl_t *egl);
 
 egl_t *
-init_egl(int width, int height);
+init_egl(int width, int height, int xpos, int ypos);
 
 int
 _egl_no_error(const char *file, int line);

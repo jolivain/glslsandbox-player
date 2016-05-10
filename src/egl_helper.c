@@ -324,7 +324,7 @@ __xegl_eglTerminate(const char *file, int line,
 #endif /* defined(XEGL_STRICT) */
 
 egl_t *
-init_egl(int width, int height)
+init_egl(int width, int height, int xpos, int ypos)
 {
   egl_t *egl;
 
@@ -379,7 +379,7 @@ init_egl(int width, int height)
   XeglChooseConfig(egl->dpy, conf_attribList, configs, NUM_CONFIGS, &num_configs);
   assert( num_configs == 1 );
 
-  native_gfx_create_window(egl->native_gfx, width, height);
+  native_gfx_create_window(egl->native_gfx, width, height, xpos, ypos);
   egl->width = native_gfx_get_window_width(egl->native_gfx);
   egl->height = native_gfx_get_window_height(egl->native_gfx);
 

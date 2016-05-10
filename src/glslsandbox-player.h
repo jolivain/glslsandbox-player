@@ -79,6 +79,8 @@ struct context_s {
   int run_shader;
   int height;
   int width;
+  int winxpos;
+  int winypos;
   int shader_width;
   int shader_height;
   char *user_shader;
