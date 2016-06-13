@@ -1325,6 +1325,8 @@ fprintf_info(FILE *fp)
   fprintf(fp, "Native window system        : Vivante FB\n");
 #elif defined (ENABLE_RPI)
   fprintf(fp, "Native window system        : Raspberry Pi\n");
+#elif defined (ENABLE_WL)
+  fprintf(fp, "Native window system        : Wayland EGL\n");
 #else
 # warning "Native window system is not defined in info function"
 #endif

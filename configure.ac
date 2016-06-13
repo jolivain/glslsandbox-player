@@ -48,7 +48,7 @@ AS_IF([test "x$with_libpng" = "xyes"], [
 AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb,rpi]),
+        AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb,rpi,wl]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
@@ -80,6 +80,21 @@ AS_IF([test "x$with_native_gfx" = "xrpi"], [
         AC_MSG_NOTICE([Raspberry Pi support disabled])
 ])
 AM_CONDITIONAL([ENABLE_RPI], [test "x$with_native_gfx" = "xrpi"])
+
+AS_IF([test "x$with_native_gfx" = "xwl"], [
+    native_gfx=wl
+    PKG_CHECK_MODULES([wayland_client], [wayland-client >= 1], [
+        have_wayland_client=yes
+    ])
+    PKG_CHECK_MODULES([wayland_egl], [wayland-egl >= 1], [
+        have_wayland_egl=yes
+    ])
+    AC_DEFINE([ENABLE_WL], [1], [Enable Wayland EGL])
+    AC_MSG_NOTICE([Wayland EGL support enabled])
+], [
+    AC_MSG_NOTICE([Wayland EGL support disabled])
+])
+AM_CONDITIONAL([ENABLE_WL], [test "x$with_native_gfx" = "xwl"])
 
 AS_IF([test "x$native_gfx" = "x"], [
     AC_ERROR([unknown native gfx selected: $with_native_gfx])
