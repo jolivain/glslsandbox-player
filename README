@@ -483,9 +483,9 @@ http://apitrace.github.io/
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
-The code currently only supports two native windowing libraries: X11
-and Vivante/libGAL framebuffer. Adding support to a new native library
-should not be too hard.
+The code currently only supports three native windowing libraries:
+X11, Vivante/libGAL framebuffer and Raspberry Pi DispManX. Adding
+support to a new native library should not be too hard.
 
 Create a file for your native window file
 (e.g. src/native_gfx_mynatwin.c). You could start from an existing one
