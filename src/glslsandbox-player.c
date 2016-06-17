@@ -1327,6 +1327,8 @@ fprintf_info(FILE *fp)
   fprintf(fp, "Native window system        : Raspberry Pi\n");
 #elif defined (ENABLE_WL)
   fprintf(fp, "Native window system        : Wayland EGL\n");
+#elif defined (ENABLE_SDL2)
+  fprintf(fp, "Native window system        : SDL2\n");
 #else
 # warning "Native window system is not defined in info function"
 #endif
@@ -1594,6 +1596,11 @@ main(int argc, char *argv[])
   }
 
   if ((ctx->verbose > 0)) {
+#ifdef ENABLE_SDL2
+    fprintf(stderr, "SDL2                        :\n");
+    fprintf(stderr, "Video system                : %s\n\n",
+            SDL_GetCurrentVideoDriver());
+#endif /* ENABLE_SDL2 */
     fprintf_gles_info(stderr, ctx->verbose);
 
     if (is_using_builtin_shader(ctx)) {

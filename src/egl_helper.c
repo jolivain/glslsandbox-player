@@ -18,6 +18,11 @@
 #include <EGL/egl.h>
 #include <assert.h>
 
+#ifdef ENABLE_SDL2
+# include "SDL.h"
+# include "SDL_opengles2.h"
+#endif /* ENABLE_SDL2 */
+
 #include "native_gfx.h"
 #include "egl_helper.h"
 
@@ -323,6 +328,74 @@ __xegl_eglTerminate(const char *file, int line,
 
 #endif /* defined(XEGL_STRICT) */
 
+#ifdef ENABLE_SDL2
+
+egl_t *
+egl_init(int width, int height, int xpos, int ypos)
+{
+  egl_t *egl;
+
+  egl = malloc(sizeof (*egl));
+  if (egl == NULL) {
+    fprintf(stderr, "ERROR: Can't allocate egl structure: error %i: %s\n",
+            errno, strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  memset(egl, 0, sizeof (*egl));
+
+  SDL_Init(SDL_INIT_VIDEO);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+  if (width == 0)
+    width = 256;
+  if (height == 0)
+    height = 256;
+
+  egl->sdlwin = SDL_CreateWindow("glslsandbox-player",
+                                 xpos, ypos, width, height,
+                                 SDL_WINDOW_OPENGL);
+  if (egl->sdlwin == NULL) {
+    fprintf(stderr, "SDL2: Could not create window: %s\n", SDL_GetError());
+    exit(EXIT_FAILURE);
+  }
+
+  egl->sdlctx = SDL_GL_CreateContext(egl->sdlwin);
+  if (egl->sdlctx == NULL) {
+    fprintf(stderr, "SDL2: Could not create GLES context: %s\n", SDL_GetError());
+    exit(EXIT_FAILURE);
+  }
+
+  egl->width = width;
+  egl->height = height;
+
+  return (egl);
+}
+
+void
+egl_swap_buffers(egl_t *egl)
+{
+  SDL_GL_SwapWindow(egl->sdlwin);
+}
+
+void
+egl_clean(egl_t *egl)
+{
+  SDL_GL_DeleteContext(egl->sdlctx);
+  SDL_DestroyWindow(egl->sdlwin);
+}
+
+void
+egl_swap_interval(egl_t *egl, int interval)
+{
+  (void)egl /* UNUSED */;
+  SDL_GL_SetSwapInterval(interval);
+}
+
+#else /* ENABLE_SDL2 */
+
 egl_t *
 egl_init(int width, int height, int xpos, int ypos)
 {
@@ -433,6 +506,8 @@ egl_swap_interval(egl_t *egl, int interval)
 {
   XeglSwapInterval(egl->dpy, interval);
 }
+
+#endif /* ENABLE_SDL2 */
 
 /*
 * Copyright (c) 2015-2016, Julien Olivain <juju@cotds.org>

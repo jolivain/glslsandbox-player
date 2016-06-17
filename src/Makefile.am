@@ -15,6 +15,11 @@ AM_CFLAGS += ${wayland_client_CFLAGS} ${wayland_egl_CFLAGS}
 LDADD += ${wayland_client_LIBS} ${wayland_egl_LIBS}
 endif
 
+if ENABLE_SDL2
+AM_CFLAGS += ${sdl2_CFLAGS}
+LDADD += ${sdl2_LIBS}
+endif
+
 GEN_SHADER_IDS = $(top_srcdir)/scripts/gen-shader-ids
 DL_SHADER = $(top_srcdir)/scripts/dl-shader
 FRAG2INC = $(top_srcdir)/scripts/frag2inc

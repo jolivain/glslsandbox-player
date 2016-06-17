@@ -12,6 +12,10 @@
 
 #include <EGL/egl.h>
 
+#ifdef ENABLE_SDL2
+#include "SDL.h"
+#endif /* ENABLE_SDL2 */
+
 #include "native_gfx.h"
 
 typedef struct egl_s egl_t;
@@ -22,11 +26,16 @@ struct egl_s {
   int width;
   int height;
 
+#ifdef ENABLE_SDL2
+  SDL_Window *sdlwin;
+  SDL_GLContext sdlctx;
+#else /* ENABLE_SDL2 */
   EGLSurface surf;
   EGLDisplay dpy;
   EGLContext ctx;
 
   native_gfx_t *native_gfx;
+#endif /* ENABLE_SDL2 */
 };
 
 void
