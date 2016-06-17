@@ -30,10 +30,16 @@ struct egl_s {
 };
 
 void
-clean_egl(egl_t *egl);
+egl_clean(egl_t *egl);
 
 egl_t *
-init_egl(int width, int height, int xpos, int ypos);
+egl_init(int width, int height, int xpos, int ypos);
+
+void
+egl_swap_buffers(egl_t *egl);
+
+void
+egl_swap_interval(egl_t *egl, int interval);
 
 int
 _egl_no_error(const char *file, int line);

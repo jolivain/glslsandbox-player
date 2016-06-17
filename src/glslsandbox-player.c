@@ -91,7 +91,7 @@ cleanup_ctx(context_t *ctx)
   if (ctx->user_shader)
     free(ctx->user_shader);
 
-  clean_egl(ctx->egl);
+  egl_clean(ctx->egl);
 }
 
 static char *
@@ -646,7 +646,7 @@ setup(context_t *ctx)
 
   XglClear(GL_COLOR_BUFFER_BIT);
 
-  XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
+  egl_swap_buffers(ctx->egl);
 }
 
 
@@ -1442,7 +1442,7 @@ player_render_loop_warmup(context_t *ctx)
 
     draw(ctx);
 
-    XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
+    egl_swap_buffers(ctx->egl);
 
     if (ctx->frame_sleep > 0)
       usleep(ctx->frame_sleep);
@@ -1511,7 +1511,7 @@ player_render_loop(context_t *ctx)
         || ((ctx->dump_frame == DUMP_FRAME_LAST) && last_frame))
       dump_framebuffer_to_ppm(ctx);
 
-    XeglSwapBuffers(ctx->egl->dpy, ctx->egl->surf);
+    egl_swap_buffers(ctx->egl);
 
     if (ctx->frame_sleep > 0)
       usleep(ctx->frame_sleep);
@@ -1563,12 +1563,12 @@ main(int argc, char *argv[])
     fprintf(stderr, "-------------[ end of shader code ]-------------\n\n");
   }
 
-  ctx->egl = init_egl(ctx->width, ctx->height, ctx->winxpos, ctx->winypos);
+  ctx->egl = egl_init(ctx->width, ctx->height, ctx->winxpos, ctx->winypos);
   ctx->width = ctx->egl->width;
   ctx->height = ctx->egl->height;
 
   if (ctx->swap_interval >= 0) {
-    XeglSwapInterval(ctx->egl->dpy, ctx->swap_interval);
+    egl_swap_interval(ctx->egl, ctx->swap_interval);
   }
 
   if (ctx->use_fbo) {

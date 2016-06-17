@@ -324,7 +324,7 @@ __xegl_eglTerminate(const char *file, int line,
 #endif /* defined(XEGL_STRICT) */
 
 egl_t *
-init_egl(int width, int height, int xpos, int ypos)
+egl_init(int width, int height, int xpos, int ypos)
 {
   egl_t *egl;
 
@@ -394,7 +394,7 @@ init_egl(int width, int height, int xpos, int ypos)
 }
 
 void
-clean_egl(egl_t *egl)
+egl_clean(egl_t *egl)
 {
   if (egl->dpy != EGL_NO_DISPLAY) {
 
@@ -420,6 +420,18 @@ clean_egl(egl_t *egl)
   native_gfx_close_display(egl->native_gfx);
 
   free(egl);
+}
+
+void
+egl_swap_buffers(egl_t *egl)
+{
+  XeglSwapBuffers(egl->dpy, egl->surf);
+}
+
+void
+egl_swap_interval(egl_t *egl, int interval)
+{
+  XeglSwapInterval(egl->dpy, interval);
 }
 
 /*
