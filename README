@@ -158,7 +158,7 @@ The build dependencies of glslsandbox are:
 - Python 2.6 or greater (also works with Python 3.x)
 - Development files for an OpenGL ES 2.0 and EGL library
 - One of the following native window library: X11, Vivante/libGAL,
-  Raspberry Pi, Wayland EGL, SDL2
+  Raspberry Pi, Wayland EGL, SDL2, libdrm and libgbm (for KMS)
 - optional: libpng library and header files for texture support
 
   Compiling glslsandbox-player should be straightforward if all
@@ -169,7 +169,7 @@ windowing library for your system.
   The configure script takes an option to select the native windowing
 system:
 
-  --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2
+  --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms
 
   For example, compiling for using the the Vivante frame buffer native
 windowing support, use "./configure --with-native-gfx=vivfb".
@@ -480,13 +480,32 @@ For more details, refer to apitrace documentation:
 http://apitrace.github.io/
 
 
+Notes on KMS DRM Native Windowing
+---------------------------------
+
+For building with DRM/KMS support, on Fedora system, package build
+dependencies needs to be installed with the command:
+
+    sudo dnf install libdrm-devel mesa-libgbm-devel
+
+For building, use the configure command:
+
+    ./configure --with-native-gfx=kms
+
+By default, the program will try to load all DRM drivers, stopping at
+the first one that will successfully load.  This behavior can be
+changed to try to load only one DRM driver, setting the driver name to
+the environement variable `GLSLSANDBOX_PLAYER_DRM_DRIVER'.
+
+
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
-The code currently supports four native windowing libraries: X11,
-Vivante/libGAL framebuffer, Raspberry Pi DispManX and SDL2 (SDL2 will
-support native windowing systems configured at its compilation
-time). Adding support to a new native library should not be too hard.
+The code currently supports five native windowing libraries: X11,
+Vivante/libGAL framebuffer, Raspberry Pi DispManX,SDL2 (SDL2 will
+support native windowing systems configured at its compilation time)
+and KMS (Kernel Mode Setting using libdrm and libgbm).  Adding support
+to a new native library should not be too hard.
 
 Create a file for your native window file
 (e.g. src/native_gfx_mynatwin.c). You could start from an existing one

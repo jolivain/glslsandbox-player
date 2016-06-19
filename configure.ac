@@ -48,7 +48,7 @@ AS_IF([test "x$with_libpng" = "xyes"], [
 AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX], [Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2]),
+        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
@@ -95,6 +95,17 @@ AS_IF([test "x$with_native_gfx" = "xwl"], [
     AC_MSG_NOTICE([Wayland EGL support disabled])
 ])
 AM_CONDITIONAL([ENABLE_WL], [test "x$with_native_gfx" = "xwl"])
+
+AS_IF([test "x$with_native_gfx" = "xkms"], [
+    native_gfx=kms
+    AC_DEFINE([ENABLE_KMS], [1], [Enable KMS/GBM/DRM])
+    AC_MSG_NOTICE([KMS/GBM/DRM support enabled])
+    PKG_CHECK_MODULES([drm], [libdrm])
+    PKG_CHECK_MODULES([gbm], [gbm])
+], [
+    AC_MSG_NOTICE([KMS/GBM/DRM support disabled])
+])
+AM_CONDITIONAL([ENABLE_KMS], [test "x$with_native_gfx" = "xkms"])
 
 AS_IF([test "x$with_native_gfx" = "xsdl2"], [
     native_gfx=sdl2

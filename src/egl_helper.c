@@ -499,6 +499,7 @@ void
 egl_swap_buffers(egl_t *egl)
 {
   XeglSwapBuffers(egl->dpy, egl->surf);
+  native_gfx_swap_buffers(egl->native_gfx);
 }
 
 void

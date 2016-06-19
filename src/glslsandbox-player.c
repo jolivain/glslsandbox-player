@@ -1329,6 +1329,8 @@ fprintf_info(FILE *fp)
   fprintf(fp, "Native window system        : Wayland EGL\n");
 #elif defined (ENABLE_SDL2)
   fprintf(fp, "Native window system        : SDL2\n");
+#elif defined (ENABLE_KMS)
+  fprintf(fp, "Native window system        : KMS\n");
 #else
 # warning "Native window system is not defined in info function"
 #endif

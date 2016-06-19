@@ -15,6 +15,11 @@ AM_CFLAGS += ${wayland_client_CFLAGS} ${wayland_egl_CFLAGS}
 LDADD += ${wayland_client_LIBS} ${wayland_egl_LIBS}
 endif
 
+if ENABLE_KMS
+AM_CFLAGS += ${drm_CFLAGS} ${gbm_CFLAGS}
+LDADD += ${drm_LIBS} ${gbm_LIBS}
+endif
+
 if ENABLE_SDL2
 AM_CFLAGS += ${sdl2_CFLAGS}
 LDADD += ${sdl2_LIBS}
@@ -69,6 +74,10 @@ endif
 
 if ENABLE_WL
 glslsandbox_player_SOURCES += native_gfx_wl.c
+endif
+
+if ENABLE_KMS
+glslsandbox_player_SOURCES += native_gfx_kms.c
 endif
 
 nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c
