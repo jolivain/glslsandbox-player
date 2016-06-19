@@ -594,7 +594,7 @@ results.
   In case an issue is encountered with Mesa, a software rendering
 backend should be attempted, by setting the environment variable
 "LIBGL_ALWAYS_SOFTWARE=1" alone or with "GALLIUM_DRIVER=swrast" (in
-last change). Refer to the Mesa documentation for details.
+last chance). Refer to the Mesa documentation for details.
 
   User should be careful when using virtual machines. Various GPU can
 be emulated and could result to a non working configuration. For
