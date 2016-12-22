@@ -74,6 +74,9 @@ endif
 
 if ENABLE_WL
 glslsandbox_player_SOURCES += native_gfx_wl.c
+if ENABLE_IVI
+glslsandbox_player_SOURCES += ivi-application-protocol.c
+endif
 endif
 
 if ENABLE_KMS

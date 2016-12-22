@@ -29,6 +29,13 @@
 #include <wayland-client.h>
 #include <wayland-egl.h>
 
+#ifdef ENABLE_IVI
+# include <sys/types.h>
+# include <unistd.h>
+# include "ivi-application-client-protocol.h"
+# define IVI_SURFACE_ID 10000
+#endif /* ENABLE_IVI */
+
 #include "native_gfx.h"
 
 #define GFX_WL_UNUSED(x)  ((void)(x))
@@ -50,6 +57,10 @@ struct native_gfx_s
   /* struct wl_region *region; */
   struct wl_shell *shell;
   struct wl_shell_surface *shell_surface;
+#ifdef ENABLE_IVI
+  struct ivi_application *ivi_app;
+  struct ivi_surface *ivi_surface;
+#endif
 };
 
 static void
@@ -71,6 +82,12 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
     ctx->shell = wl_registry_bind(registry, id,
                                   &wl_shell_interface, 1);
   }
+#ifdef ENABLE_IVI
+  else if (strcmp(interface, "ivi_application") == 0) {
+    ctx->ivi_app = wl_registry_bind(registry, id,
+                                    &ivi_application_interface, 1);
+  }
+#endif /* ENABLE_IVI */
 }
 
 static void
@@ -101,8 +118,22 @@ get_server_references(native_gfx_t *gfx)
   wl_display_dispatch(gfx->display);
   wl_display_roundtrip(gfx->display);
 
-  if (gfx->compositor == NULL || gfx->shell == NULL) {
-    fprintf(stderr, "ERROR: Can't find compositor or shell\n");
+  if (gfx->compositor == NULL) {
+    fprintf(stderr, "ERROR: Can't find wl_compositor\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if ((gfx->shell == NULL)
+#ifdef ENABLE_IVI
+      && (gfx->ivi_app == NULL)
+#endif /* ENABLE_IVI */
+     ) {
+    fprintf(stderr,
+            "ERROR: Can't find wl_shell"
+#ifdef ENABLE_IVI
+            " or ivi_application shell"
+#endif /* ENABLE_IVI */
+            "\n");
     exit(EXIT_FAILURE);
   }
 }
@@ -139,6 +170,22 @@ native_gfx_get_egl_native_window(const native_gfx_t *gfx)
   return ((NativeWindowType)gfx->egl_window);
 }
 
+#ifdef ENABLE_IVI
+static void
+create_ivi_surface(native_gfx_t *gfx)
+{
+  uint32_t id_ivisurf = IVI_SURFACE_ID + (uint32_t)getpid();
+  gfx->ivi_surface =
+    ivi_application_surface_create(gfx->ivi_app,
+                                   id_ivisurf, gfx->surface);
+
+  if (gfx->ivi_surface == NULL) {
+    fprintf(stderr, "ERROR: Failed to create ivi_client_surface\n");
+    exit(EXIT_FAILURE);
+  }
+}
+#endif /* ENABLE_IVI */
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -151,9 +198,16 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
-  gfx->shell_surface = wl_shell_get_shell_surface(gfx->shell, gfx->surface);
-  wl_shell_surface_set_toplevel(gfx->shell_surface);
-  wl_shell_surface_set_title(gfx->shell_surface, "glslsandbox-player");
+  if (gfx->shell != NULL) {
+    gfx->shell_surface = wl_shell_get_shell_surface(gfx->shell, gfx->surface);
+    wl_shell_surface_set_toplevel(gfx->shell_surface);
+    wl_shell_surface_set_title(gfx->shell_surface, "glslsandbox-player");
+  }
+#if ENABLE_IVI
+  else if (gfx->ivi_app != NULL) {
+    create_ivi_surface(gfx);
+  }
+#endif /* ENABLE_IVI */
 
   if (width == 0)
     width = default_wayland_window_width;
@@ -177,8 +231,17 @@ native_gfx_destroy_window(native_gfx_t *gfx)
   wl_egl_window_destroy(gfx->egl_window);
   gfx->egl_window = NULL;
 
-  wl_shell_surface_destroy(gfx->shell_surface);
-  gfx->shell_surface = NULL;
+  if (gfx->shell_surface != NULL) {
+    wl_shell_surface_destroy(gfx->shell_surface);
+    gfx->shell_surface = NULL;
+  }
+
+#ifdef ENABLE_IVI
+  if (gfx->ivi_surface != NULL) {
+    ivi_surface_destroy(gfx->ivi_surface);
+    gfx->ivi_surface = NULL;
+  }
+#endif
 
   wl_surface_destroy(gfx->surface);
   gfx->surface = NULL;
