@@ -18,7 +18,9 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#ifdef HAVE_UNAME
 #include <sys/utsname.h>
+#endif
 #include <limits.h>
 #include <unistd.h>
 #include <time.h>
@@ -1325,6 +1327,8 @@ fprintf_info(FILE *fp)
   fprintf(fp, "Native window system        : Vivante FB\n");
 #elif defined (ENABLE_RPI)
   fprintf(fp, "Native window system        : Raspberry Pi\n");
+#elif defined (ENABLE_WGL)
+  fprintf(fp, "Native window system        : Windows WGL\n");
 #elif defined (ENABLE_WL)
   fprintf(fp, "Native window system        : Wayland EGL\n");
 #elif defined (ENABLE_SDL2)
@@ -1345,6 +1349,7 @@ fprintf_info(FILE *fp)
 static void
 fprintf_sysinfo(FILE *fp)
 {
+#ifdef HAVE_UNAME
   struct utsname un;
   int ret;
 
@@ -1361,6 +1366,9 @@ fprintf_sysinfo(FILE *fp)
   fprintf(fp, "System version              : %s\n", un.version);
   fprintf(fp, "System machine              : %s\n", un.machine);
   fprintf(fp, "\n");
+#else
+  fprintf(fp, "System information          : uname() unavailable\n");
+#endif
 }
 
 static void

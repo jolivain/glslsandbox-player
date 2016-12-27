@@ -80,4 +80,8 @@ if ENABLE_KMS
 glslsandbox_player_SOURCES += native_gfx_kms.c
 endif
 
+if ENABLE_WGL
+glslsandbox_player_SOURCES += native_gfx_wgl.c
+endif
+
 nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c

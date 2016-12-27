@@ -48,7 +48,7 @@ AS_IF([test "x$with_libpng" = "xyes"], [
 AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms]),
+        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,wgl]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
@@ -118,6 +118,15 @@ AS_IF([test "x$with_native_gfx" = "xsdl2"], [
     AC_MSG_NOTICE([SDL2 EGL support disabled])
 ])
 AM_CONDITIONAL([ENABLE_SDL2], [test "x$with_native_gfx" = "xsdl2"])
+
+AS_IF([test "x$with_native_gfx" = "xwgl"], [
+    native_gfx=wgl
+    AC_DEFINE([ENABLE_WGL], [1], [Enable Native Windows WGL])
+    AC_MSG_NOTICE([Windows WGL support enabled])
+], [
+    AC_MSG_NOTICE([Windows WGL support disabled])
+])
+AM_CONDITIONAL([ENABLE_WGL], [test "x$with_native_gfx" = "xwgl"])
 
 AS_IF([test "x$native_gfx" = "x"], [
     AC_ERROR([unknown native gfx selected: $with_native_gfx])
