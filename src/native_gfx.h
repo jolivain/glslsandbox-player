@@ -60,6 +60,14 @@ NativeWindowType
 native_gfx_get_egl_native_window(const native_gfx_t *gfx);
 
 /*
+ * Function called after EGL swap buffer.
+ * Some backends (for example kms) needs some native help to swap
+ * buffers.
+ */
+void
+native_gfx_swap_buffers(native_gfx_t *gfx);
+
+/*
  * Returns the actual window width.
  */
 int

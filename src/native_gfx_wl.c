@@ -197,6 +197,12 @@ native_gfx_close_display(native_gfx_t *gfx)
   free(gfx);
 }
 
+void
+native_gfx_swap_buffers(native_gfx_t *gfx)
+{
+  GFX_WL_UNUSED(gfx);
+}
+
 int
 native_gfx_get_window_width(const native_gfx_t *gfx)
 {
