@@ -193,6 +193,12 @@ clean_drm(native_gfx_t *gfx)
   drmClose(gfx->drm_fd);
 }
 
+char *
+native_gfx_get_name(void)
+{
+  return ("KMS");
+}
+
 native_gfx_t *
 native_gfx_open_display(void)
 {

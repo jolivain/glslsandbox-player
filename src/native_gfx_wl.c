@@ -138,6 +138,12 @@ get_server_references(native_gfx_t *gfx)
   }
 }
 
+char *
+native_gfx_get_name(void)
+{
+  return ("Wayland EGL");
+}
+
 native_gfx_t *
 native_gfx_open_display(void)
 {

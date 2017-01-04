@@ -394,6 +394,12 @@ egl_swap_interval(egl_t *egl, int interval)
   SDL_GL_SetSwapInterval(interval);
 }
 
+char *
+native_gfx_get_name(void)
+{
+  return ("SDL2");
+}
+
 #else /* ENABLE_SDL2 */
 
 egl_t *

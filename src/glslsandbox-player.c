@@ -1321,23 +1321,8 @@ fprintf_info(FILE *fp)
   fprintf(fp, "compiler __VERSION__ macro  : %s\n", __VERSION__);
 #endif
 
-#if defined (ENABLE_X11)
-  fprintf(fp, "Native window system        : X11\n");
-#elif defined (ENABLE_VIVFB)
-  fprintf(fp, "Native window system        : Vivante FB\n");
-#elif defined (ENABLE_RPI)
-  fprintf(fp, "Native window system        : Raspberry Pi\n");
-#elif defined (ENABLE_WGL)
-  fprintf(fp, "Native window system        : Windows WGL\n");
-#elif defined (ENABLE_WL)
-  fprintf(fp, "Native window system        : Wayland EGL\n");
-#elif defined (ENABLE_SDL2)
-  fprintf(fp, "Native window system        : SDL2\n");
-#elif defined (ENABLE_KMS)
-  fprintf(fp, "Native window system        : KMS\n");
-#else
-# warning "Native window system is not defined in info function"
-#endif
+  fprintf(fp, "Native window system        : %s\n",
+          native_gfx_get_name());
 
 #ifdef HAVE_LIBPNG
   fprintf(fp, "libpng support version      : %s\n", PNG_LIBPNG_VER_STRING);

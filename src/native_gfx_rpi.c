@@ -44,6 +44,12 @@ struct native_gfx_s
   EGL_DISPMANX_WINDOW_T     dispman_window;
 };
 
+char *
+native_gfx_get_name(void)
+{
+  return ("Raspberry Pi DispManX");
+}
+
 native_gfx_t *
 native_gfx_open_display(void)
 {

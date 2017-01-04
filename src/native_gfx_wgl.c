@@ -100,6 +100,12 @@ createWindow(int width, int height)
   return hwnd;
 }
 
+char *
+native_gfx_get_name(void)
+{
+  return ("Windows WGL");
+}
+
 native_gfx_t *
 native_gfx_open_display(void)
 {

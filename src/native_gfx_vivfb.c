@@ -31,6 +31,12 @@ struct native_gfx_s
   int win_height;
 };
 
+char *
+native_gfx_get_name(void)
+{
+  return ("Vivante FB");
+}
+
 native_gfx_t *
 native_gfx_open_display(void)
 {

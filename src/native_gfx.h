@@ -18,6 +18,12 @@
 typedef struct native_gfx_s native_gfx_t;
 
 /*
+ * Return the name of the native backend as a string.
+ */
+char *
+native_gfx_get_name(void);
+
+/*
  * Open a connection to the native display, allocate a native_gfx_t
  * object, initialize its members, and return it.
  */
