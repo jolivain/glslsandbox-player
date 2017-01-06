@@ -674,12 +674,6 @@ static void
 draw_frame(context_t *ctx)
 {
   int i;
-  GLfloat surfPos[8] = {
-    -1.0,  1.0,
-     1.0,  1.0,
-    -1.0, -1.0,
-     1.0, -1.0
-  };
   static const GLfloat plane[] = {
     -1.0,  1.0,
      1.0,  1.0,
@@ -709,13 +703,13 @@ draw_frame(context_t *ctx)
       float sp;
 
       sp = M_PI * (ctx->time_offset + ctx->time * ctx->surfpos_anim_speed);
-      compute_surface_position(surfPos,
+      compute_surface_position(ctx->surface_position,
                                sinf(0.125f * sp),
                                sinf(0.250f * sp),
                                1.0f + sinf(0.05f * sp) * 0.75f);
     }
     XglVertexAttribPointer(ctx->a_surfacePosition, 2, GL_FLOAT, GL_FALSE,
-			   0, surfPos);
+			   0, ctx->surface_position);
   }
 
   if (ctx->u_backbuf >= 0) {
@@ -908,6 +902,7 @@ player_usage(void)
   fprintf(stderr, "  -s <f>: set time speed factor\n");
   fprintf(stderr, "  -u: disable surfacePosition varying animation\n");
   fprintf(stderr, "  -U <f>: set surfacePosittion animation speed factor\n");
+  fprintf(stderr, "  -e <f:f:f:f>: set fixed surfacePosittion values\n");
   fprintf(stderr, "  -W <n>: set window width to n\n");
   fprintf(stderr, "  -H <n>: set window height to n\n");
   fprintf(stderr, "  -x <n>: set window x position to n (if supported)\n");
@@ -930,6 +925,35 @@ player_usage(void)
   fprintf(stderr, "\n");
 }
 
+static int
+parse_surfpos(context_t *ctx, const char *args)
+{
+  float left, bottom, width, height;
+  float right, top;
+  int ret;
+
+  ret = sscanf(args, "%f:%f:%f:%f", &left, &bottom, &width, &height);
+  if (ret != 4)
+    return (-1);
+
+  right = left + width;
+  top = bottom + height;
+
+  ctx->surface_position[0] = left;
+  ctx->surface_position[1] = top;
+
+  ctx->surface_position[2] = right;
+  ctx->surface_position[3] = top;
+
+  ctx->surface_position[4] = left;
+  ctx->surface_position[5] = bottom;
+
+  ctx->surface_position[6] = right;
+  ctx->surface_position[7] = bottom;
+
+  return (0);
+}
+
 static void
 parse_cmdline(context_t *ctx, int argc, char *argv[])
 {
@@ -937,8 +961,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  /* available short option: AabCcEeGgJjKknoQ89 */
-  while ((opt = getopt(argc, argv, "BdDf:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabCcEGgJjKknoQ89 */
+  while ((opt = getopt(argc, argv, "BdDe:f:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -963,6 +987,17 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 'D':
       ctx->dump_frame = DUMP_FRAME_LAST;
+      break ;
+
+    case 'e':
+      ctx->enable_surfpos_anim = 0;
+      i = parse_surfpos(ctx, optarg);
+      if (i != 0) {
+        fprintf(stderr,
+                "ERROR: -e option format is four floats values separated by column"
+                "left:bottom:width:height (got '%s')\n", optarg);
+        exit(EXIT_FAILURE);
+      }
       break ;
 
     case 'f':
@@ -1289,6 +1324,18 @@ init_ctx(context_t *ctx)
   ctx->surfpos_anim_speed = 1.0f;
   ctx->report_fps_count = 100;
   ctx->warmup_frames = 3;
+
+  ctx->surface_position[0] = -1.0f;
+  ctx->surface_position[1] =  1.0f;
+
+  ctx->surface_position[2] =  1.0f;
+  ctx->surface_position[3] =  1.0f;
+
+  ctx->surface_position[4] = -1.0f;
+  ctx->surface_position[5] = -1.0f;
+
+  ctx->surface_position[6] =  1.0f;
+  ctx->surface_position[7] = -1.0f;
 
   xclock_gettime(CLOCK_REALTIME, &ctx->player_start_time);
 }

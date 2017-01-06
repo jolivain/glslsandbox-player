@@ -222,6 +222,7 @@ browser.
      -s <f>: set time speed factor
      -u: disable surfacePosition varying animation
      -U <f>: set surfacePosittion animation speed factor
+     -e <f:f:f:f>: set fixed surfacePosittion values
      -W <n>: set window width to n
      -H <n>: set window height to n
      -x <n>: set window x position to n (if supported)
@@ -275,6 +276,12 @@ Render and save a frame of an animation when time=100:
 Generate 100 PPM frames of an animation at 20fps:
     glslsandbox-player -S BouncingBalls -W720 -H480 -w0 -T0.05 -f100 -d
 
+Two by two split screen rendering for 30 seconds:
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e -1:-1:1:1 &
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e  0:-1:1:1 &
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e -1:0:1:1  &
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e  0:0:1:1  &
+
   Since glslsandbox-player was designed for testing purposes, it will
 execute one shader per process execution. This initial design choice
 is to easily catch driver crash without interrupting a test sequence
@@ -326,6 +333,15 @@ native windowing system.  Not all windowing systems are supporting
 window positioning and could be silently ignored.  Other windowing
 systems may also use those values as a hint and may not exactly honor
 the requested values.
+
+  Shaders using the "surfacePosition" varying can be rendered on split
+screens, using the "-e" option (see examples).  Since the animation is
+computed from the local clock time, such shaders can be rendered on
+remotes computers, provided their clock are properly synchronized
+(using ntp or ptp for example).  Note that accurate clock
+synchronization is usually better on wired network (compared to
+wireless networks) since they have smaller jitter.  This can be used
+to build screen walls.
 
 
 Additional Features not Present in GLSL Sandbox

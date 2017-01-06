@@ -97,6 +97,7 @@ struct context_s {
   GLint fbo_u_tex;
   GLint fbo_a_pos;
   GLint fbo_a_surfpos;
+  GLfloat surface_position[8];
 };
 
 #endif /* GLSLSANDBOX_PLAYER_H */
