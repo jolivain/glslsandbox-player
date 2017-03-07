@@ -261,7 +261,19 @@ __xegl_eglReleaseThread(const char *file, int line)
   EGLBoolean ret;
 
   ret = eglReleaseThread();
-  __xegl_check_error(file, line, "eglReleaseThread");
+
+  /* Don't call __xegl_check_error() or eglGetError() here.
+   *
+   * Quoting EGL 1.5 Specification,
+   * Section 3.12 Releasing Thread State:
+   *
+   * Applications may call other EGL routines from a thread following
+   * eglReleaseThread, but any such call may reallocate the EGL state
+   * previously released.  In particular, calling eglGetError
+   * immediately following a successful call to eglReleaseThread
+   * should not be done. Such a call will return EGL_SUCCESS - but
+   * will also result in reallocating per-thread state.
+   */
 
   if (ret != EGL_TRUE) {
     fprintf(stderr, "%s:%i: eglReleaseThread(): returned EGL_FALSE\n",
