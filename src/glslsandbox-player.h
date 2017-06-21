@@ -71,6 +71,7 @@ struct context_s {
   int report_fps_count;
   int verbose;
   int print_shader;
+  int disable_dither;
   int dump_frame;
   int enable_mouse_emu;
   float mouse_emu_speed;

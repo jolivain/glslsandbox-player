@@ -576,6 +576,12 @@ setup_textures(context_t *ctx)
 static void
 setup(context_t *ctx)
 {
+  if (ctx->disable_dither) {
+    if ((ctx->verbose > 0))
+      fprintf(stderr, "Disabling dithering.\n");
+    XglDisable(GL_DITHER);
+  }
+
   load_program(vertex_shader_g, get_shader_code(ctx),
 	       &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog);
   if (ctx->gl_prog == 0) {
@@ -918,6 +924,7 @@ player_usage(void)
   fprintf(stderr, "  -P <n>: sleep n milliseconds between frames\n");
   fprintf(stderr, "  -d: dump each frame as PPM\n");
   fprintf(stderr, "  -D: dump only the last frame as PPM\n");
+  fprintf(stderr, "  -E: disable dithering\n");
   fprintf(stderr, "  -0 <file.png>: Load \"file.png\" and bind it to TEXTURE0\n");
   fprintf(stderr, "  -1 to -7: same as -0 for TEXTUREn\n");
   fprintf(stderr, "  -v: increase verbosity level\n");
@@ -961,8 +968,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  /* available short option: AabCcEGgJjKknoQ89 */
-  while ((opt = getopt(argc, argv, "BdDe:f:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabCcGgJjKknoQ89 */
+  while ((opt = getopt(argc, argv, "BdDe:Ef:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -998,6 +1005,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
                 "left:bottom:width:height (got '%s')\n", optarg);
         exit(EXIT_FAILURE);
       }
+      break ;
+
+    case 'E':
+      ctx->disable_dither = 1;
       break ;
 
     case 'f':

@@ -238,6 +238,7 @@ browser.
      -P <n>: sleep n milliseconds between frames
      -d: dump each frame as PPM
      -D: dump only the last frame as PPM
+     -E: disable dithering
      -0 <file.png>: Load "file.png" and bind it to TEXTURE0
      -1 to -7: same as -0 for TEXTUREn
      -v: increase verbosity level
