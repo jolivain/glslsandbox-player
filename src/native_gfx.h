@@ -88,7 +88,7 @@ native_gfx_get_window_height(const native_gfx_t *gfx);
 #endif /* NATIVE_GFX_H */
 
 /*
-* Copyright (c) 2015-2017, Julien Olivain <juju@cotds.org>
+* Copyright (c) 2015-2018, Julien Olivain <juju@cotds.org>
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without

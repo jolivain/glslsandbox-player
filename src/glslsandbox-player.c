@@ -1748,7 +1748,7 @@ main(int argc, char *argv[])
 }
 
 /*
-* Copyright (c) 2015-2017, Julien Olivain <juju@cotds.org>
+* Copyright (c) 2015-2018, Julien Olivain <juju@cotds.org>
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without

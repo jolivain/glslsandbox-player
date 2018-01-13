@@ -588,7 +588,7 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #endif /* GLES_HELPER_H */
 
 /*
-* Copyright (c) 2015-2017, Julien Olivain <juju@cotds.org>
+* Copyright (c) 2015-2018, Julien Olivain <juju@cotds.org>
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
