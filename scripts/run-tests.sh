@@ -26,6 +26,8 @@ function run_cleanup() {
 }
 
 function run_tests() {
+    RET=0
+
     make \
         -C "${TEST_DIR}/" \
         GLSLSANDBOX_PLAYER="${GLSLSANDBOX_PLAYER}" \
@@ -40,13 +42,16 @@ function run_tests() {
     FAILED_COUNT="$(find "${OUTPUT_DIR}/" -type f -name '*.failed' | wc -l)"
 
     if [[ $FAILED_COUNT -gt 0 ]] ; then
-	echo
-	echo "---------------"
-	echo "Failed shaders:"
-	echo "---------------"
-	( cd "${OUTPUT_DIR}/" && ls -1 ./*.failed )
-	echo
+        echo
+        echo "---------------"
+        echo "Failed shaders:"
+        echo "---------------"
+        ( cd "${OUTPUT_DIR}/" && ls -1 ./*.failed )
+        echo
+        RET=1
     fi
+
+    return ${RET}
 }
 
 function usage() {
