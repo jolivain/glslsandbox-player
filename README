@@ -15,7 +15,7 @@ glslsandbox-player is a working EGL and GLESv2 libraries.
 
 Install dependencies:
 
-* For Ubuntu 14.04.2:
+* For Ubuntu 14.04 and 16.04 LTS:
 
     sudo apt-get install \
       git curl make gcc autoconf automake libx11-dev \
@@ -27,9 +27,9 @@ Install dependencies:
       git curl make gcc autoconf automake libx11-dev \
       libegl1-mesa-dev-lts-trusty libgles2-mesa-dev-lts-trusty
 
-* For Fedora (tested on 21, 22 and 23):
+* For Fedora (tested on version 21 to 27):
 
-    sudo yum install \
+    sudo dnf install \
       git curl make gcc autoconf automake libX11-devel \
       mesa-libEGL-devel mesa-libGLES-devel
 
