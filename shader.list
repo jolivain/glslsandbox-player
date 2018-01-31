@@ -1,12 +1,57 @@
 # ID      Nickname
 
+45094.1   ColorPlasma
+45083.2   MandelZoom2
+45083.1   MandelZoom
+45027.0   HomerCurve
+45023.0   BlueBubbles
+42472.1   Plantation
+40851.0   ProceduralCubemap
+40567.1   Fire
+40107.0   Bear
+40104.0   Cartoon
+39784.1   RedPortals
+39017.2   HotTunnel
+38803.3   SpaceInvaders
+38740.1   Smiley
+37065.4   Burger
+37065.0   Pizza
+36887.0   Bacterium
+36838.1   KelpForest
+36684.2   TunnelBeauty4
+36612.2   LightExperiment
+36398.2   MagicCircle
+36234.0   SkyLines
+36196.0   GreenGrid
+36089.1   Woods
+35983.1   MovingBlocks
+35332.1   MegaWave
+35245.1   StructuredVolSampling
+34167.0   CubeGrid
+34155.1   RollingBall
+34109.0   LightRay
+34005.1   Batman
+33231.1   WaterCave
+32694.0   SmallWorld
+32225.0   ColorPicker
+31180.3   PlanetShadertoyLow
+31180.2   PlanetShadertoy
+30992.0   RainCity
+30868.1   PrimeNumbers
+30736.1   DancingPixels
+30733.1   StarTrip
+30350.1   TraceVisualization
+29698.0   OilyColors2
+29662.0   Snail
+29611.0   OilyColors
+29520.0   TunnelFall
 29149.10  Explosion
 29082.0   MarbleLevels
 29050.0   MetalicStructure
 29031.1   Labyrinth
 28898.1   NixieTube
-28681.1   Rain
 28814.9   LightTunnel
+28681.1   Rain
 28672.0   SixteenSegmentDisplayV4
 28514.1   PlasmaTriangle
 28511.1   Flower
@@ -43,8 +88,8 @@
 27547.5   WavyTunnel
 27539.11  LightProjection2
 27539.1   LightProjection
-27512.36  GSLRotoZoom
 27518.1   SierpinskyRayCast
+27512.36  GSLRotoZoom
 27511.0   ColorRotatingTunnel
 27501.0   FastFlyingBalls
 27499.0   Heart
@@ -87,12 +132,12 @@
 26701.0   FlyingSeascape
 26694.0   Arrows
 26675.2   CloudyNoise3D
+26634.1   ColorSquares
 26600.1   CoulombHUE
-26575.13  AlgebraicSurfaces
 # FPSCcounter needs backbuffer buffer
 26576.4   FPSCounter
+26575.13  AlgebraicSurfaces
 26573.7   FlyingBalls
-26634.1   ColorSquares
 26569.1   BouncingLines
 26568.0   GreyWavyPixels
 26562.2   SquareTwist
@@ -105,9 +150,9 @@
 26518.0   Stripes
 26511.0   PinkBrickWall
 26496.4   Mode7
+26494.0   Chains
 # BouncingSpheres: Crash on Fedora 22, firefox-39.0-8.fc22.x86_64, mesa-libGLES-10.6.1-1.20150629.fc22.x86_64
 26493.0   BouncingSpheres
-26494.0   Chains
 26462.0   TerrainView
 26458.0   AnimatedTexture
 26451.0   Groovymap
@@ -156,6 +201,7 @@
 23269.0   RainCity
 23216.2   CloudTunnel
 23182.0   StarNursery
+23111.0   Portal
 23002.0   PepperminCandyRain
 22864.3   CubicEntanglement
 22630.0   GoldenDunes
@@ -171,13 +217,15 @@
 21586.0   GreenSnow
 21022.0   StarVolumeRendering
 20988.1   Ocean
+20682.2   BurningSmileys
 20674.0   WoodenCubes
 20299.2   BlackLines
-20682.2   BurningSmileys
 20033.1   Doom
 19885.0   Cylinders
+19868.0   Robot
 19521.1   SparseMengerCube
 18749.0   Wolfenstein
+18609.0   StellarHighway
 18434.1   AfghanGirl
 18431.0   CubesTunnel
 18426.0   Grid3D
@@ -197,6 +245,7 @@
 17474.1   Tentacules
 17427.0   ElectricCaves
 17316.1   Spout
+17166.1   Monster
 17109.2   FractalCorail
 17056.0   HelloWorld
 16971.0   RubikCube
@@ -266,6 +315,7 @@
 6339.0    TorusJourney
 6333.1    Spirals
 6056.1    CloudySky
+5996.0    Cat
 5882.0    ProceduralVoronoi
 5855.0    Julia3D
 5787.0    Fractal
@@ -276,8 +326,7 @@
 4902.1    NormalMap
 4862.0    ShaderMouse
 4747.0    RotatingLines
-# Slisesix: no longer working with mesa 10.6.1 (preprocessor error)
-# 4456.6  Slisesix
+4456.7    Slisesix
 4285.0    Commodore64Heavy
 4278.1    CubeColorLight
 4272.1    Blox
@@ -316,5 +365,6 @@
 892.1     Bars
 772.0     XmasParticles
 714.0     Trees
+456.15    Breakout
 424.12    ShaderInvaders
 6.0       ColorRipples
