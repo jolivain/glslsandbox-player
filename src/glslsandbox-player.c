@@ -1404,6 +1404,58 @@ fprintf_sysinfo(FILE *fp)
 }
 
 static void
+fprintf_gles_precision(FILE *fp, GLenum shader_type, GLenum precision_type)
+{
+  GLint range[2];
+  GLint precision;
+
+  XglGetShaderPrecisionFormat(shader_type, precision_type, range, &precision);
+  fprintf(fp, "| %3i:%-3i %3i ",
+	  range[0], range[1], precision);
+}
+
+
+static void
+fprintf_gles_precisions(FILE *fp)
+{
+  fprintf(fp, "\nShader precision returned by glGetShaderPrecisionFormat():\n");
+  fprintf(fp, "Cell format is: \"range[0]:range[1] precision\"\n");
+
+  fprintf(fp,
+          "+-----+---------------------------+---------------------------+\n");
+  fprintf(fp,
+          "|Preci|          Vertex           |          Fragment         |\n");
+  fprintf(fp,
+          "|sion |    Float    |   Integer   |    Float    |   Integer   |\n");
+  fprintf(fp,
+          "+-----+-------------+-------------+-------------+-------------+\n");
+
+  fprintf(fp, "| Low ");
+  fprintf_gles_precision(fp, GL_VERTEX_SHADER, GL_LOW_FLOAT);
+  fprintf_gles_precision(fp, GL_VERTEX_SHADER, GL_LOW_INT);
+  fprintf_gles_precision(fp, GL_FRAGMENT_SHADER, GL_LOW_FLOAT);
+  fprintf_gles_precision(fp, GL_FRAGMENT_SHADER, GL_LOW_INT);
+  fprintf(fp, "|\n");
+
+  fprintf(fp, "| Med ");
+  fprintf_gles_precision(fp, GL_VERTEX_SHADER, GL_MEDIUM_FLOAT);
+  fprintf_gles_precision(fp, GL_VERTEX_SHADER, GL_MEDIUM_INT);
+  fprintf_gles_precision(fp, GL_FRAGMENT_SHADER, GL_MEDIUM_FLOAT);
+  fprintf_gles_precision(fp, GL_FRAGMENT_SHADER, GL_MEDIUM_INT);
+  fprintf(fp, "|\n");
+
+  fprintf(fp, "| Hig ");
+  fprintf_gles_precision(fp, GL_VERTEX_SHADER, GL_HIGH_FLOAT);
+  fprintf_gles_precision(fp, GL_VERTEX_SHADER, GL_HIGH_INT);
+  fprintf_gles_precision(fp, GL_FRAGMENT_SHADER, GL_HIGH_FLOAT);
+  fprintf_gles_precision(fp, GL_FRAGMENT_SHADER, GL_HIGH_INT);
+  fprintf(fp, "|\n");
+
+  fprintf(fp,
+          "+-----+-------------+-------------+-------------+-------------+\n");
+}
+
+static void
 fprintf_gles_info(FILE *fp, int verbose)
 {
   const char *vendor;
@@ -1442,6 +1494,9 @@ fprintf_gles_info(FILE *fp, int verbose)
     }
     fprintf(fp, "GL_EXTENSIONS               : %s\n", exts);
   }
+
+  if (verbose > 2)
+    fprintf_gles_precisions(fp);
 
   fprintf(fp, "\n");
 }

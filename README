@@ -343,6 +343,13 @@ synchronization is usually better on wired network (compared to
 wireless networks) since they have smaller jitter.  This can be used
 to build screen walls.
 
+  The range and precision for different shader numeric formats is
+printed when glslsandbox-player is executed with a verbosity level of
+2 (with `-vv' command line argument).  For the details for
+interpreting data, refer to the documentation of
+`glGetShaderPrecisionFormat()' function:
+https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glGetShaderPrecisionFormat.xml
+
 
 Additional Features not Present in GLSL Sandbox
 -----------------------------------------------
