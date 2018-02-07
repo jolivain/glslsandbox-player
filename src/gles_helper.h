@@ -141,6 +141,9 @@ void
 __xgles_glGetShaderInfoLog(const char *file, int line, GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 
 void
+__xgles_glGetShaderPrecisionFormat(const char *file, int line, GLenum shadertype, GLenum precisiontype, GLint *range, GLint *precision);
+
+void
 __xgles_glGetShaderSource(const char *file, int line, GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source);
 
 const GLubyte *
@@ -329,6 +332,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #define XglGetShaderInfoLog(shader, bufSize, length, infoLog) \
   __xgles_glGetShaderInfoLog(__FILE__, __LINE__, shader, bufSize, length, infoLog)
 
+#define XglGetShaderPrecisionFormat(shadertype, precisiontype, range, precision) \
+  __xgles_glGetShaderPrecisionFormat(__FILE__, __LINE__, shadertype, precisiontype, range, precision)
+
 #define XglGetShaderSource(shader, bufSize, length, source) \
   __xgles_glGetShaderSource(__FILE__, __LINE__, shader, bufSize, length, source)
 
@@ -513,6 +519,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 
 #define XglGetShaderInfoLog(shader, bufSize, length, infoLog) \
   glGetShaderInfoLog(shader, bufSize, length, infoLog)
+
+#define XglGetShaderPrecisionFormat(shadertype, precisiontype, range, precision) \
+  glGetShaderPrecisionFormat(shadertype, precisiontype, range, precision)
 
 #define XglGetShaderSource(shader, bufSize, length, source) \
   glGetShaderSource(shader, bufSize, length, source)

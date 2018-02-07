@@ -386,6 +386,13 @@ __xgles_glGetShaderInfoLog(const char *file, int line, GLuint shader, GLsizei bu
 }
 
 void
+__xgles_glGetShaderPrecisionFormat(const char *file, int line, GLenum shadertype, GLenum precisiontype, GLint *range, GLint *precision)
+{
+  glGetShaderPrecisionFormat(shadertype, precisiontype, range, precision);
+  __xgles_check_error(file, line, "glGetShaderInfoLog");
+}
+
+void
 __xgles_glGetShaderSource(const char *file, int line, GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source)
 {
   glGetShaderSource(shader, bufSize, length, source);
