@@ -274,8 +274,9 @@ or
 Render and save a frame of an animation when time=100:
     glslsandbox-player -S Mountains -w0 -W720 -H480 -s0 -O100 -f1 -D
 
-Generate 100 PPM frames of an animation at 20fps:
+Generate 100 PPM frames of an animation at 20fps, then encode to a video:
     glslsandbox-player -S BouncingBalls -W720 -H480 -w0 -T0.05 -f100 -d
+    ffmpeg -r 20 -i BouncingBalls-%05d.ppm BouncingBalls.mp4
 
 Two by two split screen rendering for 30 seconds:
     glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e -1:-1:1:1 &
