@@ -1,0 +1,41 @@
+#! /bin/bash
+
+set -e
+set -u
+
+if [[ $# -ne 1 ]] ; then
+    echo "Usage: $0 <shader.list>" >&2
+    exit 1
+fi
+
+SHADER_LIST="$1"
+
+RET=0
+
+print_id_dupes() {
+    grep -vE '^[[:blank:]]*(#|$)' "${SHADER_LIST}" |
+        awk '{print $1;}' |
+        LANG=C sort |
+        uniq -d
+}
+
+if [ "$(print_id_dupes | wc -l)" != "0" ] ; then
+    echo "ERROR: There is duplicated shader ID entries:" >&2
+    print_id_dupes >&2
+    RET=1
+fi
+
+print_name_dupes() {
+    grep -vE '^[[:blank:]]*(#|$)' "${SHADER_LIST}" |
+        awk '{print $2;}' |
+        LANG=C sort |
+        uniq -d
+}
+
+if [ "$(print_name_dupes | wc -l)" != "0" ] ; then
+    echo "ERROR: There is duplicated shader name entries:" >&2
+    print_name_dupes >&2
+    RET=1
+fi
+
+exit "${RET}"
