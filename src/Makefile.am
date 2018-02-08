@@ -29,10 +29,17 @@ GEN_SHADER_IDS = $(top_srcdir)/scripts/gen-shader-ids
 DL_SHADER = $(top_srcdir)/scripts/dl-shader
 FRAG2INC = $(top_srcdir)/scripts/frag2inc
 INC2C = $(top_srcdir)/scripts/inc2c
+SHADER_LIST_CHECK = $(top_srcdir)/scripts/chk-shader-list
 SHADER_LIST = $(top_srcdir)/shader.list
 SHADER_IDS = $(shell $(GEN_SHADER_IDS) $(SHADER_LIST) )
 SHADER_FILES = $(addsuffix .frag,$(SHADER_IDS))
 SHADER_CFILES = $(addsuffix .inc,$(SHADER_IDS))
+
+$(SHADER_LIST): shader-list-check
+
+.PHONY: shader-list-check
+shader-list-check:
+	$(SHADER_LIST_CHECK) $(SHADER_LIST)
 
 .SECONDARY: $(SHADER_FILES)
 
