@@ -56,8 +56,10 @@ struct context_s {
   struct timespec player_start_time;
   struct timespec render_start_time;
   struct timespec first_frame_time;
+  struct timespec shader_origin_time;
   struct timespec warmup_end_time;
   struct timespec last_fps_count_time;
+  int use_fixed_time_origin;
   float time;
   float time_offset;
   float time_factor;

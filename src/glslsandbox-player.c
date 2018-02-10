@@ -902,6 +902,7 @@ player_usage(void)
   fprintf(stderr, "  -f <n>: run n frames of shader(s)\n");
   fprintf(stderr, "  -t <n>: run n seconds of shader(s)\n");
   fprintf(stderr, "  -T <f>: time step at each frame instead of using real time\n");
+  fprintf(stderr, "  -o <timespec>: set an absolute time origin\n");
   fprintf(stderr, "  -O <f>: time offset for the animation\n");
   fprintf(stderr, "  -m: disable mouse movement emulation\n");
   fprintf(stderr, "  -M <f>: set mouse movement speed factor\n");
@@ -961,6 +962,58 @@ parse_surfpos(context_t *ctx, const char *args)
   return (0);
 }
 
+static int
+parse_timespec(const char *timespec_str, struct timespec *ts)
+{
+  struct timespec t = { 0, 0 };
+  char *endptr = NULL;
+  const char *nsec;
+  size_t nsec_len;
+  unsigned int i;
+
+  t.tv_sec = strtol(timespec_str, &endptr, 10);
+  if (endptr[0] == '\0') {
+    ts->tv_sec = t.tv_sec;
+    ts->tv_nsec = t.tv_nsec;
+    return (0);
+  }
+
+  if (endptr[0] != '.')
+    return (-1);
+
+  nsec = endptr + 1;
+  t.tv_nsec = strtol(nsec, &endptr, 10);
+  if (endptr[0] != '\0')
+    return (-2);
+
+  nsec_len = strlen(nsec);
+  if (nsec_len > 9)
+    return (-3);
+
+  nsec_len = 9 - nsec_len;
+  for (i = 0; i < nsec_len; ++i)
+    t.tv_nsec *= 10;
+
+  ts->tv_sec = t.tv_sec;
+  ts->tv_nsec = t.tv_nsec;
+  
+  return (0);
+}
+
+static void
+set_timespec_origin(context_t *ctx, const char *timespec)
+{
+  int ret;
+
+  ret = parse_timespec(timespec, &ctx->shader_origin_time);
+  if (ret != 0) {
+    fprintf(stderr,
+            "ERROR: option -o takes a timespec argument.\n"
+            "ERROR: format is: INTEGER or INTEGER.INTEGER\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
 static void
 parse_cmdline(context_t *ctx, int argc, char *argv[])
 {
@@ -968,8 +1021,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  /* available short option: AabCcGgJjKknoQ89 */
-  while ((opt = getopt(argc, argv, "BdDe:Ef:F:hH:i:I:lLmM:NO:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabCcGgJjKknQ89 */
+  while ((opt = getopt(argc, argv, "BdDe:Ef:F:hH:i:I:lLmM:No:O:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -1084,6 +1137,11 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 'N':
       ctx->fbo_nearest = 1;
+      break ;
+
+    case 'o':
+      set_timespec_origin(ctx, optarg);
+      ctx->use_fixed_time_origin = 1;
       break ;
 
     case 'O':
@@ -1276,12 +1334,20 @@ init_render_start_time(context_t *ctx)
   memcpy(&ctx->last_fps_count_time, &ctx->render_start_time,
          sizeof (ctx->last_fps_count_time));
 
-  /* animation time is computed from first_frame_time.
-   * in case there is no warmup frame, we need to init
-   * first_frame_time here. */
-  if (ctx->warmup_frames == 0)
+  /* Shader animation time is computed from first_frame_time or
+   * shader_origin_time if set.  In case there is no warmup frame, we
+   * need to init first_frame_time here. */
+  if (ctx->warmup_frames == 0) {
     memcpy(&ctx->first_frame_time, &ctx->render_start_time,
            sizeof (ctx->first_frame_time));
+    /* If no fixed time origin was given, also copy to
+       shader_origin_time. */
+    if (ctx->use_fixed_time_origin == 0) {
+      memcpy(&ctx->shader_origin_time,
+             &ctx->first_frame_time,
+             sizeof (ctx->shader_origin_time));
+    }
+  }
 
   if (ctx->verbose > 0) {
     struct timespec diff;
@@ -1297,6 +1363,14 @@ static void
 init_first_frame_time(context_t *ctx)
 {
   xclock_gettime(CLOCK_REALTIME, &ctx->first_frame_time);
+
+  /* If a fixed shader time origin was not given in command line with
+   * -o argument, initialize the time origin to first_frame_time. */
+  if (ctx->use_fixed_time_origin == 0) {
+    memcpy(&ctx->shader_origin_time,
+           &ctx->first_frame_time,
+           sizeof (ctx->shader_origin_time));
+  }
 
   if (ctx->verbose > 0) {
     struct timespec diff;
@@ -1318,7 +1392,7 @@ update_time(context_t *ctx)
   if (ctx->use_time_step)
     ctx->time = (float)(ctx->frame + 1) * ctx->time_step;
   else
-    ctx->time = get_float_reltime(&ctx->first_frame_time);
+    ctx->time = get_float_reltime(&ctx->shader_origin_time);
 }
 
 static void
@@ -1534,7 +1608,7 @@ report_fps(FILE *fp, context_t *ctx)
 
   fps = (float)ctx->report_fps_count / ft;
 
-  fprintf(fp, "from_frame:%-7u to_frame:%-7u time:%-7.3f frame_rate:%-9.3f abstime=%.3f\n",
+  fprintf(fp, "from_frame:%-7u to_frame:%-7u time:%-7.3f frame_rate:%-9.3f shadertime=%.3f\n",
           ctx->frame - ctx->report_fps_count + 1, ctx->frame,
           ft, fps, ctx->time);
 }
@@ -1610,6 +1684,11 @@ player_render_loop(context_t *ctx)
 {
   int last_frame;
 
+  if (ctx->verbose > 0) {
+    fprintf(stderr, "Using origin of time: %lu.%09lu\n",
+            ctx->shader_origin_time.tv_sec, ctx->shader_origin_time.tv_nsec);
+  }
+  
   last_frame = 0;
   for (;;) {
 

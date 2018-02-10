@@ -216,6 +216,7 @@ browser.
      -f <n>: run n frames of shader(s)
      -t <n>: run n seconds of shader(s)
      -T <f>: time step at each frame instead of using real time
+     -o <timespec>: set an absolute time origin
      -O <f>: time offset for the animation
      -m: disable mouse movement emulation
      -M <f>: set mouse movement speed factor
@@ -279,10 +280,11 @@ Generate 100 PPM frames of an animation at 20fps, then encode to a video:
     ffmpeg -r 20 -i BouncingBalls-%05d.ppm BouncingBalls.mp4
 
 Two by two split screen rendering for 30 seconds:
-    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e -1:-1:1:1 &
-    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e  0:-1:1:1 &
-    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e -1:0:1:1  &
-    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -e  0:0:1:1  &
+    O="$(date +%s)"
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e -1:-1:1:1 &
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e  0:-1:1:1 &
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e -1:0:1:1  &
+    glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e  0:0:1:1  &
 
   Since glslsandbox-player was designed for testing purposes, it will
 execute one shader per process execution. This initial design choice
@@ -335,15 +337,6 @@ native windowing system.  Not all windowing systems are supporting
 window positioning and could be silently ignored.  Other windowing
 systems may also use those values as a hint and may not exactly honor
 the requested values.
-
-  Shaders using the "surfacePosition" varying can be rendered on split
-screens, using the "-e" option (see examples).  Since the animation is
-computed from the local clock time, such shaders can be rendered on
-remotes computers, provided their clock are properly synchronized
-(using ntp or ptp for example).  Note that accurate clock
-synchronization is usually better on wired network (compared to
-wireless networks) since they have smaller jitter.  This can be used
-to build screen walls.
 
   The range and precision for different shader numeric formats is
 printed when glslsandbox-player is executed with a verbosity level of
@@ -611,6 +604,48 @@ Counting differences with netpbm-progs:
 
 Using pnmpsnr:
     pnmpsnr img1.ppm img2.ppm
+
+
+Notes on Distributed Rendering
+------------------------------
+
+  Shaders using the "surfacePosition" varying can be rendered on split
+screens, using the "-e" option (see examples). Since the animation is
+computed from the local clock time, such shaders can be rendered on
+remotes computers, provided their clock are properly synchronized
+(using ntp or ptp for example). Note that accurate clock
+synchronization is usually better on wired network (compared to
+wireless networks) since they have smaller jitter. This can be used
+to build screen walls.
+
+  In order to properly synchronize the rendering, an accurate time
+origin needs to be set on all renderers. This can be done with "-o"
+command line argument. This option take a `timespec' time, which the
+number of second since 1970-01-01 00:00:00 UTC, and optionally a the
+number of nanosecond. The current time can be shown in that format
+with the command `date +%s' for one-second resolution, or `date +%s.%N'
+for a nano-second resolution.
+
+  Distributing this time origin to slaves can be done for example via
+HTTP, using the following simple shell scripts and Busybox httpd.
+
+  On master:
+
+    GLSLSANDBOX_RUN_DIR=/tmp/glslsandbox-master
+    mkdir -p "${GLSLSANDBOX_RUN_DIR}"
+    date +%s > "${GLSLSANDBOX_RUN_DIR}/origin.txt"
+    busybox httpd -p 8080 -h "${GLSLSANDBOX_RUN_DIR}"
+
+  On rendering slaves:
+
+    TIME_ORIGIN="$(wget -q -O - masterhost:8080/origin.txt | grep -m1 -o '[0-9.]*')"
+    glslsandbox-player \
+        -q -t30 -S MandelZoom2 -W320 -H240 \
+        -o "${TIME_ORIGIN}"
+
+  In case security is important (for example, if running on public
+networks), consider using SSL/TLS certificates, SSH or any other
+system providing security.
 
 
 Miscellaneous Notes
