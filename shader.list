@@ -1,5 +1,24 @@
 # ID      Nickname
 
+45334.0   RayCubesLearning
+45333.0   TheDriveHome
+45332.0   Tardigrade
+45330.0   AtomicMotion
+45329.0   MotionBlur3D
+45328.0   MotionBlur2D
+45318.16  MucousMembrane
+45323.0   Gabor2
+45317.1   RorschachTest
+45308.0   FisherCat
+45253.1   GreekFrieze2
+45233.0   SuperMarioBros
+45232.0   LadyBug
+45231.0   AlienCavity
+45230.0   KirbyJump
+45221.0   BubbleWaves
+45217.0   Formation
+45216.0   HouseInABox
+45205.0   FBMExploration
 45094.1   ColorPlasma
 45083.2   MandelZoom2
 45083.1   MandelZoom
@@ -7,7 +26,7 @@
 45023.0   BlueBubbles
 42472.1   Plantation
 40851.0   ProceduralCubemap
-40567.1   Fire
+40567.1   Fire2
 40107.0   Bear
 40104.0   Cartoon
 39784.1   RedPortals
@@ -27,11 +46,13 @@
 35983.1   MovingBlocks
 35332.1   MegaWave
 35245.1   StructuredVolSampling
+35135.0   ToonCloud
 34167.0   CubeGrid
 34155.1   RollingBall
 34109.0   LightRay
 34005.1   Batman
 33231.1   WaterCave
+32714.0   IceCubes
 32694.0   SmallWorld
 32225.0   ColorPicker
 31180.3   PlanetShadertoyLow
@@ -185,6 +206,7 @@
 25361.0   AudreyHepburn
 25355.1   Esher
 25311.1   KaleidoscopicIFS
+25299.1   ZXSpectrum
 24643.1   Galaxy
 24368.0   MoreBlobs
 24237.2   BlueCells
@@ -198,7 +220,6 @@
 23528.0   AnotherKaleidoscopicIFS
 23480.0   OpticalCircuit
 23312.2   ColorWaves
-23269.0   RainCity
 23216.2   CloudTunnel
 23182.0   StarNursery
 23111.0   Portal
@@ -252,6 +273,7 @@
 16940.0   ColorfulBalls
 16126.1   Bokeh
 16084.0   MandelBulb
+16059.1   IO
 15929.0   ColorField
 15834.1   Sierpinksy2D
 15772.0   StarNest
@@ -313,7 +335,7 @@
 6429.1    MoisyMandel
 6342.2    TunnelBlob
 6339.0    TorusJourney
-6333.1    Spirals
+6333.1    Spirals3D
 6056.1    CloudySky
 5996.0    Cat
 5882.0    ProceduralVoronoi
