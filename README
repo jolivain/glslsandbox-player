@@ -15,25 +15,26 @@ glslsandbox-player is a working EGL and GLESv2 libraries.
 
 Install dependencies:
 
-* For Ubuntu 14.04 and 16.04 LTS:
+For Ubuntu 14.04 and 16.04 LTS:
 
     sudo apt-get install \
       git curl make gcc autoconf automake libx11-dev \
       libegl1-mesa-dev libgles2-mesa-dev
 
-* For Ubuntu 12.04.5:
+For Ubuntu 12.04.5:
 
     sudo apt-get install \
       git curl make gcc autoconf automake libx11-dev \
       libegl1-mesa-dev-lts-trusty libgles2-mesa-dev-lts-trusty
 
-* For Fedora (tested on version 21 to 27):
+For Fedora (tested on version 21 to 27):
 
     sudo dnf install \
       git curl make gcc autoconf automake libX11-devel \
       mesa-libEGL-devel mesa-libGLES-devel
 
 Build:
+
     git clone https://github.com/jolivain/glslsandbox-player.git
     cd glslsandbox-player
     autoreconf -vfi
@@ -41,8 +42,10 @@ Build:
     make
 
 Run a demo:
+
     ./scripts/run-demo-random.sh
 or:
+
     ./scripts/run-demo.sh
 
   For the less impatient user, continue reading...
@@ -70,8 +73,8 @@ with unusual shader load or program constructions.
 a target device, the code of a selection of fragment shaders is
 downloaded at compilation time, processed and then compiled inside the
 final binary. The list of shader code to embed into the binary is
-maintained in the file "shader.list", in the root of this source
-package. The source distribution includes a ready to use "shader.list"
+maintained in the file `shader.list`, in the root of this source
+package. The source distribution includes a ready to use `shader.list`
 file of an arbitrary pseudo-random selection of nice looking shaders.
 
   One would be tempted to include all available shaders on the website
@@ -115,33 +118,33 @@ Supported glslsandbox Features
   The supported features of the original http://glslsandbox.com/
 shader player are:
 
-- the "time" float uniform is set to the number of seconds since the
-  beginning of the rendering. In case the -T command line argument is
-  used, the time is increased with this step at each frame, regardless
-  the frame rate and computation time.
+- the `time` float uniform is set to the number of seconds since the
+  beginning of the rendering. In case the `-T` command line argument
+  is used, the time is increased with this step at each frame,
+  regardless the frame rate and computation time.
 
-- the "mouse" vec2 uniform is updated with cyclic movement (two
+- the `mouse` vec2 uniform is updated with cyclic movement (two
   components of the vec2 encodes the mouse coordinates as float
   [-1.0:1.0]).
 
-- the "resolution" vec2 uniform, which encodes the dimension of the
+- the `resolution` vec2 uniform, which encodes the dimension of the
   surface in pixel to render.
 
-- the "surfacePosition" vec2 varying, which define the viewport of the
+- the `surfacePosition` vec2 varying, which define the viewport of the
   quad surface to be rendered (default is -1,-1 for lower left corner,
   1,1 for the upper right). This varying is used for the pan/zoom
   feature of the mouse (in the original http://glslsandbox.com/
   player). In glslsandbox-player, this varying is updated with cyclic
   movements of pan/zoom.
 
-- the "surfaceSize" vec2 uniform, which defines the relative size
+- the `surfaceSize` vec2 uniform, which defines the relative size
   ratio of the surface. It's value is:
-  vec2(resolution.x / resolution.y, 1.0)
+  `vec2(resolution.x / resolution.y, 1.0)`
 
-- the "backbuffer" uniform sampler2D gives access to the previous
+- the `backbuffer` uniform sampler2D gives access to the previous
   frame (back buffer) as a texture. It will work only when the FBO
-  rendering is active (-B, -R or -X/-Y command line arguments). See
-  for example shader 424.12.
+  rendering is active (`-B`, `-R` or `-X`/`-Y` command line
+  arguments). See for example shader 424.12.
 
 
 Building glslsandbox-player
@@ -163,16 +166,16 @@ The build dependencies of glslsandbox are:
 
   Compiling glslsandbox-player should be straightforward if all
 dependencies are present since it's an autotools package (aka
-"./configure && make"). Make sure to enable/disable the proper native
+`./configure && make`). Make sure to enable/disable the proper native
 windowing library for your system.
 
   The configure script takes an option to select the native windowing
 system:
 
-  --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms
+    --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms
 
   For example, compiling for using the the Vivante frame buffer native
-windowing support, use "./configure --with-native-gfx=vivfb".
+windowing support, use `./configure --with-native-gfx=vivfb`.
 
 
 Important Note about Shader Copyright, Licenses and Author Credits
@@ -195,12 +198,12 @@ Running glslsandbox-player
 
   If glslsandbox-player is executed without any option, it will run
 infinitely the builtin shader id 0, on a full screen window. It will
-render 3 warmup frames (defined later in "Note about Performance
-Counting" section) and will report frame rate every 100 frames. By
-default, the program is started with a verbosity level 1, which means
-info messages will be printed. Original URL of the shader is also
-printed to easily check the rendering from a WebGL enabled web
-browser.
+render 3 warmup frames (defined later in [Note about Performance
+Counting](#note-about-performance-counting) section) and will report
+frame rate every 100 frames. By default, the program is started with a
+verbosity level 1, which means info messages will be printed. Original
+URL of the shader is also printed to easily check the rendering from a
+WebGL enabled web browser.
 
   Command line arguments of glslsandbox-player are:
 
@@ -245,41 +248,56 @@ browser.
      -v: increase verbosity level
      -q: run quietly
 
-  In case -t and -f are used in the same command line, the program
+  In case `-t` and `-f` are used in the same command line, the program
 will terminate when the first condition is satisfied.
 
 Command line examples:
 
 List builtin shader, sorted by internal id:
+
     glslsandbox-player -l
 
 List builtin shader, sorted by glslsandbox id:
+
     glslsandbox-player -l | sort -k2 -n
 
 List the 20 biggest builtin shader:
+
     glslsandbox-player -l | sort -k5 -r -n | head -20
 
 Render 5000 frames of the shader id 109 in a 128x128 window and report
 frame rate every 500 frames:
+
     glslsandbox-player -W128 -H128 -f5000 -r500 -i109
 
 Renders shader id 123 in a 256x256 window using a 64x64 FBO (reduce
 resolution by 4):
+
     glslsandbox-player -W256 -H256 -i123 -X64 -Y64
 
 Render a frozen animation when time=100:
+
     glslsandbox-player -S Mountains -w0 -W720 -H480 -s0 -O100
 or
+
     glslsandbox-player -S Mountains -w0 -W720 -H480 -T0 -O100
 
 Render and save a frame of an animation when time=100:
+
     glslsandbox-player -S Mountains -w0 -W720 -H480 -s0 -O100 -f1 -D
 
 Generate 100 PPM frames of an animation at 20fps, then encode to a video:
+
     glslsandbox-player -S BouncingBalls -W720 -H480 -w0 -T0.05 -f100 -d
     ffmpeg -r 20 -i BouncingBalls-%05d.ppm BouncingBalls.mp4
 
+Generate the glslsandbox.png image:
+
+    glslsandbox-player -I 26379.2 -W640 -H200 -s0 -f1 -d
+    convert GLSLSandbox-00000.ppm glslsandbox.png
+
 Two by two split screen rendering for 30 seconds:
+
     O="$(date +%s)"
     glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e -1:-1:1:1 &
     glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e  0:-1:1:1 &
@@ -292,9 +310,9 @@ is to easily catch driver crash without interrupting a test sequence
 (provided the kernel driver and GPU hardware are able to recover the
 crash). A caller script is needed to run all the shaders embedded in
 the program. For this purpose, two demo scripts are provided
-"scripts/run-demo.sh" and "scripts/run-demo-random.sh".
+`scripts/run-demo.sh` and `scripts/run-demo-random.sh`.
 
-  The script "scripts/run-url.sh" is also provided to show how to run
+  The script `scripts/run-url.sh` is also provided to show how to run
 a shader directly from the http://glslsandbox.com/ website that was
 not embedded in the binary at compilation time.
 
@@ -302,8 +320,8 @@ not embedded in the binary at compilation time.
 RAM for shader compilation, or GPU time), it could make the computer
 running it unstable. Make sure there is not important application
 running in case of a crash. When running glslsandbox-player, it could
-be safe to use resources limits. See the "ulimit" bash builtin and the
-"timeout" command (see "scripts/run-demo.sh" for an example how to use
+be safe to use resources limits. See the `ulimit` bash builtin and the
+`timeout` command (see `scripts/run-demo.sh` for an example how to use
 those).
 
   By default, glslsandbox-player renders the selected shader code
@@ -312,37 +330,37 @@ render to an off-screen frame buffer object (FBO) instead, then render
 this buffer on screen. The main purpose of this feature is to reduce
 the shader resolution without actually reducing the displayed
 surface. This rendered FBO is textured on the whole window
-surface. The FBO usage can be enabled with the -B command line
+surface. The FBO usage can be enabled with the `-B` command line
 argument, in which case it will be sized to the same size of the
-rendering window. The FBO size can be set with the -X and -Y command
-line arguments, which respectively sets its width and height. By
-default, the FBO is textured on screen with linear filtering, which
-can produce a blurred result. This filter can be changed to a nearest
-neighbor using the -N command line option.
+rendering window. The FBO size can be set with the `-X` and `-Y`
+command line arguments, which respectively sets its width and
+height. By default, the FBO is textured on screen with linear
+filtering, which can produce a blurred result. This filter can be
+changed to a nearest neighbor using the `-N` command line option.
 
-  By default, glslsandbox-player does not call eglSwapInterval() EGL
-function. It will default to 1 (as per EGL specification). The -V
+  By default, glslsandbox-player does not call `eglSwapInterval()` EGL
+function. It will default to 1 (as per EGL specification). The `-V`
 command line argument will set the swap interval by calling
-eglSwapInterval(). Some EGL implementation will return a failure if it
-cannot be set. If glslsandbox-player is built with strict EGL/GLES
+`eglSwapInterval()`. Some EGL implementation will return a failure if
+it cannot be set. If glslsandbox-player is built with strict EGL/GLES
 error checking (which is the default), it will abort execution.
 
   Since the swap internal can be silently clamped or ignored by some
-implementations, the -P option can be used to virtually slow down the
-frame rate be sleeping for some defined time between frame.  Frames
-will not be synchronized, but this will reduce system load.
+implementations, the `-P` option can be used to virtually slow down
+the frame rate be sleeping for some defined time between frame.
+Frames will not be synchronized, but this will reduce system load.
 
-  Window position command line arguments (-x/-y) are passed to the
-native windowing system.  Not all windowing systems are supporting
-window positioning and could be silently ignored.  Other windowing
+  Window position command line arguments (`-x`/`-y`) are passed to the
+native windowing system. Not all windowing systems are supporting
+window positioning and could be silently ignored. Other windowing
 systems may also use those values as a hint and may not exactly honor
 the requested values.
 
   The range and precision for different shader numeric formats is
 printed when glslsandbox-player is executed with a verbosity level of
-2 (with `-vv' command line argument).  For the details for
+2 (with `-vv` command line argument).  For the details for
 interpreting data, refer to the documentation of
-`glGetShaderPrecisionFormat()' function:
+`glGetShaderPrecisionFormat()` function:
 https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glGetShaderPrecisionFormat.xml
 
 
@@ -350,17 +368,17 @@ Additional Features not Present in GLSL Sandbox
 -----------------------------------------------
 
   For testing purposes, a feature for loading PNG textures is added to
-glslsandbox-player.  This feature is not in the original
+glslsandbox-player. This feature is not in the original
 http://glslsandbox.com/ site.
 
-  Using the -0 <file.png> to -7 <file.png> command line option will
-load the "file.png" file and bind it to the texture unit corresponding
-to the number of the option.  Each texture can be accessed in fragment
-shaders through the "textureN" sampler2D uniform, where 'N' is the
-number of the texture.
+  Using the `-0 <file.png>` to `-7 <file.png>` command line option
+will load the `file.png` file and bind it to the texture unit
+corresponding to the number of the option. Each texture can be
+accessed in fragment shaders through the `textureN` sampler2D uniform,
+where `N` is the number of the texture.
 
   Example, for just displaying a PNG image with glslsandbox-player,
-use the following fragment shader, the the file "texture.glslf":
+use the following fragment shader, the the file `texture.glslf`:
 
     #ifdef GL_ES
     precision mediump float;
@@ -376,45 +394,46 @@ use the following fragment shader, the the file "texture.glslf":
     }
 
   Then, to run glslsandbox-player with the command-line:
+  
     glslsandbox-player -F texture.glslf -0 image.png
 
   For now, supported PNG formats are one to four 8-bit channels
-(Luminance, Luminance+Alpha, RGB and RGBA).  Pallete and 16-bit PNG
-files are not supported.  Use an image converter if an image is in an
+(Luminance, Luminance+Alpha, RGB and RGBA). Pallete and 16-bit PNG
+files are not supported. Use an image converter if an image is in an
 unsupported format.
 
 
 Using glslsandbox-player for Automatic Testing
 ----------------------------------------------
 
-  In addition to the "scripts/run-demo.sh" and
-"scripts/run-demo-random.sh" demo scripts which are more for
+  In addition to the `scripts/run-demo.sh` and
+`scripts/run-demo-random.sh` demo scripts which are more for
 demonstrating the player, another helper script example is provided in
-"scripts/run-tests.sh". It will use a Makefile to run tests and
+`scripts/run-tests.sh`. It will use a Makefile to run tests and
 collect results, which is more suited for automated testing.
 
   When called without any argument, it will run all builtin shaders in
 the binary, collect the output in a log file, render 3 frames and save
 the last one in a PPM file. The computation is not time dependent: it
 will render frames for time=3,4,5. Parameters can be adjusted in the
-"scripts/tests/Makefile" file. This time invariance will make output
+`scripts/tests/Makefile` file. This time invariance will make output
 comparison easier. Once all tests are executed, all PPM images are
-converted to PNG to save some space using ImageMagick "convert".
+converted to PNG to save some space using ImageMagick `convert`.
 
   All the generated output will be stored in the
-"scripts/tests/output/" directory by default. For each shader, output
+`scripts/tests/output/` directory by default. For each shader, output
 is stored in files the shader name as a base name. Each execution is
-marked with a ".done" file whatever the success or failure of the
+marked with a `.done` file whatever the success or failure of the
 execution. This is for preventing to retest again all failed tests
 when interrupting the execution. In case the execution succeed, a
-".passed" file is created. Otherwise, a ".failed" file is created
-containing the error code. Since the execution is made in a "timeout"
-command, a return code of "124" means a timeout. Standard output
+`.passed` file is created. Otherwise, a `.failed` file is created
+containing the error code. Since the execution is made in a `timeout`
+command, a return code of `124` means a timeout. Standard output
 (stdout and stderr) is saved in the ".log" file. The last frame is
-saved as a ".ppm" file. When all shaders are executed, all the PPM
-files are converted to ".png".
+saved as a `.ppm` file. When all shaders are executed, all the PPM
+files are converted to `.png`.
 
-  When using the "scripts/run-tests.sh" script, a test execution can
+  When using the `scripts/run-tests.sh` script, a test execution can
 be named to save result in another directory, for comparison.
 
   For example, it can be useful when modifying an OpenGL ES
@@ -422,12 +441,12 @@ implementation. Before change, run:
 
     ./scripts/run-tests.sh run before-change
 
-Then make your changes in the GLESv2 library, then run:
+  Then make your changes in the GLESv2 library, then run:
 
     ./scripts/run-tests.sh run after-change
 
-Those commands will respectively put results in directories:
-"./scripts/tests/{before,after}-change/". Then, output logs can be
+  Those commands will respectively put results in directories:
+`./scripts/tests/{before,after}-change/`. Then, output logs can be
 compared to check for regressions or unexpected behavior. Then output
 PNG images can be compared with the script:
 
@@ -436,7 +455,7 @@ PNG images can be compared with the script:
         ./scripts/tests/after-change/ \
         /var/tmp/before-after-compare/
 
-Those scripts are provided as an example working out of the box
+  Those scripts are provided as an example working out of the box
 without any fancy dependencies. They will probably need to be adjusted
 to specific needs or test framework.
 
@@ -450,9 +469,9 @@ setup calls (including shader compilation), then frame rate during
 rendering.
 
   It can also be useful benchmark the shader compiler, or detect
-bottlenecks in it. For example shader 25424.0 "MonaLisa" may reveal
+bottlenecks in it. For example shader 25424.0 `MonaLisa` may reveal
 long compilation times if compiler is inlining/unrolling too
-aggressively. Another example is the shader 4285.0 "Commodore64Heavy"
+aggressively. Another example is the shader 4285.0 `Commodore64Heavy`
 that could reach a high memory usage at compilation time.
 
   Some driver implementation may have a big command pipeline,
@@ -471,11 +490,12 @@ than the average time of other frames. This is why when warmup frames
 are enabled, the rendering time of the first frame is displayed apart.
 
   By default, there is 3 warmup frames. The number of warmup frames
-can be changed with the "-w" command line argument. When warmup frames
-are enabled, the "time" uniform is not updated between the first two
+can be changed with the `-w` command line argument. When warmup frames
+are enabled, the `time` uniform is not updated between the first two
 frames (i.e. the first frame is rendered twice), in case the rendering
-time of the first frame is long, it will not create a big visual
-discontinuity in the animation.
+time of the first frame is long (due to some lazy initialization
+inside the GLES driver), it will not create a big visual discontinuity
+in the animation.
 
   Finally, at the end of setup, there is always a black frame which is
 rendered. This frame will make sure all the setup commands will be
@@ -490,8 +510,11 @@ and what is the current strategy.
 with apitrace (the profiling with GLES is not supported though):
 
 Usage example:
+
     apitrace trace --api=egl glslsandbox-player -H256 -W256 -i0 -f30
+
 then:
+
     qapitrace glslsandbox-player.trace
 
 For more details, refer to apitrace documentation:
@@ -501,51 +524,51 @@ http://apitrace.github.io/
 Notes on KMS DRM Native Windowing
 ---------------------------------
 
-For building with DRM/KMS support, on Fedora system, package build
+  For building with DRM/KMS support, on Fedora system, package build
 dependencies needs to be installed with the command:
 
     sudo dnf install libdrm-devel mesa-libgbm-devel
 
-For building, use the configure command:
+  For building, use the configure command:
 
     ./configure --with-native-gfx=kms
 
-By default, the program will try to load all DRM drivers, stopping at
-the first one that will successfully load.  This behavior can be
+  By default, the program will try to load all DRM drivers, stopping
+at the first one that will successfully load.  This behavior can be
 changed to try to load only one DRM driver, setting the driver name to
-the environement variable `GLSLSANDBOX_PLAYER_DRM_DRIVER'.
+the environement variable `GLSLSANDBOX_PLAYER_DRM_DRIVER`.
 
 
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
-The code currently supports five native windowing libraries: X11,
+  The code currently supports five native windowing libraries: X11,
 Vivante/libGAL framebuffer, Raspberry Pi DispManX,SDL2 (SDL2 will
 support native windowing systems configured at its compilation time)
-and KMS (Kernel Mode Setting using libdrm and libgbm).  Adding support
+and KMS (Kernel Mode Setting using libdrm and libgbm). Adding support
 to a new native library should not be too hard.
 
-Create a file for your native window file
-(e.g. src/native_gfx_mynatwin.c). You could start from an existing one
-(native_gfx_vivfb.c or native_gfx_x11.c).
+  Create a file for your native window file
+(e.g. `src/native_gfx_mynatwin.c`). You could start from an existing
+one (for example `native_gfx_vivfb.c` or `native_gfx_x11.c`).
 
-Declare a native_gfx_s structure that will hold all needed data for
-the new native system.
+  Declare a `native_gfx_s` structure that will hold all needed data
+for the new native system.
 
-Implement all the functions declared in "src/native_gfx.h". See this
+  Implement all the functions declared in `src/native_gfx.h`. See this
 file content for function documentation.
 
-Finally, the "configure.ac" file should be adjusted to search for the
-new native library, adjust CFLAGS and LDFLAGS if needed. Your newly
-created "native_gfx_mynatwin.c" also need to be added in the
-"src/Makefile.am" file.
+  Finally, the `configure.ac` file should be adjusted to search for
+the new native library, adjust `CFLAGS` and `LDFLAGS` if needed. Your
+newly created `native_gfx_mynatwin.c` also need to be added in the
+`src/Makefile.am` file.
 
 
 Notes About Image Comparison
 ----------------------------
 
-  glslsandbox-player can be used to check non-regression of rendering of
-a driver. Command line arguments -d and -D can be used to dump
+  glslsandbox-player can be used to check non-regression of rendering
+of a driver. Command line arguments `-d` and `-D` can be used to dump
 reference and test frames as PPM files.
 
   This section describes several ways to compare frames, and how to track
@@ -554,14 +577,14 @@ down image content differences.
   First, PPM files generated with glslsandbox-player does not include
 any varying content between different executions (no timestamp, no
 random). So if two image content are the same (bit correct), both
-generated PPM will be the same. So files can by compared with standard
-tools like cmp or md5sum and other check-summing tools. For performing
-reproducible animation, it's important to take care that configuration
-should also be the same (display resolution, color depth, etc.) and
-also glslsandbox-player does not rely on unstable parameters (see -d,
--f, -T and -O command line arguments).
+generated PPM will also be the same. So files can by compared with
+standard tools like `cmp`, `md5sum` and other check-summing tools. For
+performing reproducible animation, it's important to take care that
+configuration should also be the same (display resolution, color
+depth, etc.) and also glslsandbox-player does not rely on unstable
+parameters (see `-d`, `-f`, `-T` and `-O` command line arguments).
 
-For comparing rendered output, there is various ways to track
+  For comparing rendered output, there is various ways to track
 differences. Standard tools are good starting points (coreutils,
 ImageMagick and GraphicsMagick, netpbm-progs, ...)
 
@@ -577,40 +600,47 @@ http://netpbm.sourceforge.net/doc/directory.html
 http://netpbm.sourceforge.net/doc/pamarith.html
 http://netpbm.sourceforge.net/doc/ppmhist.html
 
-For visually comparing two PPM images, producing the result in
-img1-img2-diff.png:
+For visually comparing two PPM images (`img1.ppm` and `img2.ppm`),
+producing the result in `img1-img2-diff.png`:
+
     compare img1.ppm img2.ppm img1-img2-diff.png
 
 For using the absolute error metric, returning the number of different
 pixels:
+
     compare -metric ae img1.ppm img2.ppm img1-img2-diff.png
 
 For generating the mask of changed pixels, for overlaying in Gimp, for
 example:
+
     compare -compose src -metric ae -lowlight-color none \
             img1.png img2.png PNG32:img1-img2-diff.png
 
 For automatically comparing images, ImageMagick compare returns 0 for
 identical images or 1 when they are different:
+
     compare -metric ae -quiet \
             img1.png img2.png /dev/null 2> /dev/null \
                     && echo SAME || echo different
 
 Raw image content can also be check-summed:
+
     convert img1.png -depth 8 RGBA: | md5sum
 
 Counting differences with netpbm-progs:
+
     pnmarith -difference img1.ppm img2.ppm | pnmhist
 
 Using pnmpsnr:
+
     pnmpsnr img1.ppm img2.ppm
 
 
 Notes on Distributed Rendering
 ------------------------------
 
-  Shaders using the "surfacePosition" varying can be rendered on split
-screens, using the "-e" option (see examples). Since the animation is
+  Shaders using the `surfacePosition` varying can be rendered on split
+screens, using the `-e` option (see examples). Since the animation is
 computed from the local clock time, such shaders can be rendered on
 remotes computers, provided their clock are properly synchronized
 (using ntp or ptp for example). Note that accurate clock
@@ -619,17 +649,17 @@ wireless networks) since they have smaller jitter. This can be used
 to build screen walls.
 
   In order to properly synchronize the rendering, an accurate time
-origin needs to be set on all renderers. This can be done with "-o"
-command line argument. This option take a `timespec' time, which the
+origin needs to be set on all renderers. This can be done with `-o`
+command line argument. This option take a `timespec` time, which the
 number of second since 1970-01-01 00:00:00 UTC, and optionally a the
 number of nanosecond. The current time can be shown in that format
-with the command `date +%s' for one-second resolution, or `date +%s.%N'
-for a nano-second resolution.
+with the command `date +%s` for one-second resolution, or `date
++%s.%N` for a nano-second resolution.
 
   Distributing this time origin to slaves can be done for example via
 HTTP, using the following simple shell scripts and Busybox httpd.
 
-  On master:
+  On the master host:
 
     GLSLSANDBOX_RUN_DIR=/tmp/glslsandbox-master
     mkdir -p "${GLSLSANDBOX_RUN_DIR}"
@@ -655,40 +685,40 @@ Miscellaneous Notes
 identify your environment before reporting bugs. For example, Linux
 distributions usually include a specific Mesa release, and the issue
 could be already fixed upstream in a development branch. The source
-archive include the "scripts/bug-report-info.sh" script to help
+archive include the `scripts/bug-report-info.sh` script to help
 gathering some information. There is no sensitive information in
 gathered data, but it's recommended to the user to review information
 before sending it. Moreover, the output of glslsandbox-player
-triggering the issue in verbose mode (-v command line argument) could
-be helpful.
+triggering the issue in verbose mode (`-v` command line argument)
+could be helpful.
 
   An easy way to chase down a shader compiler issue is to get the
-shader code generating the error (either with the -p command line
-argument, using the "dl-shader" script or directly from the
+shader code generating the error (either with the `-p` command line
+argument, using the `dl-shader` script or directly from the
 glslsandbox.com website), then to modify it a bit (commenting parts,
-rewriting differently, ...) then reload the modified code with the -F
-command line argument to see what changed. You can also use the -T and
--d command line arguments to generate images for comparing the
+rewriting differently, ...) then reload the modified code with the
+`-F` command line argument to see what changed. You can also use the
+`-T` and `-d` command line arguments to generate images for comparing the
 results.
 
   In case an issue is encountered with Mesa, a software rendering
 backend should be attempted, by setting the environment variable
-"LIBGL_ALWAYS_SOFTWARE=1" alone or with "GALLIUM_DRIVER=swrast" (in
+`LIBGL_ALWAYS_SOFTWARE=1` alone or with `GALLIUM_DRIVER=swrast` (in
 last chance). Refer to the Mesa documentation for details.
 
   User should be careful when using virtual machines. Various GPU can
 be emulated and could result to a non working configuration. For
 example, running a Ubuntu 12.04.5 LTS guest in a qemu-kvm emulating a
 Cirrus (which is the default on qemu-kvm 2.1.3) will result in a white
-window. Emulating a 'vmware' will workaround the issue (i.e. "qemu-kvm
--vga vmware").
+window. Emulating a 'vmware' will workaround the issue (i.e. `qemu-kvm
+-vga vmware`).
 
   Thanks to Sébastien Fagard and Vincent Stehlé for all their
-suggestions and interesting discussions.  Thanks to Marouen Ghodhbane
-for the initial Wayland EGL support.  Many thanks to
+suggestions and interesting discussions. Thanks to Marouen Ghodhbane
+for the initial Wayland EGL support. Many thanks to
 http://glslsandbox.com/ authors and all its contributors.
 
-This glslsandbox-player code is distributed under the 2 clause BSD
-license. See the LICENSE file for details.
+  This glslsandbox-player code is distributed under the 2-Clause BSD
+License. See the LICENSE file for details.
 
 Julien Olivain <juju@cotds.org>
