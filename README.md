@@ -235,6 +235,7 @@ WebGL enabled web browser.
      -w <n>: set the number of warmup frames
      -V <n>: set EGL swap interval to n
      -P <n>: sleep n milliseconds between frames
+     -Q <precision>: force shader precision to low, medium or high
      -d: dump each frame as PPM
      -D: dump only the last frame as PPM
      -E: disable dithering
@@ -299,6 +300,14 @@ Two by two split screen rendering for 30 seconds:
     glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e -1:0:1:1  &
     glslsandbox-player -q -t30 -S MandelZoom2 -W320 -H240 -o "$O" -e  0:0:1:1  &
 
+Force fragment shader precision to use `lowp` precision:
+
+    glslsandbox-player -W320 -H240 -Q low -S GPUPrecisionMedium
+
+Force fragment shader precision to use `highp` precision:
+
+    glslsandbox-player -W320 -H240 -Q high -S GPUPrecisionMedium
+
   Since glslsandbox-player was designed for testing purposes, it will
 execute one shader per process execution. This initial design choice
 is to easily catch driver crash without interrupting a test sequence
@@ -357,6 +366,19 @@ printed when glslsandbox-player is executed with a verbosity level of
 interpreting data, refer to the documentation of
 `glGetShaderPrecisionFormat()` function:
 https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glGetShaderPrecisionFormat.xml
+
+  OpenGL ES implementations may have different fragment shader
+precision for floating point values and math functions. Most fragment
+shaders uses the `mediump` precision. On desktop GPUs, this medium
+precision is usually enough to achieve a good rendering. On the other
+hand, on embedded devices, this precision can sometimes be to small
+for noise generation function, producing poor rendering. The `-Q`
+option can be used to force a different float precision than the one
+present in shader code (low, medium or high). This is achieved by
+redefining GLSL precision keywords with preprocessor macros. Some
+shaders are included to test precision. For example, see:
+`GPUPrecisionLow`, `GPUPrecisionMedium`, `GPUPrecisionHigh`,
+`SinPrecisionLow`, `SinPrecisionMedium`, `SinPrecisionHigh`.
 
 
 Additional Features not Present in GLSL Sandbox

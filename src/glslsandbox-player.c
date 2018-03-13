@@ -308,20 +308,22 @@ dump_framebuffer_to_ppm(const context_t *ctx)
 }
 
 static GLuint
-load_shader(GLenum type, const char *shaderSrc)
+load_shader(GLenum type,
+            GLsizei count,
+            const GLchar * const *shaderSrc)
 {
   GLuint shader;
-  GLint compiled;
+  GLint compiled = GL_FALSE;
 
   shader = XglCreateShader(type);
   if (shader == 0)
     return (0);
 
-  XglShaderSource(shader, 1, &shaderSrc, NULL);
+  XglShaderSource(shader, count, shaderSrc, NULL);
   XglCompileShader(shader);
   XglGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 
-  if ( ! compiled ) {
+  if (compiled != GL_TRUE) {
     GLint infoLen = 0;
 
     XglGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
@@ -343,7 +345,10 @@ load_shader(GLenum type, const char *shaderSrc)
 }
 
 static void
-load_program(const char *v_shader_src, const char *f_shader_src,
+load_program(GLint v_shader_count,
+             const GLchar * const *v_shader_src,
+             GLint f_shader_count,
+             const GLchar * const *f_shader_src,
              GLuint *vshader, GLuint *fshader, GLuint *program)
 {
   GLuint vsh;
@@ -351,11 +356,11 @@ load_program(const char *v_shader_src, const char *f_shader_src,
   GLuint prog;
   GLint  linked;
 
-  vsh = load_shader(GL_VERTEX_SHADER, v_shader_src);
+  vsh = load_shader(GL_VERTEX_SHADER, v_shader_count, v_shader_src);
   if (vsh == 0)
     return ;
 
-  fsh = load_shader(GL_FRAGMENT_SHADER, f_shader_src);
+  fsh = load_shader(GL_FRAGMENT_SHADER, f_shader_count, f_shader_src);
   if (fsh == 0) {
     XglDeleteShader(vsh);
     return ;
@@ -373,7 +378,7 @@ load_program(const char *v_shader_src, const char *f_shader_src,
   XglLinkProgram(prog);
 
   XglGetProgramiv(prog, GL_LINK_STATUS, &linked);
-  if ( linked != GL_TRUE ) {
+  if (linked != GL_TRUE) {
     GLint info_len = 0;
 
     XglGetProgramiv(prog, GL_INFO_LOG_LENGTH, &info_len);
@@ -439,7 +444,16 @@ setup_fbo_fb(context_t *ctx, int i)
 static void
 setup_fbo(context_t *ctx)
 {
-  load_program(vertex_shader_g, fbo_frag_shader_g,
+  const GLchar *v_src[2];
+  const GLchar *f_src[2];
+
+  v_src[0] = ctx->force_precision;
+  v_src[1] = vertex_shader_g;
+
+  f_src[0] = ctx->force_precision;
+  f_src[1] = fbo_frag_shader_g;
+
+  load_program(2, v_src, 2, f_src,
                &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
   if (ctx->fbo_prog == 0) {
     fprintf(stderr, "ERROR: while loading FBO shaders and program.\n");
@@ -577,13 +591,22 @@ setup_textures(context_t *ctx)
 static void
 setup(context_t *ctx)
 {
+  const GLchar *v_src[2];
+  const GLchar *f_src[2];
+
   if (ctx->disable_dither) {
     if ((ctx->verbose > 0))
       fprintf(stderr, "Disabling dithering.\n");
     XglDisable(GL_DITHER);
   }
 
-  load_program(vertex_shader_g, get_shader_code(ctx),
+  v_src[0] = ctx->force_precision;
+  v_src[1] = vertex_shader_g;
+
+  f_src[0] = ctx->force_precision;
+  f_src[1] = get_shader_code(ctx);
+
+  load_program(2, v_src, 2, f_src,
                &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog);
   if (ctx->gl_prog == 0) {
     fprintf(stderr, "ERROR: while loading shaders and program.\n");
@@ -924,6 +947,7 @@ player_usage(void)
   fprintf(stderr, "  -w <n>: set the number of warmup frames\n");
   fprintf(stderr, "  -V <n>: set EGL swap interval to n\n");
   fprintf(stderr, "  -P <n>: sleep n milliseconds between frames\n");
+  fprintf(stderr, "  -Q <precision>: force shader precision to low, medium or high\n");
   fprintf(stderr, "  -d: dump each frame as PPM\n");
   fprintf(stderr, "  -D: dump only the last frame as PPM\n");
   fprintf(stderr, "  -E: disable dithering\n");
@@ -1015,6 +1039,40 @@ set_timespec_origin(context_t *ctx, const char *timespec)
   }
 }
 
+static const char *
+force_precision_high_g =
+  "#define lowp highp\n"
+  "#define mediump highp\n";
+
+static const char *
+force_precision_medium_g =
+  "#define lowp mediump\n"
+  "#define highp mediump\n";
+
+static const char *
+force_precision_low_g =
+  "#define mediump lowp\n"
+  "#define highp lowp\n";
+
+static void
+force_shader_precision(context_t *ctx, const char *precision)
+{
+  if (!strcmp("high", precision)) {
+    ctx->force_precision = force_precision_high_g;
+  }
+  else if (!strcmp("medium", precision)) {
+    ctx->force_precision = force_precision_medium_g;
+  }
+  else if (!strcmp("low", precision)) {
+    ctx->force_precision = force_precision_low_g;
+  }
+  else {
+    fprintf(stderr,
+            "ERROR: option -Q takes a precision argument (high, medium, low).\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
 static void
 parse_cmdline(context_t *ctx, int argc, char *argv[])
 {
@@ -1022,8 +1080,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  /* available short option: AabCcGgJjKknQ89 */
-  while ((opt = getopt(argc, argv, "BdDe:Ef:F:hH:i:I:lLmM:No:O:pP:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabCcGgJjKkn89 */
+  while ((opt = getopt(argc, argv, "BdDe:Ef:F:hH:i:I:lLmM:No:O:pP:Q:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -1162,6 +1220,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
         exit(EXIT_FAILURE);
       }
       ctx->frame_sleep = i * 1000;
+      break ;
+
+    case 'Q':
+      force_shader_precision(ctx, optarg);
       break ;
 
     case 'q':
@@ -1410,6 +1472,7 @@ init_ctx(context_t *ctx)
   ctx->surfpos_anim_speed = 1.0f;
   ctx->report_fps_count = 100;
   ctx->warmup_frames = 3;
+  ctx->force_precision = "";
 
   ctx->surface_position[0] = -1.0f;
   ctx->surface_position[1] =  1.0f;
