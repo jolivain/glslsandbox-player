@@ -73,13 +73,13 @@ __xegl_eglChooseConfig(const char *file, int line,
 
 EGLContext
 __xegl_eglCreateContext(const char *file, int line,
-			EGLDisplay dpy, EGLConfig config, EGLContext share_context,
-			const EGLint *attrib_list);
+                        EGLDisplay dpy, EGLConfig config, EGLContext share_context,
+                        const EGLint *attrib_list);
 
 EGLSurface
 __xegl_eglCreateWindowSurface(const char *file, int line,
-			      EGLDisplay dpy, EGLConfig config,
-			      EGLNativeWindowType win, const EGLint *attrib_list);
+                              EGLDisplay dpy, EGLConfig config,
+                              EGLNativeWindowType win, const EGLint *attrib_list);
 
 EGLBoolean
 __xegl_eglDestroyContext(const char *file, int line,
@@ -95,14 +95,14 @@ __xegl_eglInitialize(const char *file, int line,
 
 EGLBoolean
 __xegl_eglMakeCurrent(const char *file, int line,
-		      EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
+                      EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
 
 EGLBoolean
 __xegl_eglReleaseThread(const char *file, int line);
 
 EGLBoolean
 __xegl_eglSwapBuffers(const char *file, int line,
-		      EGLDisplay dpy, EGLSurface surface);
+                      EGLDisplay dpy, EGLSurface surface);
 
 EGLBoolean
 __xegl_eglSwapInterval(const char *file, int line,
@@ -110,7 +110,7 @@ __xegl_eglSwapInterval(const char *file, int line,
 
 EGLBoolean
 __xegl_eglTerminate(const char *file, int line,
-		    EGLDisplay dpy);
+                    EGLDisplay dpy);
 
 #define XeglGetDisplay(display_id) \
   __xegl_eglGetDisplay(__FILE__, __LINE__, display_id)
@@ -118,7 +118,7 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglChooseConfig(dpy, attrib_list, configs, config_size, num_config) \
   __xegl_eglChooseConfig(__FILE__, __LINE__, dpy, attrib_list, configs, config_size, num_config)
 
-#define XeglCreateContext(dpy, config, share_context, attrib_list)	\
+#define XeglCreateContext(dpy, config, share_context, attrib_list) \
   __xegl_eglCreateContext(__FILE__, __LINE__, dpy, config, share_context, attrib_list)
 
 #define XeglCreateWindowSurface(dpy, config, win, attrib_list) \

@@ -320,7 +320,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
 static void
 page_flip_handler(int fd, unsigned int frame,
-		  unsigned int sec, unsigned int usec, void *data)
+                  unsigned int sec, unsigned int usec, void *data)
 {
   int *waiting_for_flip = data;
 

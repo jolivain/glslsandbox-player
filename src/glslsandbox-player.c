@@ -343,7 +343,7 @@ load_shader(GLenum type, const char *shaderSrc)
 
 static void
 load_program(const char *v_shader_src, const char *f_shader_src,
-	     GLuint *vshader, GLuint *fshader, GLuint *program)
+             GLuint *vshader, GLuint *fshader, GLuint *program)
 {
   GLuint vsh;
   GLuint fsh;
@@ -406,8 +406,8 @@ setup_fbo_tex(context_t *ctx, int i)
 
   XglBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[i]);
   XglTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-		ctx->fbo_width, ctx->fbo_height,
-		0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+                ctx->fbo_width, ctx->fbo_height,
+                0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
   if (ctx->fbo_nearest)
     filter = GL_NEAREST;
@@ -427,7 +427,7 @@ setup_fbo_fb(context_t *ctx, int i)
 
   XglBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[i]);
   XglFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-			  GL_TEXTURE_2D, ctx->fbo_texid[i], 0);
+                          GL_TEXTURE_2D, ctx->fbo_texid[i], 0);
   s = XglCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (s != GL_FRAMEBUFFER_COMPLETE) {
     fprintf(stderr, "ERROR! glCheckFramebufferStatus() is not COMPLETE\n");
@@ -439,7 +439,7 @@ static void
 setup_fbo(context_t *ctx)
 {
   load_program(vertex_shader_g, fbo_frag_shader_g,
-	       &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
+               &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
   if (ctx->fbo_prog == 0) {
     fprintf(stderr, "ERROR: while loading FBO shaders and program.\n");
     exit(EXIT_FAILURE);
@@ -583,7 +583,7 @@ setup(context_t *ctx)
   }
 
   load_program(vertex_shader_g, get_shader_code(ctx),
-	       &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog);
+               &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog);
   if (ctx->gl_prog == 0) {
     fprintf(stderr, "ERROR: while loading shaders and program.\n");
     exit(EXIT_FAILURE);
@@ -607,14 +607,14 @@ setup(context_t *ctx)
 
   if (ctx->u_resolution >= 0) {
     XglUniform2f(ctx->u_resolution,
-		 (GLfloat)ctx->shader_width, (GLfloat)ctx->shader_height);
+                 (GLfloat)ctx->shader_width, (GLfloat)ctx->shader_height);
   }
 
   ctx->u_surfaceSize = XglGetUniformLocation(ctx->gl_prog, "surfaceSize");
 
   if (ctx->u_surfaceSize >= 0) {
     XglUniform2f(ctx->u_surfaceSize,
-		 (GLfloat)ctx->shader_width / (GLfloat)ctx->shader_height, 1.0f);
+                 (GLfloat)ctx->shader_width / (GLfloat)ctx->shader_height, 1.0f);
   }
 
   ctx->u_mouse = XglGetUniformLocation(ctx->gl_prog, "mouse");
@@ -630,8 +630,8 @@ setup(context_t *ctx)
 
     if (!ctx->use_fbo) {
       fprintf(stderr,
-	      "\nWARNING: shader includes 'backbuffer' "
-	      "but FBO is inactive\n");
+              "\nWARNING: shader includes 'backbuffer' "
+              "but FBO is inactive\n");
       fprintf(stderr, "Rendering will probably be incorrect.\n");
       fprintf(stderr, "Try adding -B or -X/-Y command line options.\n\n");
     }
@@ -715,7 +715,7 @@ draw_frame(context_t *ctx)
                                1.0f + sinf(0.05f * sp) * 0.75f);
     }
     XglVertexAttribPointer(ctx->a_surfacePosition, 2, GL_FLOAT, GL_FALSE,
-			   0, ctx->surface_position);
+                           0, ctx->surface_position);
   }
 
   if (ctx->u_backbuf >= 0) {
@@ -781,7 +781,7 @@ draw_fbo(context_t *ctx)
   XglVertexAttribPointer(ctx->fbo_a_pos, 2, GL_FLOAT, GL_FALSE, 0, plane);
   XglEnableVertexAttribArray(ctx->fbo_a_surfpos);
   XglVertexAttribPointer(ctx->fbo_a_surfpos, 2, GL_FLOAT, GL_FALSE,
-			 0, tcoords);
+                         0, tcoords);
   XglDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   XglUseProgram(ctx->gl_prog);
 }
@@ -1496,7 +1496,7 @@ fprintf_gles_precision(FILE *fp, GLenum shader_type, GLenum precision_type)
 
   XglGetShaderPrecisionFormat(shader_type, precision_type, range, &precision);
   fprintf(fp, "| %3i:%-3i %3i ",
-	  range[0], range[1], precision);
+          range[0], range[1], precision);
 }
 
 

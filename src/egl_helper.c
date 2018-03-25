@@ -147,8 +147,8 @@ __xegl_eglChooseConfig(const char *file, int line,
 
 EGLContext
 __xegl_eglCreateContext(const char *file, int line,
-			EGLDisplay dpy, EGLConfig config, EGLContext share_context,
-			const EGLint *attrib_list)
+                        EGLDisplay dpy, EGLConfig config, EGLContext share_context,
+                        const EGLint *attrib_list)
 {
   EGLContext ret;
 
@@ -166,8 +166,8 @@ __xegl_eglCreateContext(const char *file, int line,
 
 EGLSurface
 __xegl_eglCreateWindowSurface(const char *file, int line,
-			      EGLDisplay dpy, EGLConfig config,
-			      EGLNativeWindowType win, const EGLint *attrib_list)
+                              EGLDisplay dpy, EGLConfig config,
+                              EGLNativeWindowType win, const EGLint *attrib_list)
 {
   EGLSurface ret;
 
@@ -239,7 +239,7 @@ __xegl_eglInitialize(const char *file, int line,
 
 EGLBoolean
 __xegl_eglMakeCurrent(const char *file, int line,
-		      EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx)
+                      EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx)
 {
   EGLBoolean ret;
 
@@ -286,7 +286,7 @@ __xegl_eglReleaseThread(const char *file, int line)
 
 EGLBoolean
 __xegl_eglSwapBuffers(const char *file, int line,
-		      EGLDisplay dpy, EGLSurface surface)
+                      EGLDisplay dpy, EGLSurface surface)
 {
   EGLBoolean ret;
 
@@ -322,7 +322,7 @@ __xegl_eglSwapInterval(const char *file, int line,
 
 EGLBoolean
 __xegl_eglTerminate(const char *file, int line,
-		    EGLDisplay dpy)
+                    EGLDisplay dpy)
 {
   EGLBoolean ret;
 

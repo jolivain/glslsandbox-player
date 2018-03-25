@@ -63,7 +63,7 @@ __xgles_check_error(const char *file, int line, const char *func)
   gl_error = glGetError();
   if (gl_error != GL_NO_ERROR) {
     fprintf(stderr, "%s:%i: %s(): glGetError(): 0x%x (%i): %s\n",
-	    file, line, func,
+            file, line, func,
             gl_error, gl_error,
             strglerror(gl_error));
     __xgles_on_error();
