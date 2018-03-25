@@ -1491,8 +1491,8 @@ fprintf_sysinfo(FILE *fp)
 static void
 fprintf_gles_precision(FILE *fp, GLenum shader_type, GLenum precision_type)
 {
-  GLint range[2];
-  GLint precision;
+  GLint range[2] = { 0, 0 };
+  GLint precision = 0;
 
   XglGetShaderPrecisionFormat(shader_type, precision_type, range, &precision);
   fprintf(fp, "| %3i:%-3i %3i ",
