@@ -98,6 +98,10 @@ __xegl_eglMakeCurrent(const char *file, int line,
                       EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
 
 EGLBoolean
+__xgles_eglQuerySurface(const char *file, int line,
+                        EGLDisplay dpy, EGLSurface surface, EGLint attribute, EGLint *value);
+
+EGLBoolean
 __xegl_eglReleaseThread(const char *file, int line);
 
 EGLBoolean
@@ -136,6 +140,9 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglMakeCurrent(dpy, draw, read, ctx) \
   __xegl_eglMakeCurrent(__FILE__, __LINE__, dpy, draw, read, ctx)
 
+#define XeglQuerySurface(dpy, surface, attribute, value) \
+  __xgles_eglQuerySurface(__FILE__, __LINE__, dpy, surface, attribute, value)
+
 #define XeglReleaseThread() \
   __xegl_eglReleaseThread(__FILE__, __LINE__)
 
@@ -173,6 +180,9 @@ __xegl_eglTerminate(const char *file, int line,
 
 #define XeglMakeCurrent(dpy, draw, read, ctx) \
   eglMakeCurrent(dpy, draw, read, ctx)
+
+#define XeglQuerySurface(dpy, surface, attribute, value) \
+  eglQuerySurface(dpy, surface, attribute, value)
 
 #define XeglReleaseThread() \
   eglReleaseThread()

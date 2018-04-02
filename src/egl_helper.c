@@ -255,6 +255,24 @@ __xegl_eglMakeCurrent(const char *file, int line,
 }
 
 EGLBoolean
+__xgles_eglQuerySurface(const char *file, int line,
+                        EGLDisplay dpy, EGLSurface surface, EGLint attribute, EGLint *value)
+{
+  EGLBoolean ret;
+
+  ret = eglQuerySurface(dpy, surface, attribute, value);
+  __xegl_check_error(file, line, "eglQuerySurface");
+
+  if (ret != EGL_TRUE) {
+    fprintf(stderr, "%s:%i: eglQuerySurface(): returned EGL_FALSE\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+
+EGLBoolean
 __xegl_eglReleaseThread(const char *file, int line)
 {
   EGLBoolean ret;
