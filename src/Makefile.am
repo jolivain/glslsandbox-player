@@ -94,4 +94,8 @@ if ENABLE_WGL
 glslsandbox_player_SOURCES += native_gfx_wgl.c
 endif
 
+if ENABLE_TISGX
+glslsandbox_player_SOURCES += native_gfx_tisgx.c
+endif
+
 nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c
