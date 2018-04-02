@@ -155,7 +155,7 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglTerminate(dpy) \
   __xegl_eglTerminate(__FILE__, __LINE__, dpy)
 
-#else
+#else /* defined(XEGL_STRICT) */
 
 #define XeglGetDisplay(display_id) \
   eglGetDisplay(display_id)
@@ -196,7 +196,7 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglTerminate(dpy) \
   eglTerminate(dpy)
 
-#endif
+#endif /* defined(XEGL_STRICT) */
 
 #endif /* EGL_HELPER_H */
 
