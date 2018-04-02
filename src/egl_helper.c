@@ -490,11 +490,12 @@ egl_init(int width, int height, int xpos, int ypos)
   }
 
   native_gfx_create_window(egl->native_gfx, width, height, xpos, ypos);
-  egl->width = native_gfx_get_window_width(egl->native_gfx);
-  egl->height = native_gfx_get_window_height(egl->native_gfx);
 
   egl_native_win = native_gfx_get_egl_native_window(egl->native_gfx);
   egl->surf = XeglCreateWindowSurface(egl->dpy, config, egl_native_win, win_attribList);
+
+  XeglQuerySurface(egl->dpy, egl->surf, EGL_WIDTH, &egl->width);
+  XeglQuerySurface(egl->dpy, egl->surf, EGL_HEIGHT, &egl->height);
 
   egl->ctx = XeglCreateContext(egl->dpy, config, EGL_NO_CONTEXT, ctx_attribList);
 

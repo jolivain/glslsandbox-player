@@ -23,8 +23,8 @@ struct egl_s {
   EGLint major;
   EGLint minor;
 
-  int width;
-  int height;
+  EGLint width;
+  EGLint height;
 
 #ifdef ENABLE_SDL2
   SDL_Window *sdlwin;
