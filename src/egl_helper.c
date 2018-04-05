@@ -16,7 +16,6 @@
 #include <errno.h>
 #include <string.h>
 #include <EGL/egl.h>
-#include <assert.h>
 
 #ifdef ENABLE_SDL2
 # include "SDL.h"
@@ -436,9 +435,8 @@ egl_init(int width, int height, int xpos, int ypos)
     EGL_NONE
   };
 
-#define NUM_CONFIGS 1
-  EGLConfig configs[NUM_CONFIGS];
-  EGLint num_configs;
+  EGLConfig config = { 0 };
+  EGLint num_configs = 0;
 
   static const EGLint win_attribList[] = {
     EGL_RENDER_BUFFER, EGL_BACK_BUFFER,
@@ -467,17 +465,20 @@ egl_init(int width, int height, int xpos, int ypos)
   egl->dpy = XeglGetDisplay(egl_native_disp);
   XeglInitialize(egl->dpy, &egl->major, &egl->minor);
 
-  XeglChooseConfig(egl->dpy, conf_attribList, configs, NUM_CONFIGS, &num_configs);
-  assert( num_configs == 1 );
+  XeglChooseConfig(egl->dpy, conf_attribList, &config, 1, &num_configs);
+  if (num_configs != 1) {
+    fprintf(stderr, "ERROR: Can't find an EGL config.\n");
+    exit(EXIT_FAILURE);
+  }
 
   native_gfx_create_window(egl->native_gfx, width, height, xpos, ypos);
   egl->width = native_gfx_get_window_width(egl->native_gfx);
   egl->height = native_gfx_get_window_height(egl->native_gfx);
 
   egl_native_win = native_gfx_get_egl_native_window(egl->native_gfx);
-  egl->surf = XeglCreateWindowSurface(egl->dpy, configs[0], egl_native_win, win_attribList);
+  egl->surf = XeglCreateWindowSurface(egl->dpy, config, egl_native_win, win_attribList);
 
-  egl->ctx = XeglCreateContext(egl->dpy, configs[0], EGL_NO_CONTEXT, ctx_attribList);
+  egl->ctx = XeglCreateContext(egl->dpy, config, EGL_NO_CONTEXT, ctx_attribList);
 
   XeglMakeCurrent(egl->dpy, egl->surf, egl->surf, egl->ctx);
 
