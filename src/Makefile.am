@@ -98,4 +98,8 @@ if ENABLE_TISGX
 glslsandbox_player_SOURCES += native_gfx_tisgx.c
 endif
 
+if ENABLE_MALI
+glslsandbox_player_SOURCES += native_gfx_mali.c
+endif
+
 nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c

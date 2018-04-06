@@ -167,7 +167,7 @@ windowing library for your system.
   The configure script takes an option to select the native windowing
 system:
 
-    --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,tisgx
+    --with-native-gfx   Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,tisgx,mali
 
   For example, compiling for using the the Vivante frame buffer native
 windowing support, use `./configure --with-native-gfx=vivfb`.

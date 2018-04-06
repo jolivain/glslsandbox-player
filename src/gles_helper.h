@@ -166,7 +166,7 @@ __xgles_glReadPixels(const char *file, int line, GLint x, GLint y, GLsizei width
 void
 __xgles_glReleaseShaderCompiler(const char *file, int line);
 
-#if defined(ENABLE_RPI) || defined(ENABLE_TISGX)
+#if defined(ENABLE_RPI) || defined(ENABLE_TISGX) || defined(ENABLE_MALI)
 void
 __xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
 #else
