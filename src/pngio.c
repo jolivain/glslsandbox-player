@@ -22,6 +22,12 @@
 
 #include "pngio.h"
 
+/* Default libpng limit is 1000000x1000000 pixels.
+ * This is a bit high for the usage in this case.
+ * We declare smaller limits. */
+#define PNG_MAX_WIDTH 65536u
+#define PNG_MAX_HEIGHT PNG_MAX_WIDTH
+
 void
 read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *img_height, int *img_channels)
 {
@@ -33,13 +39,14 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
   png_byte header[8];
   png_byte color_type;
   png_byte bit_depth;
-  int header_sz;
+  size_t header_sz;
   FILE *fp;
   size_t ret;
-  int y;
-  int width;
-  int height;
-  int channels;
+  png_uint_32 y;
+  png_uint_32 width;
+  png_uint_32 height;
+  png_byte channels;
+  int is_png;
 
   fp = fopen(fname, "rb");
   if (fp == NULL) {
@@ -47,7 +54,7 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
     exit(EXIT_FAILURE);
   }
 
-  ret = fread(header, 1, 8, fp);
+  ret = fread(header, 1, sizeof (header), fp);
   if (ret == 0) {
     if (ferror(fp)) {
       fprintf(stderr, "ERROR: fread('%s'): %s\n", fname, strerror(errno));
@@ -60,7 +67,8 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
   }
   header_sz = ret;
 
-  if (png_sig_cmp(header, 0, header_sz)) {
+  is_png = png_sig_cmp(header, 0, header_sz);
+  if (is_png) {
     fprintf(stderr, "ERROR: file '%s' is not a PNG file.\n", fname);
     fclose(fp);
     exit(EXIT_FAILURE);
@@ -77,11 +85,13 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
   info_ptr = png_create_info_struct(png_ptr);
   if (info_ptr == NULL) {
     fprintf(stderr, "ERROR: png_create_info_struct()\n");
+    fclose(fp);
     exit(EXIT_FAILURE);
   }
 
   if ( setjmp( png_jmpbuf(png_ptr) ) ) {
     fprintf(stderr, "ERROR: while initializing PNG reader\n");
+    fclose(fp);
     exit(EXIT_FAILURE);
   }
 
@@ -90,11 +100,25 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
 
   png_read_info(png_ptr, info_ptr);
 
+  png_set_user_limits(png_ptr, PNG_MAX_WIDTH, PNG_MAX_HEIGHT);
+
   width = png_get_image_width(png_ptr, info_ptr);
+
+  if (width > PNG_MAX_WIDTH) {
+    fprintf(stderr, "ERROR: PNG maximum width (%u) exceed limit (%u).",
+            width, PNG_MAX_WIDTH);
+    exit(EXIT_FAILURE);
+  }
+  
   height = png_get_image_height(png_ptr, info_ptr);
 
-  color_type = png_get_color_type(png_ptr, info_ptr);
+  if (height > PNG_MAX_HEIGHT) {
+    fprintf(stderr, "ERROR: PNG maximum height (%u) exceed limit (%u).",
+            width, PNG_MAX_HEIGHT);
+    exit(EXIT_FAILURE);
+  }
 
+  color_type = png_get_color_type(png_ptr, info_ptr);
   if (   color_type != PNG_COLOR_TYPE_RGB
       && color_type != PNG_COLOR_TYPE_RGB_ALPHA
       && color_type != PNG_COLOR_TYPE_GRAY
@@ -105,7 +129,6 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
   }
 
   bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-
   if (bit_depth != 8) {
     fprintf(stderr, "ERROR: Code only support 8bits RGB, RGBA, GRAY and GRAY_ALPHA PNG files. "
             "(bit depth is %i)\n", bit_depth);
@@ -113,7 +136,6 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
   }
 
   channels = png_get_channels(png_ptr, info_ptr);
-
   if (channels < 1 || channels > 4) {
     fprintf(stderr, "ERROR: Channel number can only be between 1 and 4. "
             "(channels is %i)\n", channels);
@@ -121,16 +143,27 @@ read_png_file(const char *fname, unsigned char **img_data, int *img_width, int *
   }
 
   png_read_update_info(png_ptr, info_ptr);
-
   if (setjmp(png_jmpbuf(png_ptr))) {
     fprintf(stderr, "ERROR: while reading PNG file '%s'\n", fname);
     fclose(fp);
     exit(EXIT_FAILURE);
   }
 
-  row_pointers = malloc( sizeof (png_bytep) * height);
+  row_pointers = malloc(sizeof (png_bytep) * height);
+  if (row_pointers == NULL) {
+    fprintf(stderr, "ERROR: PNG: malloc(): Can't allocate memory\n");
+    fclose(fp);
+    exit(EXIT_FAILURE);
+  }
+  
   rowbytes = png_get_rowbytes(png_ptr, info_ptr);
   image_data = malloc(height * rowbytes);
+  if (image_data == NULL) {
+    fprintf(stderr, "ERROR: PNG: malloc(): Can't allocate memory\n");
+    fclose(fp);
+    exit(EXIT_FAILURE);
+  }
+
   for (y = 0; y < height; ++y) {
     row_pointers[y] = &(image_data[y * rowbytes]);
   }
