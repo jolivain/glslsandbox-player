@@ -11,13 +11,12 @@
 #include "config.h"
 #endif
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <setjmp.h>
 #include <string.h>
 #include <errno.h>
 
-#include <zlib.h>
 #include <png.h>
 
 #include "pngio.h"
