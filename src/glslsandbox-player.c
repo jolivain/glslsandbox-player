@@ -28,6 +28,7 @@
 #include <math.h>
 
 #ifdef HAVE_LIBPNG
+#include <png.h>
 #include "pngio.h"
 #endif
 
