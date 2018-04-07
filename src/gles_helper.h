@@ -14,6 +14,8 @@
 
 #if defined(XGLES_STRICT)
 
+#include <GLES2/gl2.h>
+
 void
 __xgles_check_error(const char *file, int line, const char *func);
 
