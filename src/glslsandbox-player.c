@@ -557,7 +557,7 @@ load_png_texture(context_t *ctx, int tex)
 static void
 setup_textures(context_t *ctx)
 {
-  char u_name[10];
+  char u_name[32];
   int i;
 
   for (i = 0; i < MAX_TEXTURES; ++i) {
