@@ -69,7 +69,6 @@ NativeDisplayType
 native_gfx_get_egl_native_display(const native_gfx_t *gfx)
 {
   return (gfx->disp);
-  //return (EGL_DEFAULT_DISPLAY);
 }
 
 NativeWindowType
