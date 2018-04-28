@@ -1,12 +1,35 @@
 # ID      Nickname
 
+47183.0   InfiniteYinYangs
+47182.0   CodePath
+47165.3   FlowNoise
+47133.5   FlyingCheckerboard
+47131.0   WeirdRaspberry
+47130.0   CubeZoomer
+47077.0   CakeDay
+47076.0   BirthdayCake
+47063.0   Nijntje
+47062.0   SickBowSpiral
+47061.0   GimmeAllYourMoney
+47060.0   Sootie
+47059.0   InfinityMatrix
+47053.1   VoxelTunnel
+47034.1   Oblivion
+46897.6   Humanoids
+46863.2   DiscoTunnel
+46850.2   Electrons
+46838.1   Sunset
+46876.1   TestMouse
+46763.0   TestCheckerboard
+46762.0   TestColor
+46667.0   Ether
 46666.0   Octopus
 46649.0   BlurrySpheres
 46639.0   VSyncTest
 46638.0   Continuum1
 46637.0   Awesome
 46616.1   Clouds2D
-46599.2   Snowy
+46599.3   Snowy
 46597.1   Bubbles
 46562.0   ServerRoom
 46561.0   Skyline
@@ -105,10 +128,10 @@
 45323.0   Gabor2
 45317.1   RorschachTest
 45308.0   FisherCat
-45253.1   GreekFrieze2
+45253.2   GreekFrieze2
 45233.0   SuperMarioBros
 45232.0   LadyBug
-45231.0   AlienCavity
+45231.1   AlienCavity
 45230.0   KirbyJump
 45221.0   BubbleWaves
 45217.0   Formation
@@ -121,7 +144,7 @@
 45023.0   BlueBubbles
 44947.0   Meteors
 44537.1   Jellyfish
-44156.1   Fireworks
+44156.2   Fireworks
 42472.1   Plantation
 40851.0   ProceduralCubemap
 40567.1   Fire2
@@ -130,7 +153,7 @@
 39784.1   RedPortals
 39398.2   WeirdFractal
 39017.2   HotTunnel
-38803.3   SpaceInvaders
+38803.5   SpaceInvaders
 38740.1   Smiley
 37065.4   Burger
 37065.0   Pizza
@@ -138,7 +161,7 @@
 36838.1   KelpForest
 36684.2   TunnelBeauty4
 36612.2   LightExperiment
-36547.1   Snow
+36547.2   Snow
 36398.2   MagicCircle
 36234.0   SkyLines
 36196.0   GreenGrid
@@ -182,7 +205,7 @@
 28375.1   Outrun
 28373.0   ProgressBar
 28365.0   SandTerrain
-28181.0   CrowdedCubes
+28181.1   CrowdedCubes
 28180.0   TwoTweetsChallenge
 28179.0   QuasiInfiniteZoom
 28163.0   FractalMRS
@@ -234,7 +257,7 @@
 27028.0   GLSLDemo
 27009.0   NewtonFractal
 26988.20  NeonSpinner
-26986.1   BlobCave
+26986.2   BlobCave
 26978.0   NiceBlobs
 26949.16  ColorfulDots2
 26933.0   ColorfulDots
@@ -258,14 +281,14 @@
 # FPSCcounter needs backbuffer buffer
 26576.4   FPSCounter
 26575.13  AlgebraicSurfaces
-26573.7   FlyingBalls
+26573.8   FlyingBalls
 26569.1   BouncingLines
 26568.0   GreyWavyPixels
 26562.2   SquareTwist
 26545.0   MovingCheckerboard
 26539.1   AshimaNoise3D
 26537.55  BlueDots
-26536.0   RedCircles
+26536.1   RedCircles
 26522.0   ColorFlash
 26521.6   Counter
 26518.0   Stripes
@@ -300,7 +323,7 @@
 25604.0   SphereSponge
 25569.0   Grass
 25502.0   StarField
-25466.0   Particles
+25466.1   Particles
 25456.0   FeuFolet
 25424.0   MonaLisa
 25361.0   AudreyHepburn
@@ -337,7 +360,7 @@
 21950.1   MechanicalFractal
 21871.0   Cloud
 21593.5   TwisterThing
-21586.0   GreenSnow
+21586.1   GreenSnow
 21022.0   StarVolumeRendering
 20988.1   Ocean
 20682.2   BurningSmileys
@@ -373,7 +396,7 @@
 17056.0   HelloWorld
 16971.0   RubikCube
 16940.0   ColorfulBalls
-16126.1   Bokeh
+16126.2   Bokeh
 16084.0   MandelBulb
 16059.1   IO
 15929.0   ColorField
@@ -469,6 +492,7 @@
 3109.0    Flags
 3026.0    Spirals
 2985.1    MengerCube
+2927.4    Eclipse
 2922.2    AndroidField
 2795.1    RTape
 2406.1    DodecahedronRayCast
