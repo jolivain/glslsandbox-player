@@ -909,8 +909,8 @@ player_usage(void)
   fprintf(stderr, "  -M <f>: set mouse movement speed factor\n");
   fprintf(stderr, "  -s <f>: set time speed factor\n");
   fprintf(stderr, "  -u: disable surfacePosition varying animation\n");
-  fprintf(stderr, "  -U <f>: set surfacePosittion animation speed factor\n");
-  fprintf(stderr, "  -e <f:f:f:f>: set fixed surfacePosittion values\n");
+  fprintf(stderr, "  -U <f>: set surfacePosition animation speed factor\n");
+  fprintf(stderr, "  -e <f:f:f:f>: set fixed surfacePosition values\n");
   fprintf(stderr, "  -W <n>: set window width to n\n");
   fprintf(stderr, "  -H <n>: set window height to n\n");
   fprintf(stderr, "  -x <n>: set window x position to n (if supported)\n");
