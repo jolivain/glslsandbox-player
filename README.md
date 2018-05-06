@@ -220,8 +220,8 @@ WebGL enabled web browser.
      -M <f>: set mouse movement speed factor
      -s <f>: set time speed factor
      -u: disable surfacePosition varying animation
-     -U <f>: set surfacePosittion animation speed factor
-     -e <f:f:f:f>: set fixed surfacePosittion values
+     -U <f>: set surfacePosition animation speed factor
+     -e <f:f:f:f>: set fixed surfacePosition values
      -W <n>: set window width to n
      -H <n>: set window height to n
      -x <n>: set window x position to n (if supported)
