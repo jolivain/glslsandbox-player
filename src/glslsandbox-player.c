@@ -1260,7 +1260,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       break ;
 
     case 'X':
-      if (ctx->fbo_size_div >= 0) {
+      if (ctx->fbo_size_div > 0) {
         fprintf(stderr,
                 "ERROR: -X/-Y options should not be used with -R\n");
         exit(EXIT_FAILURE);
@@ -1274,7 +1274,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       break ;
 
     case 'Y':
-      if (ctx->fbo_size_div >= 0) {
+      if (ctx->fbo_size_div > 0) {
         fprintf(stderr,
                 "ERROR: -X/-Y options should not be used with -R\n");
         exit(EXIT_FAILURE);
