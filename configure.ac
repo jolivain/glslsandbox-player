@@ -1,6 +1,7 @@
 AC_PREREQ([2.68])
 AC_INIT([glslsandbox-player], [1.0], [juju@cotds.org])
 AM_INIT_AUTOMAKE([-Wall -Wno-portability subdir-objects foreign])
+AC_CONFIG_TESTDIR([tests], [src])
 
 AC_PROG_AWK
 AM_PROG_AR
@@ -13,6 +14,8 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
   Makefile
   src/Makefile
+  tests/Makefile
+  tests/atlocal
 ])
 
 AC_CHECK_HEADERS([stddef.h stdlib.h string.h])
@@ -31,6 +34,16 @@ AC_ARG_WITH([shader-list],
     [], [with_shader_list=shader.list]
 )
 AC_SUBST([shader_list], [$with_shader_list])
+
+AC_ARG_ENABLE([testing],
+               AS_HELP_STRING([--enable-testing], [Enable testing programs]),
+              [], [enable_testing=no])
+AM_CONDITIONAL([ENABLE_TESTING], [test "x$enable_testing" == "xyes"])
+
+AC_ARG_ENABLE([install-testsuite],
+               AS_HELP_STRING([--enable-install-testsuite], [Install testsuite]),
+              [], [enable_install_testsuite=no])
+AM_CONDITIONAL([ENABLE_INSTALL_TESTSUITE], [test "x$enable_install_testsuite" == "xyes"])
 
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
@@ -175,4 +188,6 @@ AC_MSG_RESULT([
     native-gfx:   ${with_native_gfx}
     libpng support: ${have_libpng}
     shader list: ${with_shader_list}
+    testing: ${enable_testing}
+    install testsuite: ${enable_install_testsuite}
 ])

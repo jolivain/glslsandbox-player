@@ -1,0 +1,28 @@
+AT_BANNER([Shader precision])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -Q low])
+AT_KEYWORDS([option force-precision])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -Q low],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -Q medium])
+AT_KEYWORDS([option force-precision])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -Q medium],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -Q high])
+AT_KEYWORDS([option force-precision])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -Q high],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -Q invalid])
+AT_KEYWORDS([option force-precision invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -Q invalid],
+         [1], [ignore], [dnl
+ERROR: option -Q takes a precision argument (high, medium, low).
+])
+AT_CLEANUP

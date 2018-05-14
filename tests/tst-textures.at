@@ -1,0 +1,125 @@
+AT_BANNER([Texture input])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -0 normal rgb])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 "${abs_testdatadir}/input.png" -D],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pngtopnm])
+AT_CHECK([pngtopnm "${abs_testdatadir}/input.png"], [0], [stdout-nolog])
+AT_CHECK([cmp -s "stdout" "output-00000.ppm"])
+AT_CLEANUP
+
+AT_SETUP([option -0 normal rgba])
+AT_KEYWORDS([option texture rgba])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 "${abs_testdatadir}/input-rgba.png" -D],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pngtopnm])
+AT_CHECK([pngtopnm "${abs_testdatadir}/input.png"], [0], [stdout-nolog])
+AT_CHECK([cmp -s "stdout" "output-00000.ppm"])
+AT_CLEANUP
+
+AT_SETUP([option -0 normal luma])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 "${abs_testdatadir}/input-l.png" -D],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pngtopnm])
+AT_CHECK([pngtopnm "${abs_testdatadir}/input-l.png"], [0], [stdout-nolog])
+AT_CHECK([pgmtoppm "white" "stdout"], [0], [stdout-nolog])
+AT_CHECK([cmp -s "stdout" "output-00000.ppm"])
+AT_CLEANUP
+
+AT_SETUP([option -0 normal luma-alpha])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 "${abs_testdatadir}/input-la.png" -D],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pngtopnm])
+AT_CHECK([pngtopnm "${abs_testdatadir}/input-l.png"], [0], [stdout-nolog])
+AT_CHECK([pgmtoppm "white" "stdout"], [0], [stdout-nolog])
+AT_CHECK([cmp -s "stdout" "output-00000.ppm"])
+AT_CLEANUP
+
+AT_SETUP([option -0 no-texture])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -D],
+         [0], [ignore], [stderr])
+AT_DATA([expout],[dnl
+WARNING: shader is using uniform "texture0" but no texture
+WARNING: was defined on command line with -0 <file.png> option.
+])
+AT_CHECK([grep -E "^WARNING: " stderr], [0], [expout])
+AT_CHECK_PPM_HISTOGRAM([output-00000.ppm], [dnl
+0 0 0 0 128000
+])
+AT_CLEANUP
+
+AT_SETUP([option -0 with -B warning])
+AT_KEYWORDS([option texture backbuffer warning])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -B \
+                             -F "${abs_testdatadir}/backbuff-texture-warning.frag" \
+                             -0 "${abs_testdatadir}/input.png"],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^WARNING: \"texture0\" sampler2D should not be used at the same time with backbuffer." stderr])
+AT_CLEANUP
+
+AT_SETUP([option -01234567 rgba])
+AT_KEYWORDS([option texture rgba])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -D \
+                             -F "${abs_testdatadir}/mix8.frag" \
+                             -0 "${abs_testdatadir}/0.png" \
+                             -1 "${abs_testdatadir}/1.png" \
+                             -2 "${abs_testdatadir}/2.png" \
+                             -3 "${abs_testdatadir}/3.png" \
+                             -4 "${abs_testdatadir}/4.png" \
+                             -5 "${abs_testdatadir}/5.png" \
+                             -6 "${abs_testdatadir}/6.png" \
+                             -7 "${abs_testdatadir}/7.png"],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pngtopnm])
+AT_CHECK([pngtopnm "${abs_testdatadir}/8.png"], [0], [stdout-nolog])
+AT_CHECK([cmp -s "stdout" "output-00000.ppm"])
+AT_CLEANUP
+
+AT_SETUP([option -0 unsupported palette])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 "${abs_testdatadir}/input-palette.png"],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+# PNG images are loaded only when a texture sampler is used in the
+# shader.  Create a test with an non-existant png texture and a shader
+# without texture.  This should suceed.
+AT_SETUP([option -0 unused])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f1 -0 /dev/null],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -0 invalid texture])
+AT_KEYWORDS([option texture])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W640 -H200 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 /dev/null],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -0 invalid texture])
+AT_KEYWORDS([option texture invalid])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W64 -H64 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 /no/such/file.png],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -0 invalid png texture])
+AT_KEYWORDS([option texture invalid])
+AT_SKIP_IF_NO_LIBPNG
+AT_CHECK([glslsandbox-player -W64 -H64 -F "${abs_testdatadir}/tex0.frag" -w0 -f1 -0 /dev/zero],
+         [1], [ignore], [ignore])
+AT_CLEANUP

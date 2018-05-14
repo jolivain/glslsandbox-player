@@ -1,0 +1,77 @@
+AT_BANNER([Mouse emulation])
+
+
+dnl --------------------------------------------------------
+# TestMouse shader sets the pixel under the mouse position to white.
+# Mouse emulation is enabled, so the white pixel should move from the
+# center. The center pixel should be black.
+AT_SETUP([option -m disabled])
+AT_KEYWORDS([option mouse-emu])
+AT_CHECK([glslsandbox-player -W64 -H64 -T0.1 -S TestMouse -w0 -f5 -D],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pnmcut])
+AT_CHECK([pnmcut 32 31 1 1 TestMouse-00004.ppm], [0], [stdout-nolog])
+AT_CHECK_PPM_HISTOGRAM([stdout], [dnl
+0 0 0 0 1
+])
+AT_CLEANUP
+
+# With mouse emulation disabled, the white pixel should stay at center.
+AT_SETUP([option -m enabled])
+AT_KEYWORDS([option mouse-emu])
+AT_CHECK([glslsandbox-player -W64 -H64 -T0.1 -S TestMouse -w0 -f5 -D -m],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pnmcut])
+AT_CHECK([pnmcut 32 31 1 1 TestMouse-00004.ppm], [0], [stdout-nolog])
+AT_CHECK_PPM_HISTOGRAM([stdout], [dnl
+255 255 255 255 1
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -M 1.0])
+AT_KEYWORDS([option mouse-speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -O0 -T1.0 -S TestMouse -w0 -f9 -D -M 1.0],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pnmcut])
+AT_CHECK([pnmcut 31 30 3 3 TestMouse-00008.ppm], [0], [stdout-nolog])
+AT_CHECK_PPM_HISTOGRAM([stdout], [dnl
+0 0 0 0 8
+255 255 255 255 1
+])
+AT_CLEANUP
+
+AT_SETUP([option -M 0.5])
+AT_KEYWORDS([option mouse-speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -O0 -T1.0 -S TestMouse -w0 -f9 -D -M 0.5],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pnmcut])
+AT_CHECK([pnmcut 31 30 3 3 TestMouse-00008.ppm], [0], [stdout-nolog])
+AT_CHECK_PPM_HISTOGRAM([stdout], [dnl
+0 0 0 0 9
+])
+AT_CLEANUP
+
+AT_SETUP([option -M 2.0])
+AT_KEYWORDS([option mouse-speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -O0 -T1.0 -S TestMouse -w0 -f9 -D -M 2.0],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pnmcut])
+AT_CHECK([pnmcut 31 30 3 3 TestMouse-00008.ppm], [0], [stdout-nolog])
+AT_CHECK_PPM_HISTOGRAM([stdout], [dnl
+0 0 0 0 8
+255 255 255 255 1
+])
+AT_CLEANUP
+
+AT_SETUP([option -M 3.0])
+AT_KEYWORDS([option mouse-speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -O0 -T1.0 -S TestMouse -w0 -f9 -D -M 2.5],
+         [0], [ignore], [ignore])
+AT_SKIP_IF_MISSING([pnmcut])
+AT_CHECK([pnmcut 31 30 3 3 TestMouse-00008.ppm], [0], [stdout-nolog])
+AT_CHECK_PPM_HISTOGRAM([stdout], [dnl
+0 0 0 0 9
+])
+AT_CLEANUP

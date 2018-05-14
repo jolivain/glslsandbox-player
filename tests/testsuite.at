@@ -1,0 +1,41 @@
+AT_INIT([autotest])
+AT_COLOR_TESTS
+
+#
+# Testsuite is using the following netpbm programs:
+#
+# ppmhist (since 1989, space at end-of-line seems new in 2006 10.7, svn r2692)
+# pnmcut (since 1989)
+# pamundice (since 2007, 10.39.00)
+# pamvalidate (since 2014, 10.66.00)
+# pamfile (since 1991)
+# pnmscale (since 22nov89)
+# pngtopnm (added in 2000, 8.1)
+# pgmtoppm (same as pngtopnm)
+# psnpsnr (added in 2000, 9.6)
+#
+# Since some of those programs are relatively recent, the test relying
+# on this particular program will be skipped, if the program is missing.
+#
+
+m4_include(tst-common-macros.at)
+
+# Test categories:
+m4_include(tst-shader-list.at)
+m4_include(tst-shader-select.at)
+m4_include(tst-textures.at)
+m4_include(tst-time-control.at)
+m4_include(tst-render-control.at)
+m4_include(tst-shader-precision.at)
+m4_include(tst-log-output.at)
+m4_include(tst-frames-output.at)
+m4_include(tst-render-window.at)
+m4_include(tst-render-fbo.at)
+m4_include(tst-shader-input-file.at)
+m4_include(tst-render-backbuffer.at)
+m4_include(tst-mouse-emu.at)
+m4_include(tst-surface-position.at)
+m4_include(tst-warmup.at)
+m4_include(tst-frame-pause.at)
+m4_include(tst-gl-egl-control.at)
+m4_include(tst-misc-invocation.at)

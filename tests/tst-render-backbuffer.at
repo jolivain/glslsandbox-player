@@ -1,0 +1,21 @@
+AT_BANNER([Render back buffer])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -B disabled])
+AT_KEYWORDS([option fbo back-buffer])
+AT_CHECK([glslsandbox-player -W64 -H64 -S FadeToWhite -f300 -D],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([FadeToWhite-00299.ppm], [dnl
+1 1 1 1 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -B enabled])
+AT_KEYWORDS([option fbo back-buffer])
+AT_CHECK([glslsandbox-player -W64 -H64 -S FadeToWhite -f300 -D -B],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([FadeToWhite-00299.ppm], [dnl
+255 255 255 255 4096
+])
+AT_CLEANUP

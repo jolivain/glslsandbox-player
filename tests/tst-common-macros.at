@@ -1,0 +1,27 @@
+m4_define([AT_SKIP_IF_MISSING], [dnl
+AT_CHECK([[$1] --version || exit 77], [0], [ignore], [ignore])
+])
+
+# Spaces and tabs changed in "ppmhist" output over time.  To make sure
+# testsuite will work on a wide range of netpbm-progs versions
+# expected output is normalized (all blank characters are replace by
+# exactly one space)
+m4_define([AT_CHECK_PPM_HISTOGRAM], [dnl
+AT_SKIP_IF_MISSING([ppmhist])
+AT_CHECK([ppmhist --noheader [$1]], [0], [stdout])
+AT_DATA([expout],[$2])
+AT_CHECK([sed 's/^[[[:blank:]]]*//;s/[[[:blank:]]]*$//;s/[[[:blank:]]][[[:blank:]]]*/ /g' stdout],
+         [0], [expout])
+])
+
+m4_define([AT_CHECK_PPM_IS_VALID], [dnl
+AT_SKIP_IF_MISSING([pamvalidate])
+AT_CHECK([pamvalidate < [$1]], [0], [stdout-nolog])
+AT_CHECK([cmp -s [$1] stdout])
+])
+
+m4_define([AT_SKIP_IF_NO_LIBPNG], [
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f1 -v],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^libpng support version      :" stderr || exit 77])
+])

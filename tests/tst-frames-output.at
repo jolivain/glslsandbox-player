@@ -1,0 +1,32 @@
+AT_BANNER([Frame images output])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -D 1 frame])
+AT_KEYWORDS([option ppm-output])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -O1.5 -s0 -f1 -D],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_IS_VALID([TestCheckerboard-00000.ppm])
+AT_CLEANUP
+
+AT_SETUP([option -D 4 frames])
+AT_KEYWORDS([option ppm-output])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f4 -D],
+         [0], [ignore], [ignore])
+AT_CHECK([test ! -e TestCheckerboard-00000.ppm])
+AT_CHECK([test ! -e TestCheckerboard-00001.ppm])
+AT_CHECK([test ! -e TestCheckerboard-00002.ppm])
+AT_CHECK_PPM_IS_VALID([TestCheckerboard-00003.ppm])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -d 4 frames])
+AT_KEYWORDS([option ppm-output])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f4 -d],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_IS_VALID([TestCheckerboard-00000.ppm])
+AT_CHECK_PPM_IS_VALID([TestCheckerboard-00001.ppm])
+AT_CHECK_PPM_IS_VALID([TestCheckerboard-00002.ppm])
+AT_CHECK_PPM_IS_VALID([TestCheckerboard-00003.ppm])
+AT_CHECK([test ! -e TestCheckerboard-00004.ppm])
+AT_CLEANUP

@@ -1,0 +1,54 @@
+AT_BANNER([Render controls])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -f 2])
+AT_KEYWORDS([option frame-count])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -O 0.5 -T 1 -w0 -D -f2],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00001.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -f 9])
+AT_KEYWORDS([option frame-count])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -O 0.5 -T 1 -w0 -D -f9],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00008.ppm], [dnl
+0 0 255 29 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -f invalid 1])
+AT_KEYWORDS([option frame-count error])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f 0],
+         [1], [ignore], [ERROR: -f option takes a positive integer argument (got 0)
+])
+AT_CLEANUP
+
+AT_SETUP([option -f invalid 2])
+AT_KEYWORDS([option frame-count error])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f -12345],
+         [1], [ignore], [ERROR: -f option takes a positive integer argument (got -12345)
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -t 1])
+AT_KEYWORDS([option render-time])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -t1],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E '^glslsanbox-player: exiting after [[0-9]]* frames in [[0-9.]]* s \(avg rate [[0-9.]]* fps\)\.' stderr], [0], [stdout])
+AT_CHECK([sed 's/^glslsanbox-player: exiting after [[0-9]]* frames in \([[0-9.]]*\).*/\1/' stdout], [0], [stdout])
+AT_CHECK([awk '{if ($0 < 0.9 || $0 > 1.1) { exit 1; } }' stdout])
+AT_CLEANUP
+
+AT_SETUP([option -t 3])
+AT_KEYWORDS([option render-time])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -t3],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E '^glslsanbox-player: exiting after [[0-9]]* frames in [[0-9.]]* s \(avg rate [[0-9.]]* fps\)\.' stderr], [0], [stdout])
+AT_CHECK([sed 's/^glslsanbox-player: exiting after [[0-9]]* frames in \([[0-9.]]*\).*/\1/' stdout], [0], [stdout])
+AT_CHECK([awk '{if ($0 < 2.9 || $0 > 3.1) { exit 1; } }' stdout])
+AT_CLEANUP

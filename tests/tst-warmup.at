@@ -1,0 +1,46 @@
+AT_BANNER([Warm-up frame])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -w default])
+AT_KEYWORDS([option warmup-frame default])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^finished 3 warmup frames in " stderr])
+AT_CLEANUP
+
+AT_SETUP([option -w 0])
+AT_KEYWORDS([option warmup-frame])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1 -w 0],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^finished [[0-9]]* warmup frames in " stderr], [1])
+AT_CLEANUP
+
+AT_SETUP([option -w 1])
+AT_KEYWORDS([option warmup-frame])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1 -w 1],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^First frame time " stderr])
+AT_CLEANUP
+
+AT_SETUP([option -w 2])
+AT_KEYWORDS([option warmup-frame])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1 -w 2],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^finished 2 warmup frames in " stderr])
+AT_CLEANUP
+
+AT_SETUP([option -w 10])
+AT_KEYWORDS([option warmup-frame])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1 -w 10],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^finished 10 warmup frames in " stderr])
+AT_CLEANUP
+
+AT_SETUP([option -w invalid])
+AT_KEYWORDS([option warmup-frame invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1 -w -123],
+         [1], [ignore], [dnl
+ERROR: -w option takes a non-negative integer argument (got -123)
+])
+AT_CLEANUP

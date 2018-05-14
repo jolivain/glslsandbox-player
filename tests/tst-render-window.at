@@ -1,0 +1,49 @@
+AT_BANNER([Render window controls])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -W128 -H32])
+AT_KEYWORDS([option window-dimension])
+AT_CHECK([glslsandbox-player -W128 -H32 -S TestColor -O 0.5 -T 1 -w0 -D -f2],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Rendering on a 128x32 window" stderr])
+AT_SKIP_IF_MISSING([pamfile])
+AT_CHECK([pamfile TestColor-00001.ppm], [0], [dnl
+TestColor-00001.ppm:	PPM raw, 128 by 32  maxval 255
+])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00001.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+m4_define([AT_TEST_WINDOW], [dnl
+AT_SETUP([option -W[$1] -H[$2]])
+AT_KEYWORDS([option window-dimension])
+AT_CHECK([glslsandbox-player -W[$1] -H[$2] -S TestColor -O 0.5 -T 1 -w0 -D -f2],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Rendering on a [$1]x[$2] window" stderr])
+AT_SKIP_IF_MISSING([pamfile])
+AT_CHECK([pamfile TestColor-00001.ppm], [0], [dnl
+TestColor-00001.ppm:	PPM raw, [$1] by [$2]  maxval 255
+])
+m4_define([PIXELS], [m4_format([%d],m4_eval([$1] * [$2]))])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00001.ppm], [dnl
+255 0 0 76 PIXELS
+])
+AT_CLEANUP
+])
+
+AT_TEST_WINDOW(1, 1)
+AT_TEST_WINDOW(24, 24)
+AT_TEST_WINDOW(48, 48)
+AT_TEST_WINDOW(59, 61)
+AT_TEST_WINDOW(96, 96)
+
+
+dnl --------------------------------------------------------
+# This test is 
+#
+AT_SETUP([option -x -y])
+AT_KEYWORDS([option window-position])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f1 -x32 -y48],
+         [0], [ignore], [ignore])
+AT_CLEANUP

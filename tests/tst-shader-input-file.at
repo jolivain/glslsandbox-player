@@ -1,0 +1,50 @@
+AT_BANNER([Shader input file])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -F normal])
+AT_KEYWORDS([option shader-file])
+AT_CHECK([glslsandbox-player -W64 -H64 -F "${abs_testdatadir}/TestColor.frag" -w0 -f 1 -O 1.5 -s0 -D],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([output-00000.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -F syntax-error])
+AT_KEYWORDS([option shader-file syntax-error])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -F "${abs_testdatadir}/syntax-error.frag"],
+         [1], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Info log from shader compilation:" stderr])
+AT_CLEANUP
+
+AT_SETUP([option -F link-error])
+AT_KEYWORDS([option shader-file link-error])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -F "${abs_testdatadir}/link-error.frag"],
+         [1], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Info log from program linking:" stderr])
+AT_CLEANUP
+
+AT_SETUP([option -F missing-file])
+AT_KEYWORDS([option shader-file])
+AT_CHECK([glslsandbox-player -W64 -H64 -f1 -F not-existing-shader.frag],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -F missing-file])
+AT_KEYWORDS([option shader-file])
+AT_CHECK([glslsandbox-player -W64 -H64 -f1 -F /path/to/not/existing/shader.frag],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -F /dev/null])
+AT_KEYWORDS([option shader-file])
+AT_CHECK([glslsandbox-player -W64 -H64 -f1 -F /dev/null],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -F /dev/zero])
+AT_KEYWORDS([option shader-file])
+AT_CHECK([glslsandbox-player -W64 -H64 -f1 -F /dev/zero],
+         [1], [ignore], [ignore])
+AT_CLEANUP

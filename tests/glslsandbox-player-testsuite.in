@@ -1,0 +1,19 @@
+#! /bin/sh
+
+# This is a wrapper for executing the stand-alone Autotest test suite.
+# It assumes the tested binaries are in the PATH.
+
+set -eu
+
+TESTSUITE="@testsuitedir@/testsuite"
+abs_testdatadir="@testdatadir@"
+export abs_testdatadir
+
+: ${TESTRESULT_DIR="/var/tmp/@PACKAGE_TARNAME@-testresult"}
+
+echo "Test results will be stored in: ${TESTRESULT_DIR}"
+
+mkdir -p "${TESTRESULT_DIR}"
+cd "${TESTRESULT_DIR}"
+
+exec "${TESTSUITE}" "$@"

@@ -1,0 +1,2 @@
+# Autotest local configuration
+abs_testdatadir=@abs_srcdir@/data

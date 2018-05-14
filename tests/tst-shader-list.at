@@ -1,0 +1,21 @@
+AT_BANNER([Shader list])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -l])
+AT_KEYWORDS([invocation shader-list])
+AT_CHECK([glslsandbox-player -l], [0], [stdout], [ignore])
+AT_CHECK([awk '$0 ~ /^[[0-9]]+/ { LAST=$1; COUNT=COUNT+1; } END { if ((LAST+1) != COUNT) { print "List FAILED"; exit 1;} else { print "List passed";} }' stdout], [0], [List passed
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -L])
+AT_KEYWORDS([invocation shader-list])
+AT_CHECK([glslsandbox-player -l], [0], [stdout], [ignore])
+AT_CHECK([awk '$0 !~ /^#/ { print $3; }' stdout], [0], [stdout])
+AT_CHECK([mv stdout ref.list])
+AT_CHECK([glslsandbox-player -L], [0], [stdout], [ignore])
+AT_CHECK([awk '$0 !~ /^#/ { print $2; }' stdout], [0], [stdout], [ignore])
+AT_CHECK([cmp -s ref.list stdout])
+AT_CLEANUP

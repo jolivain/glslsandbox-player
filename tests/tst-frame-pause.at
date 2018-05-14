@@ -1,0 +1,37 @@
+AT_BANNER([Frame pause])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -P 500])
+AT_KEYWORDS([option pause-frame])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w 3 -f 4 -P 500],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E '^glslsanbox-player: exiting after [[0-9]]* frames in [[0-9.]]* s \(avg rate [[0-9.]]* fps\)\.' stderr], [0], [stdout])
+AT_CHECK([sed 's/^glslsanbox-player: exiting after [[0-9]]* frames in [[0-9.]]* s (avg rate \([[0-9.]]*\) fps)\.$/\1/' stdout], [0], [stdout])
+AT_CHECK([awk '{if ($0 < 1.9 || $0 > 2.1) { exit 1; } }' stdout])
+AT_CLEANUP
+
+AT_SETUP([option -P 250])
+AT_KEYWORDS([option pause-frame])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w 3 -f 4 -P 250],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E '^glslsanbox-player: exiting after [[0-9]]* frames in [[0-9.]]* s \(avg rate [[0-9.]]* fps\)\.' stderr], [0], [stdout])
+AT_CHECK([sed 's/^glslsanbox-player: exiting after [[0-9]]* frames in [[0-9.]]* s (avg rate \([[0-9.]]*\) fps)\.$/\1/' stdout], [0], [stdout])
+AT_CHECK([awk '{if ($0 < 3.9 || $0 > 4.1) { exit 1; } }' stdout])
+AT_CLEANUP
+
+AT_SETUP([option -P invalid 1])
+AT_KEYWORDS([option pause-frame invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w 0 -f 4 -P Garbage],
+         [1], [ignore], [dnl
+ERROR: -i option takes a positive integer argument (got 0)
+])
+AT_CLEANUP
+
+AT_SETUP([option -P invalid 2])
+AT_KEYWORDS([option pause-frame invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w 0 -f 4 -P -123],
+         [1], [ignore], [dnl
+ERROR: -i option takes a positive integer argument (got -123)
+])
+AT_CLEANUP

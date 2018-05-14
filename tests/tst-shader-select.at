@@ -1,0 +1,89 @@
+AT_BANNER([Shader selection])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -S])
+AT_KEYWORDS([option shader-name])
+AT_CHECK([glslsandbox-player -W64 -H64 -S 2DColorCircles -w0 -f3],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -S unknown])
+AT_KEYWORDS([option shader-name])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -S UnknownShaderName],
+         [1], [ignore],
+         [ERROR: "UnknownShaderName" not found in builtin shaders.
+])
+AT_CLEANUP
+
+AT_SETUP([option -S empty])
+AT_KEYWORDS([option shader-name empty])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -S ""],
+         [1], [ignore],
+         [ERROR: "" not found in builtin shaders.
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -i normal])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -i0],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -i normal])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -i1 ],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -i normal with garbage])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -i 0garbage ],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -F -q "WARNING: -i argument has garbage 'garbage' after integer value" stderr])
+AT_CLEANUP
+
+AT_SETUP([option -i invalid 1])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -i -1],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -i invalid 2])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -i 123456789],
+         [1], [ignore], [ignore])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -I normal])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -I 6.0],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -I invalid 1])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -I 0.0],
+         [1], [ignore],
+         [ERROR: "0.0" not found in builtin shaders.
+])
+AT_CLEANUP
+
+AT_SETUP([option -I invalid 2])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -I 123456789.0],
+         [1], [ignore],
+         [ERROR: "123456789.0" not found in builtin shaders.
+])
+AT_CLEANUP
+
+AT_SETUP([option -I invalid 3])
+AT_KEYWORDS([option shader-selection])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f3 -I XxXxXxX],
+         [1], [ignore],
+         [ERROR: can't read glslsandbox.com id, format is [[0-9]]+.[[0-9]]+, got "XxXxXxX"
+])
+AT_CLEANUP

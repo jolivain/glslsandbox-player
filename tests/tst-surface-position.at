@@ -1,0 +1,77 @@
+AT_BANNER([Surface position])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -u disabled])
+AT_KEYWORDS([option surface-position])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestSurfPos -O 30 -T0.5 -w0 -f5 -D],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestSurfPos-00004.ppm], [dnl
+0 255 0 150 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -u enabled])
+AT_KEYWORDS([option surface-position])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestSurfPos -O 30 -T0.5 -w0 -f5 -D -u],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestSurfPos-00004.ppm], [dnl
+0 0 0 0 2048
+0 255 0 150 2048
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -U 3.0])
+AT_KEYWORDS([option surface-position])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestSurfPos -O 30 -T0.5 -w0 -f5 -D -U 3.0],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestSurfPos-00004.ppm], [dnl
+0 0 0 0 3400
+0 255 0 150 696
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -e])
+AT_KEYWORDS([option surfacePosition])
+AT_CHECK([glslsandbox-player -W128 -H128 -S MandelZoom2 -w0 -f1 -D],
+         [0], [ignore], [ignore])
+AT_CHECK([mv MandelZoom2-00000.ppm MandelZoom2-ref.ppm])
+
+AT_CHECK([glslsandbox-player -W64 -H64 -S MandelZoom2 -w0 -f1 -D -e -1:-1:1:1],
+         [0], [ignore], [ignore])
+AT_CHECK([mv MandelZoom2-00000.ppm MandelZoom2-1-0.ppm])
+AT_CHECK([glslsandbox-player -W64 -H64 -S MandelZoom2 -w0 -f1 -D -e  0:-1:1:1],
+         [0], [ignore], [ignore])
+AT_CHECK([mv MandelZoom2-00000.ppm MandelZoom2-1-1.ppm])
+AT_CHECK([glslsandbox-player -W64 -H64 -S MandelZoom2 -w0 -f1 -D -e -1:0:1:1],
+         [0], [ignore], [ignore])
+AT_CHECK([mv MandelZoom2-00000.ppm MandelZoom2-0-0.ppm])
+AT_CHECK([glslsandbox-player -W64 -H64 -S MandelZoom2 -w0 -f1 -D -e  0:0:1:1],
+         [0], [ignore], [ignore])
+AT_CHECK([mv MandelZoom2-00000.ppm MandelZoom2-0-1.ppm])
+
+AT_SKIP_IF_MISSING([pamundice])
+AT_CHECK([pamundice MandelZoom2-%1d-%1a.ppm -down=2 -across=2], [0], [stdout-nolog])
+AT_CHECK([cmp -s stdout MandelZoom2-ref.ppm])
+AT_CLEANUP
+
+
+AT_SETUP([option -e invalid 1])
+AT_KEYWORDS([option surfacePosition])
+AT_CHECK([glslsandbox-player -W64 -H64 -S MandelZoom2 -e InvalidSurfPos],
+         [1], [ignore], [dnl
+ERROR: -e option format is four floats values separated by columnleft:bottom:width:height (got 'InvalidSurfPos')
+])
+AT_CLEANUP
+
+AT_SETUP([option -e invalid 2])
+AT_KEYWORDS([option surfacePosition])
+AT_CHECK([glslsandbox-player -W64 -H64 -S MandelZoom2 -e x:y:z:w],
+         [1], [ignore], [dnl
+ERROR: -e option format is four floats values separated by columnleft:bottom:width:height (got 'x:y:z:w')
+])
+AT_CLEANUP

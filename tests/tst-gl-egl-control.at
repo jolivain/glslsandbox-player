@@ -1,0 +1,33 @@
+AT_BANNER([GL/EGL controls])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -E])
+AT_KEYWORDS([option disable-dithering])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w 0 -f 1 -E],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Disabling dithering" stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -V])
+AT_KEYWORDS([option swap-interval])
+# Some implementations are not supporting eglSwapInterval() and will
+# return EGL_FALSE. Skip this test only in such a case.
+# Since swap internal is a hint, some implementations silently ignore
+# the call, and return EGL_TRUE.
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -t 0.5 -V 2],
+         [ignore], [ignore], [stderr])
+AT_CHECK([grep -q "eglSwapInterval(): returned EGL_FALSE" stderr && exit 77 || exit 0])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -t 0.5 -V 2],
+         [0], [ignore], [ignore])
+AT_CLEANUP
+
+AT_SETUP([option -V invalid])
+AT_KEYWORDS([option swap-interval error])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -f1 -V -123],
+         [1], [ignore], [dnl
+ERROR: -V option takes a non-negative integer argument (got -123)
+])
+AT_CLEANUP

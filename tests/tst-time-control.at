@@ -1,0 +1,191 @@
+AT_BANNER([Time controls])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -s 0])
+AT_KEYWORDS([option speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -O 0.5 -T 1.0 -f 4 -D -s 0],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00003.ppm], [dnl
+0 0 0 0 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -s 0.25])
+AT_KEYWORDS([option speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -O 0.5 -T 1.0 -f 4 -D -s 0.25],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00003.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -s 1.0])
+AT_KEYWORDS([option speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -O 0.5 -T 1.0 -f 4 -D -s 1.0],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00003.ppm], [dnl
+0 0 255 29 4096
+])
+AT_CHECK([mv TestColor-00003.ppm TestColor-00003-ref.ppm])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -O 0.5 -T 1.0 -f 4 -D],
+         [0], [ignore], [ignore])
+AT_CHECK([cmp -s TestColor-00003.ppm TestColor-00003-ref.ppm])
+AT_CLEANUP
+
+AT_SETUP([option -s 2.0])
+AT_KEYWORDS([option speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -O 0.5 -T 1.0 -f 4 -D -s 2.0],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00003.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -s -1.0])
+AT_KEYWORDS([option speed])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -O 0.5 -T 1.0 -f 4 -D -s -1.0],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00003.ppm], [dnl
+0 255 0 150 4096
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -T 0.1])
+AT_KEYWORDS([option time-step])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f10 -O 0.5 -T 0.1 -D],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00009.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -T 1.0])
+AT_KEYWORDS([option time-step])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f10 -O 0.5 -T 1.0 -D],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00009.ppm], [dnl
+255 255 255 255 4096
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -O 1.5])
+AT_KEYWORDS([option time-offset])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f1 -D -O 1.5],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00000.ppm], [dnl
+255 0 0 76 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -O 2.5])
+AT_KEYWORDS([option time-offset])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f1 -D -O 2.5],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00000.ppm], [dnl
+0 255 0 150 4096
+])
+AT_CLEANUP
+
+AT_SETUP([option -O 3.5])
+AT_KEYWORDS([option time-offset])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f1 -D -O 3.5],
+         [0], [ignore], [ignore])
+AT_CHECK_PPM_HISTOGRAM([TestColor-00000.ppm], [dnl
+0 0 255 29 4096
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -o 0])
+AT_KEYWORDS([option time-origin])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 0],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -Eq '^Using origin of time: 0\.0' stderr])
+AT_CLEANUP
+
+AT_SETUP([option -o 0.])
+AT_KEYWORDS([option time-origin])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 0.],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -Eq '^Using origin of time: 0\.0' stderr])
+AT_CLEANUP
+
+AT_SETUP([option -o 0.0])
+AT_KEYWORDS([option time-origin])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 0.0],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -Eq '^Using origin of time: 0\.0' stderr])
+AT_CLEANUP
+
+AT_SETUP([option -o 1234567890.123456])
+AT_KEYWORDS([option time-origin])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 1234567890.123456],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -Eq '^Using origin of time: 1234567890\.123456' stderr])
+AT_CLEANUP
+
+AT_SETUP([option -o future])
+AT_KEYWORDS([option time-origin])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -r1 -o $(( $(date +%s) + 1000 ))],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -Eq 'shadertime=-[[0-9.]]+' stderr])
+AT_CLEANUP
+
+AT_SETUP([option -o invalid 1])
+AT_KEYWORDS([option time-origin invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 1234567890.1234567890],
+         [1], [ignore], [dnl
+ERROR: option -o takes a timespec argument.
+ERROR: format is: INTEGER or INTEGER.INTEGER
+])
+AT_CLEANUP
+
+AT_SETUP([option -o invalid 2])
+AT_KEYWORDS([option time-origin invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 1234567890xxx],
+         [1], [ignore], [dnl
+ERROR: option -o takes a timespec argument.
+ERROR: format is: INTEGER or INTEGER.INTEGER
+])
+AT_CLEANUP
+
+AT_SETUP([option -o invalid 3])
+AT_KEYWORDS([option time-origin invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o 1234567890.123456xxx],
+         [1], [ignore], [dnl
+ERROR: option -o takes a timespec argument.
+ERROR: format is: INTEGER or INTEGER.INTEGER
+])
+AT_CLEANUP
+
+AT_SETUP([option -o invalid 4])
+AT_KEYWORDS([option time-origin invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o xxx.xxx],
+         [1], [ignore], [dnl
+ERROR: option -o takes a timespec argument.
+ERROR: format is: INTEGER or INTEGER.INTEGER
+])
+AT_CLEANUP
+
+AT_SETUP([option -o invalid 5])
+AT_KEYWORDS([option time-origin invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o xxx.],
+         [1], [ignore], [dnl
+ERROR: option -o takes a timespec argument.
+ERROR: format is: INTEGER or INTEGER.INTEGER
+])
+AT_CLEANUP
+
+AT_SETUP([option -o invalid 6])
+AT_KEYWORDS([option time-origin invalid])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestColor -w0 -f3 -o xxx],
+         [1], [ignore], [dnl
+ERROR: option -o takes a timespec argument.
+ERROR: format is: INTEGER or INTEGER.INTEGER
+])
+AT_CLEANUP

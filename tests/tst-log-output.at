@@ -1,0 +1,121 @@
+AT_BANNER([Log output controls])
+
+
+dnl --------------------------------------------------------
+AT_SETUP([default-log-level])
+AT_KEYWORDS([log-level])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1], [0], [ignore], [stderr])
+AT_CHECK([grep -F -q "OpenGL ES driver information:" stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -v])
+AT_KEYWORDS([option verbose])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w0 -f1 -v],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^GL_EXTENSIONS" stderr])
+AT_CLEANUP
+
+AT_SETUP([option -vv])
+AT_KEYWORDS([option verbose])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w0 -f1 -vv],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Shader precision returned by glGetShaderPrecisionFormat" stderr])
+AT_CLEANUP
+
+AT_SETUP([option -vvvvvvvvvv])
+AT_KEYWORDS([option verbose])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w0 -f1 -vvvvvvvvvv],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -q "^Shader precision returned by glGetShaderPrecisionFormat" stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -q])
+AT_KEYWORDS([option quiet])
+AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w0 -f1 -q],
+         [0], [], [])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -r 1])
+AT_KEYWORDS([option report-fps])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f100 -r 1],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -c "^from_frame:" stderr],
+         [0], [dnl
+100
+])
+AT_CLEANUP
+
+AT_SETUP([option -r 2])
+AT_KEYWORDS([option report-fps])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f100 -r 2],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -c "^from_frame:" stderr],
+         [0], [dnl
+50
+])
+AT_CLEANUP
+
+AT_SETUP([option -r 50])
+AT_KEYWORDS([option report-fps])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f100 -r 50],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -c "^from_frame:" stderr],
+         [0], [dnl
+2
+])
+AT_CLEANUP
+
+AT_SETUP([option -r 1000])
+AT_KEYWORDS([option report-fps])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f100 -r 1000],
+         [0], [ignore], [stderr])
+AT_CHECK([grep -E -c "^from_frame:" stderr],
+         [1], [dnl
+0
+])
+AT_CLEANUP
+
+AT_SETUP([option -r invalid])
+AT_KEYWORDS([option report-fps error])
+AT_CHECK([glslsandbox-player -W64 -H64 -S TestCheckerboard -w0 -f100 -r -123],
+         [1], [ignore], [dnl
+ERROR: -r option takes a positive integer argument (got -123)
+])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([option -p])
+AT_KEYWORDS([option print shader])
+dnl Content of "TestCheckerBoard" at:
+dnl http://glslsandbox.com/e#46763.0
+AT_DATA([expout], [dnl
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform float time;
+
+void main(void) {
+    float t = 1. + mod(time, 16.);
+    float s = floor(t);
+    vec2  a = mod(gl_FragCoord.xy, s * 2.) - s;
+    float c = sign(a.x * a.y);
+    gl_FragColor = vec4(0., c, 0., 1.);
+}
+
+])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -p -S TestCheckerboard],
+         [0], [ignore], [stderr])
+AT_CHECK([sed -n '/^------------\[[ begin of shader code \]]------------$/,/^-------------\[[ end of shader code \]]-------------$/ {
+    /^------------\[[ begin of shader code \]]------------$/b
+    /^-------------\[[ end of shader code \]]-------------$/b
+    p
+}' stderr], [0], [expout])
+AT_CLEANUP

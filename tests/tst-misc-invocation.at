@@ -1,0 +1,49 @@
+AT_BANNER([Misc invocation])
+
+dnl --------------------------------------------------------
+AT_SETUP([option -h])
+AT_KEYWORDS([invocation help])
+AT_CHECK([glslsandbox-player -h], [0], [], [stderr])
+AT_CHECK([grep -F -q "Usage: glslsandbox-player [[options]]" stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([invocation-unknown-option])
+AT_KEYWORDS([invocation unknown-option])
+AT_CHECK([glslsandbox-player -?], [1], [ignore], [stderr])
+AT_CHECK([grep -F -q "glslsandbox-player: invalid option -- '?'" stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([license-warning])
+AT_KEYWORDS([license])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1], [0], [ignore], [stderr])
+AT_CHECK([grep -F -q "PLEASE make sure to check original license and give credit to the original author(s)." stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([show-url])
+AT_KEYWORDS([show-url])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -S 2DColorCircles], [0], [ignore], [stderr])
+AT_CHECK([grep -F -q "Available online at: http://glslsandbox.com/e#7070.6" stderr])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+AT_SETUP([invocation-without-shader])
+AT_KEYWORDS([invocation without-shader])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -O2 -T1 -f3 -m -u -D],
+         [0], [ignore], [ignore])
+AT_CHECK([mv 2DColorCircles-00002.ppm without-shader.ppm])
+AT_CHECK([glslsandbox-player -W64 -H64 -w0 -O2 -T1 -f3 -m -u -D -i 0],
+         [0], [ignore], [ignore])
+AT_CHECK([mv 2DColorCircles-00002.ppm with-shader-0.ppm])
+AT_CHECK([cmp -s without-shader.ppm with-shader-0.ppm])
+AT_CLEANUP
+
+
+dnl --------------------------------------------------------
+dnl TODO: Run a shader with "surfaceSize" uniform
