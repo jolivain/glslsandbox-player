@@ -26,6 +26,12 @@ AS_IF([test "x$enable_debug" = "xyes"], [
         AC_DEFINE(ENABLE_DEBUG, [1], [Debug messages.])
 ])
 
+AC_ARG_WITH([shader-list],
+    AS_HELP_STRING([--with-shader-list=LIST], [Define the shader list file @<:@default=shader.list@:>@]),
+    [], [with_shader_list=shader.list]
+)
+AC_SUBST([shader_list], [$with_shader_list])
+
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
@@ -168,4 +174,5 @@ AC_MSG_RESULT([
     debug: ${enable_debug}
     native-gfx:   ${with_native_gfx}
     libpng support: ${have_libpng}
+    shader list: ${with_shader_list}
 ])
