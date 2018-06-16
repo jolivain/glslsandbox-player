@@ -310,7 +310,8 @@ dump_framebuffer_to_ppm(const context_t *ctx)
 static GLuint
 load_shader(GLenum type,
             GLsizei count,
-            const GLchar * const *shaderSrc)
+            const GLchar * const *shaderSrc,
+            int verbose)
 {
   GLuint shader;
   GLint compiled = GL_FALSE;
@@ -323,21 +324,22 @@ load_shader(GLenum type,
   XglCompileShader(shader);
   XglGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 
-  if (compiled != GL_TRUE) {
-    GLint infoLen = 0;
+  if ((compiled != GL_TRUE) || (verbose > 0)) {
+    GLint info_len = 0;
 
-    XglGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
+    XglGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info_len);
 
-    if (infoLen > 1) {
-      char* infoLog = malloc(infoLen);
+    if (info_len > 1) {
+      char* info_log = malloc(info_len);
 
-      XglGetShaderInfoLog(shader, infoLen, NULL, infoLog);
-      fprintf(stderr, "Error compiling shader:\n%s\n", infoLog);
-      free(infoLog);
+      XglGetShaderInfoLog(shader, info_len, NULL, info_log);
+      fprintf(stderr, "Info log from shader compilation:\n%s\n", info_log);
+      free(info_log);
     }
+  }
 
+  if (compiled != GL_TRUE) {
     XglDeleteShader(shader);
-
     return (0);
   }
 
@@ -349,20 +351,24 @@ load_program(GLint v_shader_count,
              const GLchar * const *v_shader_src,
              GLint f_shader_count,
              const GLchar * const *f_shader_src,
-             GLuint *vshader, GLuint *fshader, GLuint *program)
+             GLuint *vshader, GLuint *fshader, GLuint *program,
+             int verbose)
 {
   GLuint vsh;
   GLuint fsh;
   GLuint prog;
-  GLint  linked;
+  GLint  linked = GL_FALSE;
 
-  vsh = load_shader(GL_VERTEX_SHADER, v_shader_count, v_shader_src);
-  if (vsh == 0)
+  vsh = load_shader(GL_VERTEX_SHADER, v_shader_count, v_shader_src, verbose);
+  if (vsh == 0) {
+    *program = 0;
     return ;
+  }
 
-  fsh = load_shader(GL_FRAGMENT_SHADER, f_shader_count, f_shader_src);
+  fsh = load_shader(GL_FRAGMENT_SHADER, f_shader_count, f_shader_src, verbose);
   if (fsh == 0) {
     XglDeleteShader(vsh);
+    *program = 0;
     return ;
   }
 
@@ -370,6 +376,7 @@ load_program(GLint v_shader_count,
   if (prog == 0) {
     XglDeleteShader(vsh);
     XglDeleteShader(fsh);
+    *program = 0;
     return ;
   }
 
@@ -378,11 +385,12 @@ load_program(GLint v_shader_count,
   XglLinkProgram(prog);
 
   XglGetProgramiv(prog, GL_LINK_STATUS, &linked);
-  if (linked != GL_TRUE) {
+
+  if ((linked != GL_TRUE) || (verbose > 0)) {
     GLint info_len = 0;
 
     XglGetProgramiv(prog, GL_INFO_LOG_LENGTH, &info_len);
-    if (info_len > 1) {
+    if (info_len > 0) {
       char* info_log = malloc(info_len);
       if (info_log == NULL) {
         fprintf(stderr, "ERROR: malloc(): errno %i: %s\n",
@@ -391,13 +399,17 @@ load_program(GLint v_shader_count,
       }
 
       XglGetProgramInfoLog(prog, info_len, NULL, info_log);
-      fprintf(stderr, "Error linking program:\n%s\n", info_log);
+      fprintf(stderr, "Info log from program linking:\n%s\n", info_log);
       free(info_log);
     }
+  }
 
+  if (linked != GL_TRUE) {
     XglDeleteShader(vsh);
     XglDeleteShader(fsh);
     XglDeleteProgram(prog);
+    *program = 0;
+    return ;
   }
 
   *vshader = vsh;
@@ -454,7 +466,8 @@ setup_fbo(context_t *ctx)
   f_src[1] = fbo_frag_shader_g;
 
   load_program(2, v_src, 2, f_src,
-               &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog);
+               &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog,
+               ctx->verbose);
   if (ctx->fbo_prog == 0) {
     fprintf(stderr, "ERROR: while loading FBO shaders and program.\n");
     exit(EXIT_FAILURE);
@@ -482,17 +495,15 @@ setup_fbo(context_t *ctx)
 static void
 validate_shader_program(const context_t * ctx)
 {
-  GLint valid;
-  GLint info_len;
-
-  info_len = 0;
+  GLint valid = GL_FALSE;
+  GLint info_len = 0;
 
   XglValidateProgram(ctx->gl_prog);
   XglGetProgramiv(ctx->gl_prog, GL_INFO_LOG_LENGTH, &info_len);
 
   if (ctx->verbose > 0) {
     if (info_len > 1) {
-      char* info_log = malloc(info_len);
+      char *info_log = malloc(info_len);
       if (info_log == NULL) {
         fprintf(stderr, "ERROR: malloc(): errno %i: %s\n",
                 errno, strerror(errno));
@@ -607,7 +618,8 @@ setup(context_t *ctx)
   f_src[1] = get_shader_code(ctx);
 
   load_program(2, v_src, 2, f_src,
-               &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog);
+               &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog,
+               ctx->verbose);
   if (ctx->gl_prog == 0) {
     fprintf(stderr, "ERROR: while loading shaders and program.\n");
     exit(EXIT_FAILURE);
