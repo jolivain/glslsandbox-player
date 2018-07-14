@@ -15,8 +15,8 @@ else
     : "${GLSLSANDBOX_PLAYER:=glslsandbox-player}"
 fi
 
-# Limit Virtual Size to 1G to prevent system crash by memory exhaustion
-ulimit -S -v $(( 1024 * 1024 ))
+# Limit Virtual Size to 3G to prevent system crash by memory exhaustion
+ulimit -S -v $(( 3 * 1024 * 1024 ))
 
 mkdir -p "${OUTPUT_DIR}"
 cd "${OUTPUT_DIR}"
