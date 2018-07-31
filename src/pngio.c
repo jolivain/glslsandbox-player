@@ -17,6 +17,13 @@
 #include <string.h>
 #include <errno.h>
 
+/* libpng 1.2 (shipped in Ubuntu 16.04 LTS for example) checks that
+ * <setjmp.h> is not included before <png.h>.  This check is disabled
+ * here. See:
+ * https://sourceforge.net/p/libpng/code/ci/libpng-1.2.55-signed/tree/pngconf.h#l362
+ * This check was removed in:
+ * https://sourceforge.net/p/libpng/code/ci/6c2e919c7eb736d230581a4c925fa67bd901fcf8 */
+#define PNG_SKIP_SETJMP_CHECK 1
 #include <png.h>
 
 #include "pngio.h"
