@@ -17,6 +17,10 @@
 #include <string.h>
 #include <EGL/egl.h>
 
+#if defined(HAVE_EGL_EGLEXT_H) && defined(ENABLE_KMS)
+# include <EGL/eglext.h>
+#endif
+
 #ifdef ENABLE_SDL2
 # include "SDL.h"
 # include "SDL_opengles2.h"
@@ -515,7 +519,11 @@ egl_init(int width, int height, int xpos, int ypos)
 
   egl->native_gfx = native_gfx_open_display();
   egl_native_disp = native_gfx_get_egl_native_display(egl->native_gfx);
+#if defined(ENABLE_KMS) && defined(EGL_VERSION_1_5) && defined(EGL_KHR_platform_gbm)
+  egl->dpy = XeglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, egl_native_disp, NULL);
+#else
   egl->dpy = XeglGetDisplay(egl_native_disp);
+#endif
   XeglInitialize(egl->dpy, &egl->major, &egl->minor);
 
   XeglChooseConfig(egl->dpy, conf_attribList, &config, 1, &num_configs);
