@@ -1617,6 +1617,30 @@ fprintf_gles_precisions(FILE *fp)
 }
 
 static void
+fprintf_gl_extensions(FILE *fp,
+		      const char *prefix,
+		      const char *exts,
+		      const char *suffix)
+{
+  static const char rej[] = " ";
+  const char *cur_ext;
+  size_t cur_ext_len;
+
+  assert(exts != NULL);
+
+  cur_ext = exts;
+  while (*cur_ext != '\0') {
+    cur_ext_len = strcspn(cur_ext, rej);
+    if (prefix != NULL)
+      fprintf(fp, "%s", prefix);
+    fprintf(fp, "%.*s", (int)cur_ext_len, cur_ext);
+    if (suffix != NULL)
+      fprintf(fp, "%s", suffix);
+    cur_ext += cur_ext_len + 1;
+  }
+}
+
+static void
 fprintf_gles_info(FILE *fp, int verbose)
 {
   const char *vendor;
@@ -1661,7 +1685,8 @@ fprintf_gles_info(FILE *fp, int verbose)
       fprintf(stderr, "ERROR: glGetString(GL_EXTENSIONS) returned NULL\n");
       exit(EXIT_FAILURE);
     }
-    fprintf(fp, "GL_EXTENSIONS               : %s\n", exts);
+    fprintf(fp, "GL_EXTENSIONS               :\n");
+    fprintf_gl_extensions(stderr, "    ", exts, "\n");
   }
 
   if (verbose > 2)
