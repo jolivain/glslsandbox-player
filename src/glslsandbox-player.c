@@ -1621,12 +1621,19 @@ fprintf_gles_info(FILE *fp, int verbose)
 {
   const char *vendor;
   const char *version;
+  const char *renderer;
   const char *slver;
   const char *exts;
 
   vendor = (const char *)XglGetString(GL_VENDOR);
   if (vendor == NULL) {
     fprintf(stderr, "ERROR: glGetString(GL_VENDOR) returned NULL\n");
+    exit(EXIT_FAILURE);
+  }
+
+  renderer = (const char *)XglGetString(GL_RENDERER);
+  if (renderer == NULL) {
+    fprintf(stderr, "ERROR: glGetString(GL_RENDERER) returned NULL\n");
     exit(EXIT_FAILURE);
   }
 
@@ -1644,6 +1651,7 @@ fprintf_gles_info(FILE *fp, int verbose)
 
   fprintf(fp, "OpenGL ES driver information:\n");
   fprintf(fp, "GL_VENDOR                   : %s\n", vendor);
+  fprintf(fp, "GL_RENDERER                 : %s\n", renderer);
   fprintf(fp, "GL_VERSION                  : %s\n", version);
   fprintf(fp, "GL_SHADING_LANGUAGE_VERSION : %s\n", slver);
 
