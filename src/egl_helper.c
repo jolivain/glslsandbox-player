@@ -125,6 +125,29 @@ __xegl_eglGetDisplay(const char *file, int line,
   return (ret);
 }
 
+#if defined(EGL_VERSION_1_5)
+EGLDisplay
+__xegl_eglGetPlatformDisplay(const char *file, int line,
+                             EGLenum platform,
+                             void *native_display,
+                             const EGLAttrib *attrib_list)
+{
+  EGLDisplay ret;
+
+  ret = eglGetPlatformDisplay(platform, native_display, attrib_list);
+  __xegl_check_error(file, line, "eglGetPlatformDisplayEXT");
+
+  if (ret == EGL_NO_DISPLAY) {
+    fprintf(stderr,
+            "%s:%i: eglGetPlatformDisplayEXT(): returned EGL_NO_DISPLAY\n",
+            file, line);
+    __xegl_on_error();
+  }
+
+  return (ret);
+}
+#endif
+
 EGLBoolean
 __xegl_eglChooseConfig(const char *file, int line,
                        EGLDisplay dpy, const EGLint *attrib_list,

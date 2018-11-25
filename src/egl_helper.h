@@ -66,6 +66,14 @@ EGLDisplay
 __xegl_eglGetDisplay(const char *file, int line,
                      EGLNativeDisplayType display_id);
 
+#if defined(EGL_VERSION_1_5)
+EGLDisplay
+__xegl_eglGetPlatformDisplay(const char *file, int line,
+                             EGLenum platform,
+                             void *native_display,
+                             const EGLAttrib *attrib_list);
+#endif
+
 EGLBoolean
 __xegl_eglChooseConfig(const char *file, int line,
                        EGLDisplay dpy, const EGLint *attrib_list,
@@ -123,6 +131,11 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglGetDisplay(display_id) \
   __xegl_eglGetDisplay(__FILE__, __LINE__, display_id)
 
+#if defined(EGL_VERSION_1_5)
+#define XeglGetPlatformDisplay(platform, native_display, attrib_list) \
+  __xegl_eglGetPlatformDisplay(__FILE__, __LINE__, platform, native_display, attrib_list)
+#endif
+
 #define XeglChooseConfig(dpy, attrib_list, configs, config_size, num_config) \
   __xegl_eglChooseConfig(__FILE__, __LINE__, dpy, attrib_list, configs, config_size, num_config)
 
@@ -166,6 +179,11 @@ __xegl_eglTerminate(const char *file, int line,
 
 #define XeglGetDisplay(display_id) \
   eglGetDisplay(display_id)
+
+#if defined(EGL_VERSION_1_5)
+#define XeglGetPlatformDisplay(platform, native_display, attrib_list) \
+  eglGetPlatformDisplay(platform, native_display, attrib_list)
+#endif
 
 #define XeglChooseConfig(dpy, attrib_list, configs, config_size, num_config) \
   eglChooseConfig(dpy, attrib_list, configs, config_size, num_config)
