@@ -29,6 +29,10 @@ AS_IF([test "x$enable_debug" = "xyes"], [
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
+AC_CHECK_HEADERS([EGL/eglext.h], [], [],
+[[#include <EGL/egl.h>
+]])
+
 AC_ARG_WITH([libpng],
     AS_HELP_STRING([--with-libpng], [Enable libpng support @<:@default=enabled@:>@]),
     [], [with_libpng=yes]
