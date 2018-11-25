@@ -1696,6 +1696,54 @@ fprintf_gles_info(FILE *fp, int verbose)
 }
 
 static void
+fprintf_egl_info(egl_t *egl, FILE *fp, int verbose)
+{
+  const char *client_apis;
+  const char *vendor;
+  const char *version;
+  const char *exts;
+
+  fprintf(fp, "EGL driver information      :\n");
+
+  vendor = XeglQueryString(egl->dpy,  EGL_VENDOR);
+  if (vendor == NULL) {
+    fprintf(stderr, "ERROR: eglQueryString(EGL_VENDOR) returned NULL\n");
+    exit(EXIT_FAILURE);
+  }
+
+  fprintf(fp, "EGL_VENDOR                  : %s\n", vendor);
+
+  version = XeglQueryString(egl->dpy,  EGL_VERSION);
+  if (version == NULL) {
+    fprintf(stderr, "ERROR: eglQueryString(EGL_VERSION) returned NULL\n");
+    exit(EXIT_FAILURE);
+  }
+
+  fprintf(fp, "EGL_VERSION                 : %s\n", version);
+
+  if (verbose > 1) {
+    client_apis = XeglQueryString(egl->dpy, EGL_CLIENT_APIS);
+    if (client_apis == NULL) {
+      fprintf(stderr, "ERROR: eglQueryString(EGL_CLIENT_APIS) returned NULL\n");
+      exit(EXIT_FAILURE);
+    }
+
+    fprintf(fp, "EGL_CLIENT_APIS             : %s\n", client_apis);
+
+    exts = XeglQueryString(egl->dpy, EGL_EXTENSIONS);
+    if (exts == NULL) {
+      fprintf(stderr, "ERROR: eglQueryString(EGL_EXTENSIONS); returned NULL\n");
+      exit(EXIT_FAILURE);
+    }
+
+    fprintf(fp, "EGL_EXTENSIONS              :\n");
+    fprintf_gl_extensions(stderr, "    ", exts, "\n");
+  }
+
+  fprintf(fp, "\n");
+}
+
+static void
 report_fps(FILE *fp, context_t *ctx)
 {
   float fps;
@@ -1897,6 +1945,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "Video system                : %s\n\n",
             SDL_GetCurrentVideoDriver());
 #endif /* ENABLE_SDL2 */
+    fprintf_egl_info(ctx->egl, stderr, ctx->verbose);
     fprintf_gles_info(stderr, ctx->verbose);
 
     if (is_using_builtin_shader(ctx)) {
