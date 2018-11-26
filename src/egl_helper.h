@@ -97,6 +97,10 @@ EGLBoolean
 __xegl_eglMakeCurrent(const char *file, int line,
                       EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
 
+const char *
+__xgles_eglQueryString(const char *file, int line,
+                       EGLDisplay dpy, EGLint name);
+
 EGLBoolean
 __xgles_eglQuerySurface(const char *file, int line,
                         EGLDisplay dpy, EGLSurface surface, EGLint attribute, EGLint *value);
@@ -140,6 +144,9 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglMakeCurrent(dpy, draw, read, ctx) \
   __xegl_eglMakeCurrent(__FILE__, __LINE__, dpy, draw, read, ctx)
 
+#define XeglQueryString(dpy, name) \
+  __xgles_eglQueryString(__FILE__, __LINE__, dpy, name)
+
 #define XeglQuerySurface(dpy, surface, attribute, value) \
   __xgles_eglQuerySurface(__FILE__, __LINE__, dpy, surface, attribute, value)
 
@@ -180,6 +187,9 @@ __xegl_eglTerminate(const char *file, int line,
 
 #define XeglMakeCurrent(dpy, draw, read, ctx) \
   eglMakeCurrent(dpy, draw, read, ctx)
+
+#define XeglQueryString(dpy, name) \
+  eglQueryString(dpy, name)
 
 #define XeglQuerySurface(dpy, surface, attribute, value) \
   eglQuerySurface(dpy, surface, attribute, value)

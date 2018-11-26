@@ -254,6 +254,18 @@ __xegl_eglMakeCurrent(const char *file, int line,
   return (ret);
 }
 
+const char *
+__xgles_eglQueryString(const char *file, int line,
+                       EGLDisplay dpy, EGLint name)
+{
+  const char *ret;
+
+  ret = eglQueryString(dpy, name);
+  __xegl_check_error(file, line, "eglQueryString");
+
+  return (ret);
+}
+
 EGLBoolean
 __xgles_eglQuerySurface(const char *file, int line,
                         EGLDisplay dpy, EGLSurface surface, EGLint attribute, EGLint *value)
