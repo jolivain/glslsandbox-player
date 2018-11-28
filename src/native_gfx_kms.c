@@ -37,6 +37,9 @@
 #include <gbm.h>
 
 #include <EGL/egl.h>
+#if defined(HAVE_EGL_EGLEXT_H)
+# include <EGL/eglext.h>
+#endif
 
 #include "native_gfx.h"
 
@@ -196,7 +199,11 @@ clean_drm(native_gfx_t *gfx)
 char *
 native_gfx_get_name(void)
 {
-  return ("KMS");
+#if defined(EGL_VERSION_1_5) && defined(EGL_KHR_platform_gbm)
+  return ("KMS/EGL_KHR_platform_gbm");
+#else
+  return ("KMS/GBM");
+#endif
 }
 
 native_gfx_t *
