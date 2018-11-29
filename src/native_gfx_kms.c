@@ -31,6 +31,16 @@
 #include <string.h>
 #include <errno.h>
 
+#include <unistd.h>
+#include <signal.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/sysmacros.h>
+#include <linux/kd.h>
+#include <linux/vt.h>
+#include <linux/major.h>
+
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include <gbm.h>
@@ -72,6 +82,83 @@ struct drm_fb {
   struct gbm_bo *bo;
   uint32_t fb_id;
 };
+
+static struct termios save_tio;
+
+static void
+restore_vt(void)
+{
+  struct vt_mode mode = { .mode = VT_AUTO };
+  ioctl(STDIN_FILENO, VT_SETMODE, &mode);
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &save_tio);
+  ioctl(STDIN_FILENO, KDSETMODE, KD_TEXT);
+}
+
+static void
+handle_signal(int sig)
+{
+  restore_vt();
+  raise(sig);
+}
+
+static int
+init_vt(void)
+{
+  struct termios tio = { 0 };
+  struct stat buf = { 0 };
+  int ret;
+
+  /* If we're not on a VT, we're probably logged in as root over
+   * ssh. Skip all this then. */
+  ret = fstat(STDIN_FILENO, &buf);
+  if (ret == -1 || major(buf.st_rdev) != TTY_MAJOR)
+    return (0);
+
+  /* First, save term io setting so we can restore properly. */
+  tcgetattr(STDIN_FILENO, &save_tio);
+
+  /* We don't drop drm master, so block VT switching while we're
+   * running. Otherwise, switching to X on another VT will crash X when it
+   * fails to get drm master. */
+  struct vt_mode mode = {
+    .mode = VT_PROCESS,
+    .relsig = 0,
+    .acqsig = 0
+  };
+
+  ret = ioctl(STDIN_FILENO, VT_SETMODE, &mode);
+  if (ret == -1) {
+    fprintf(stderr, "failed to take control of vt handling\n");
+    return (-1);
+  }
+
+  /* Set KD_GRAPHICS to disable fbcon while we render. */
+  ret = ioctl(STDIN_FILENO, KDSETMODE, KD_GRAPHICS);
+  if (ret == -1) {
+    fprintf(stderr, "failed to switch console to graphics mode\n");
+    return -1;
+  }
+
+  atexit(restore_vt);
+
+  /* Set console input to raw mode. */
+  tio = save_tio;
+  tio.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &tio);
+
+  /* Restore console on SIGINT and friends. */
+  struct sigaction act = {
+    .sa_handler = handle_signal,
+    .sa_flags = SA_RESETHAND
+  };
+
+  sigaction(SIGINT, &act, NULL);
+  sigaction(SIGSEGV, &act, NULL);
+  sigaction(SIGABRT, &act, NULL);
+
+  return (0);
+}
 
 /*
  * See:
@@ -272,6 +359,8 @@ init_drm(native_gfx_t *gfx)
   gfx->drm_enc = encoder;
   gfx->drm_crtc_id = encoder->crtc_id;
   gfx->drm_connector_id = gfx->drm_conn->connector_id;
+
+  init_vt();
 
   return (0);
 }
