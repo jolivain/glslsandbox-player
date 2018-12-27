@@ -783,7 +783,8 @@ window. Emulating a 'vmware' will workaround the issue (i.e. `qemu-kvm
 
   Thanks to Sébastien Fagard and Vincent Stehlé for all their
 suggestions and interesting discussions. Thanks to Marouen Ghodhbane
-for the initial Wayland EGL support. Many thanks to
+for the initial Wayland EGL support. Thanks to Petr Cach and Santiago
+Mejia for the QNX support. Finally, many, many thanks to all
 http://glslsandbox.com/ authors and all its contributors.
 
   This glslsandbox-player code is distributed under the 2-Clause BSD
