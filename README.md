@@ -402,11 +402,14 @@ use the following fragment shader, the the file `texture.glslf`:
     #endif
     
     uniform vec2 resolution;
+    uniform float time;
     uniform sampler2D texture0;
     
     void main(void) {
       vec2 uv = gl_FragCoord.xy / resolution.xy;
       uv.y = 1.0 - uv.y;
+      // Uncomment for a basic texture animation:
+      // uv += sin((uv.yx * 4. + time) * 3.1416) * 0.02;
       gl_FragColor = texture2D(texture0, uv);
     }
 
