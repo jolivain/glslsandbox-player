@@ -158,6 +158,7 @@ The build dependencies of glslsandbox are:
 - One of the following native window library: X11, Vivante/libGAL,
   Raspberry Pi, Wayland EGL, SDL2, libdrm and libgbm (for KMS)
 - optional: libpng library and header files for texture support
+- optional: netpbm commands are used by testsuite
 
   Compiling glslsandbox-player should be straightforward if all
 dependencies are present since it's an autotools package (aka
@@ -421,6 +422,53 @@ use the following fragment shader, the the file `texture.glslf`:
 (Luminance, Luminance+Alpha, RGB and RGBA). Pallete and 16-bit PNG
 files are not supported. Use an image converter if an image is in an
 unsupported format.
+
+
+Testing the glslsandbox-player program
+--------------------------------------
+
+  As glslsandbox-player can be used to stress test an OpenGL ES 2.0
+implementation by running shaders, it also include a testsuite to
+validate all its options and features.
+
+  In case of a native compilation, use configure command:
+
+    ./configure --enable-testing
+
+  In case of automated build, it's advised to use the shader list
+including test shaders only, to reduce the load on
+http://glslsandbox.com/ servers. In that case, use the configure
+command:
+
+    ./configure --enable-testing --with-shader-list=shader-tests.list
+
+  The test suite can be executed from the build directory, with the
+command:
+
+    make check
+
+  For parallel execution of tests, use command:
+
+    make check TESTSUITEFLAGS="-j$(nproc)"
+
+  In order to better test the program itself, and to prevent any
+unknown external behaviors from an OpenGL ES 2.0 implementation, the
+test suite can be executed into the virtual frame buffer X11 server
+(Xvfb). The Mesa 3D software implementation will be used. This can
+done with the command:
+
+    xvfb-run --server-args="-screen 0 640x360x24" make check
+
+  When the package is cross-compiled (for embedded devices for
+example), it is not possible to execute the test suite directly from
+the build directory. The test suite and test data can be installed to
+the target file system. In that case, use the configure command:
+
+    ./configure --enable-testing --enable-install-testsuite
+
+  The `make install` command will also install a wrapper script
+`glslsandbox-player-testsuite` that will execute the test suite, as
+same as the `make check` command for native tests.
 
 
 Using glslsandbox-player for Automatic Testing
