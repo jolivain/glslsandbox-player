@@ -107,7 +107,7 @@ struct context_s {
 #endif /* GLSLSANDBOX_PLAYER_H */
 
 /*
-* Copyright (c) 2015-2018, Julien Olivain <juju@cotds.org>
+* Copyright (c) 2015-2019, Julien Olivain <juju@cotds.org>
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
