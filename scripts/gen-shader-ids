@@ -11,5 +11,5 @@ fi
 SHADER_LIST="$1"
 
 grep -vE '^[[:blank:]]*(#|$)' "${SHADER_LIST}" |
-    sort -k2 |
+    LANG=C sort -b -k2 |
     awk '{ print $1; }'
