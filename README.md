@@ -296,7 +296,7 @@ Generate 100 PPM frames of an animation at 20fps, then encode to a video:
 
 Generate the glslsandbox.png image:
 
-    glslsandbox-player -I 26379.2 -W640 -H200 -s0 -f1 -d
+    glslsandbox-player -I 26379.3 -W640 -H200 -s0 -f1 -d
     convert GLSLSandbox-00000.ppm glslsandbox.png
 
 Two by two split screen rendering for 30 seconds:
