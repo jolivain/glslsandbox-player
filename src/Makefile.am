@@ -44,13 +44,16 @@ shader-list-check:
 .SECONDARY: $(SHADER_FILES)
 
 %.inc: %.frag $(srcdir)/glslsandbox-shaders.h
-	$(FRAG2INC) $(SHADER_LIST) $< > $@
+	$(FRAG2INC) $(SHADER_LIST) $< > $@.tmp
+	mv -f $@.tmp $@
 
 %.frag:
-	$(DL_SHADER) $(@:.frag=) > $@
+	$(DL_SHADER) $(@:.frag=) > $@.tmp
+	mv -f $@.tmp $@
 
 glslsandbox-shaders.c: $(SHADER_LIST) $(SHADER_CFILES)
-	$(INC2C) $(SHADER_CFILES) > $(srcdir)/glslsandbox-shaders.c
+	$(INC2C) $(SHADER_CFILES) > $(srcdir)/glslsandbox-shaders.c.tmp
+	mv -f $(srcdir)/glslsandbox-shaders.c.tmp $(srcdir)/glslsandbox-shaders.c
 
 bin_PROGRAMS = glslsandbox-player
 
