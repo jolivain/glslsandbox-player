@@ -23,21 +23,15 @@ cd "${OUTPUT_DIR}"
 
 ${GLSLSANDBOX_PLAYER} -l |
     awk '1 == /^[0-9]+/ {print $3;}' |
-    while read shader_id ; do
-        echo "Rendering ${shader_id}"
+    while read -r shader_name ; do
+        echo "Rendering ${shader_name}"
         timeout \
             --foreground \
             --kill-after=1 60 \
-            "${GLSLSANDBOX_PLAYER}" -q -w0 -m -u -O10 -W640 -H360 -f 1 -D -S "${shader_id}" || :
+            "${GLSLSANDBOX_PLAYER}" -q -w0 -m -u -O10 -W640 -H360 -f 1 -D -S "${shader_name}" &&
+        convert "${shader_name}-00000.ppm" -quality 75% "${shader_name}.jpg" &&
+        rm -f "${shader_name}-00000.ppm" || :
 done
-
-echo "Compressing images..."
-find . -type f -name "*.ppm" |
-    sed 's/-00000.ppm$//' |
-    xargs -I{} -P$(nproc) convert {}-00000.ppm {}.png
-
-echo "Cleanup..."
-find . -type f -name "*.ppm" | xargs rm
 
 echo "Catalog directory is: ${PWD}"
 echo "Done."
