@@ -10,19 +10,19 @@ fi
 ulimit -S -v $(( 1024 * 1024 ))
 
 ${GLSLSANDBOX_PLAYER} -l |
-    awk '1 == /^[0-9]+/ {print $1;}' |
+    awk '1 == /^[0-9]+/ {print $3;}' |
     shuf |
-    while read shader_id ; do
-        echo "Running shader ${shader_id}"
+    while read -r shader_name ; do
+        echo "Running shader ${shader_name}"
         timeout \
             --foreground \
-            --kill-after=1 15 \
-            "${GLSLSANDBOX_PLAYER}" -W 640 -H 480 -t 3 -q -i "${shader_id}"
+            --kill-after=1 30 \
+            "${GLSLSANDBOX_PLAYER}" -W 640 -H 480 -t 3 -w 0 -q -S "${shader_name}"
         RET=$?
 
         if [[ $RET -eq 124 ]] ; then
-            echo "Execution of shader ${shader_id} timed out"
+            echo "Execution of shader ${shader_name} timed out"
         elif [[ $RET -ne 0 ]] ; then
-            echo "Execution of shader ${shader_id} failed"
+            echo "Execution of shader ${shader_name} failed"
         fi
 done
