@@ -606,6 +606,17 @@ at the first one that will successfully load.  This behavior can be
 changed to try to load only one DRM driver, setting the driver name to
 the environement variable `GLSLSANDBOX_PLAYER_DRM_DRIVER`.
 
+glslsandbox-player will select, by default, the first connected DRM
+connector for display output. In case of multiple display system, this
+behavior can be changed by setting the desired connector ID to the
+`GSP_DRM_CONN` environment variable (ex: `export GSP_DRM_CONN=42`).
+Valid connector IDs can be found with the `modetest` command.
+
+The default display mode (resolution) is the one marked as "preferred"
+by the DRM driver (see `modetest` output). This mode can be changed by
+setting the mode name in the `GSP_DRM_MODE` environment variable (ex:
+`export GSP_DRM_MODE="640x480"`).
+
 
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------

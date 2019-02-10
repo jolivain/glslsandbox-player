@@ -30,7 +30,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <assert.h>
 
 #include <xf86drm.h>
 #include <xf86drmMode.h>
@@ -84,13 +83,127 @@ static const char *modules_g[] = {
   "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111",
 };
 
+
+static drmModeConnector *
+drm_find_connector_connected(const native_gfx_t *gfx)
+{
+  drmModeConnector *connector = NULL;
+  int i;
+
+  for (i = 0; i < gfx->drm_moderes->count_connectors; i++) {
+    connector = drmModeGetConnector(gfx->drm_fd,
+                                    gfx->drm_moderes->connectors[i]);
+    if (connector->connection == DRM_MODE_CONNECTED) {
+      break ;
+    }
+    drmModeFreeConnector(connector);
+    connector = NULL;
+  }
+
+  return (connector);
+}
+
+static drmModeConnector *
+drm_find_connector_by_id(const native_gfx_t *gfx, uint32_t id)
+{
+  drmModeConnector *connector = NULL;
+  int i;
+
+  for (i = 0; i < gfx->drm_moderes->count_connectors; ++i) {
+    connector = drmModeGetConnector(gfx->drm_fd,
+                                    gfx->drm_moderes->connectors[i]);
+    if (connector->connector_id == id) {
+      break ;
+    }
+    drmModeFreeConnector(connector);
+    connector = NULL;
+  }
+
+  return (connector);
+}
+
+static drmModeConnector *
+drm_find_connector(native_gfx_t *gfx)
+{
+  const char *drm_conn_name;
+  drmModeConnector *conn = NULL;
+
+  drm_conn_name = getenv("GSP_DRM_CONN");
+  if (drm_conn_name == NULL) {
+    conn = drm_find_connector_connected(gfx);
+  }
+  else {
+    char *endptr;
+    unsigned long id;
+    id = strtoul(drm_conn_name, &endptr, 10);
+    if (endptr[0] == '\0') {
+      conn = drm_find_connector_by_id(gfx, id);
+    }
+    else {
+      fprintf(stderr,
+              "ERROR: GSP_DRM_CONN environement variable should "
+              "contain a valid integer connector ID\n");
+    }
+  }
+
+  return (conn);
+}
+
+static drmModeModeInfo *
+drm_find_mode_preferred(const native_gfx_t *gfx)
+{
+  int i;
+  drmModeModeInfo *current_mode = NULL;
+
+  for (i = 0; i < gfx->drm_conn->count_modes; i++) {
+    current_mode = &gfx->drm_conn->modes[i];
+    if (current_mode->type & DRM_MODE_TYPE_PREFERRED)
+      break ;
+    current_mode = NULL;
+  }
+
+  return (current_mode);
+}
+
+static drmModeModeInfo *
+drm_find_mode_by_name(const native_gfx_t *gfx, const char *mode_name)
+{
+  int i;
+  drmModeModeInfo *current_mode = NULL;
+
+  for (i = 0; i < gfx->drm_conn->count_modes; i++) {
+    current_mode = &gfx->drm_conn->modes[i];
+    if (!strcmp(current_mode->name, mode_name))
+      break ;
+    current_mode = NULL;
+  }
+
+  return (current_mode);
+}
+
+static drmModeModeInfo *
+drm_find_mode(native_gfx_t *gfx)
+{
+  const char *drm_mode_name;
+  drmModeModeInfo *mode = NULL;
+
+  drm_mode_name = getenv("GSP_DRM_MODE");
+  if (drm_mode_name == NULL) {
+    mode = drm_find_mode_preferred(gfx);
+  }
+  else {
+    mode = drm_find_mode_by_name(gfx, drm_mode_name);
+  }
+
+  return (mode);
+}
+
 static int
 init_drm(native_gfx_t *gfx)
 {
   drmModeRes *moderes;
-  drmModeConnector *connector = NULL;
   drmModeEncoder *encoder = NULL;
-  int i, area;
+  int i;
   const char *drm_driver_name;
   const char **drv_array;
   size_t drv_count;
@@ -105,7 +218,7 @@ init_drm(native_gfx_t *gfx)
     drv_count = ARRAY_SIZE(modules_g);
   }
 
-  for (i = 0; ((unsigned int)i) < drv_count; i++) {
+  for (i = 0; ((size_t)i) < drv_count; i++) {
     fprintf(stderr, "drm: trying to load module %s...", drv_array[i]);
     gfx->drm_fd = drmOpen(drv_array[i], NULL);
     if (gfx->drm_fd < 0) {
@@ -130,38 +243,14 @@ init_drm(native_gfx_t *gfx)
 
   gfx->drm_moderes = moderes;
 
-  /* find a connected connector: */
-  for (i = 0; i < moderes->count_connectors; i++) {
-    connector = drmModeGetConnector(gfx->drm_fd, moderes->connectors[i]);
-    if (connector->connection == DRM_MODE_CONNECTED) {
-      /* it's connected, let's use this! */
-      break ;
-    }
-    drmModeFreeConnector(connector);
-    connector = NULL;
-  }
-
-  if (connector == NULL) {
-    /* we could be fancy and listen for hotplug events and wait for
-     * a connector..
-     */
+  gfx->drm_conn = drm_find_connector(gfx);
+  if (gfx->drm_conn == NULL) {
     fprintf(stderr, "ERROR: no connected connector!\n");
     return (-1);
   }
 
-  gfx->drm_conn = connector;
-
-  /* find highest resolution mode: */
-  for (i = 0, area = 0; i < connector->count_modes; i++) {
-    drmModeModeInfo *current_mode = &connector->modes[i];
-    int current_area = current_mode->hdisplay * current_mode->vdisplay;
-    if (current_area > area) {
-      gfx->drm_mode = current_mode;
-      area = current_area;
-    }
-  }
-
-  if (gfx->drm_mode == 0) {
+  gfx->drm_mode = drm_find_mode(gfx);
+  if (gfx->drm_mode == NULL) {
     fprintf(stderr, "ERROR: could not find mode!\n");
     return (-1);
   }
@@ -169,7 +258,7 @@ init_drm(native_gfx_t *gfx)
   /* find encoder: */
   for (i = 0; i < moderes->count_encoders; i++) {
     encoder = drmModeGetEncoder(gfx->drm_fd, moderes->encoders[i]);
-    if (encoder->encoder_id == connector->encoder_id)
+    if (encoder->encoder_id == gfx->drm_conn->encoder_id)
       break ;
     drmModeFreeEncoder(encoder);
     encoder = NULL;
@@ -182,7 +271,7 @@ init_drm(native_gfx_t *gfx)
 
   gfx->drm_enc = encoder;
   gfx->drm_crtc_id = encoder->crtc_id;
-  gfx->drm_connector_id = connector->connector_id;
+  gfx->drm_connector_id = gfx->drm_conn->connector_id;
 
   return (0);
 }
