@@ -18,7 +18,7 @@ ${GLSLSANDBOX_PLAYER} -l |
         timeout \
             --foreground \
             --kill-after=1 30 \
-            "${GLSLSANDBOX_PLAYER}" -W 640 -H 480 -t 3 -w 0 -S "${shader_name}"
+            "${GLSLSANDBOX_PLAYER}" -W 640 -H 360 -t 3 -w 0 -S "${shader_name}"
         RET=$?
 
         if [[ $RET -eq 124 ]] ; then
