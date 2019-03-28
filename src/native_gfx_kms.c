@@ -52,7 +52,6 @@
 
 #include "native_gfx.h"
 
-#define GFX_KMS_UNUSED(x)  ((void)(x))
 #define ARRAY_SIZE(arr) (sizeof (arr) / sizeof ((arr)[0]))
 
 struct native_gfx_s
@@ -435,7 +434,7 @@ drm_fb_destroy_callback(struct gbm_bo *bo, void *data)
 {
   struct drm_fb *fb = data;
 
-  GFX_KMS_UNUSED(bo);
+  GFX_UNUSED(bo);
   
   if (fb->fb_id)
     drmModeRmFB(fb->gfx->drm_fd, fb->fb_id);
@@ -480,8 +479,8 @@ void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
   // XXX: Can we change position with KMS ?
-  GFX_KMS_UNUSED(xpos);
-  GFX_KMS_UNUSED(ypos);
+  GFX_UNUSED(xpos);
+  GFX_UNUSED(ypos);
 
   if (width == 0)
     width = gfx->drm_mode->hdisplay;
@@ -510,10 +509,10 @@ page_flip_handler(int fd, unsigned int frame,
 {
   int *waiting_for_flip = data;
 
-  GFX_KMS_UNUSED(fd);
-  GFX_KMS_UNUSED(frame);
-  GFX_KMS_UNUSED(sec);
-  GFX_KMS_UNUSED(usec);
+  GFX_UNUSED(fd);
+  GFX_UNUSED(frame);
+  GFX_UNUSED(sec);
+  GFX_UNUSED(usec);
   
   *waiting_for_flip = 0;
 }

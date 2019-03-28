@@ -217,8 +217,7 @@ native_gfx_close_display(native_gfx_t *gfx)
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  /* UNUSED */
-  (void)gfx;
+  GFX_UNUSED(gfx);
 }
 
 int

@@ -151,9 +151,8 @@ native_gfx_get_egl_native_window(const native_gfx_t *gfx)
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
-  /* UNUSED */
-  (void)(xpos);
-  (void)(ypos);
+  GFX_UNUSED(xpos);
+  GFX_UNUSED(ypos);
 
   if (width == 0)
     width = 256;
@@ -189,8 +188,7 @@ native_gfx_close_display(native_gfx_t *gfx)
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  /* UNUSED */
-  (void)gfx;
+  GFX_UNUSED(gfx);
 }
 
 int

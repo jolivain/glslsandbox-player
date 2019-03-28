@@ -38,8 +38,6 @@
 
 #include "native_gfx.h"
 
-#define GFX_WL_UNUSED(x)  ((void)(x))
-
 static const int default_wayland_window_width = 256;
 static const int default_wayland_window_height = 256;
 
@@ -69,7 +67,7 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
 {
   native_gfx_t *ctx;
 
-  GFX_WL_UNUSED(version);
+  GFX_UNUSED(version);
 
   ctx = (native_gfx_t *)data;
 
@@ -93,9 +91,9 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
 static void
 global_registry_remover(void *data, struct wl_registry *registry, uint32_t id)
 {
-  GFX_WL_UNUSED(data);
-  GFX_WL_UNUSED(registry);
-  GFX_WL_UNUSED(id);
+  GFX_UNUSED(data);
+  GFX_UNUSED(registry);
+  GFX_UNUSED(id);
 }
 
 static const struct wl_registry_listener registry_listener = {
@@ -195,8 +193,8 @@ create_ivi_surface(native_gfx_t *gfx)
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
-  GFX_WL_UNUSED(xpos);
-  GFX_WL_UNUSED(ypos);
+  GFX_UNUSED(xpos);
+  GFX_UNUSED(ypos);
 
   gfx->surface = wl_compositor_create_surface(gfx->compositor);
   if (gfx->surface == NULL) {
@@ -269,7 +267,7 @@ native_gfx_close_display(native_gfx_t *gfx)
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  GFX_WL_UNUSED(gfx);
+  GFX_UNUSED(gfx);
 }
 
 int

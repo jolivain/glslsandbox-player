@@ -84,26 +84,29 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
    * passed to eglCreateWindowSurface() as native window. See:
    * https://github.com/powervr-graphics/Native_SDK/blob/5.1/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp#L170
    */
+  GFX_UNUSED(gfx);
+  GFX_UNUSED(width);
+  GFX_UNUSED(height);
+  GFX_UNUSED(xpos);
+  GFX_UNUSED(ypos);
 }
 
 void
 native_gfx_destroy_window(native_gfx_t *gfx)
 {
-  gfx->win = NULL;
+  GFX_UNUSED(gfx);
 }
 
 void
 native_gfx_close_display(native_gfx_t *gfx)
 {
-  gfx->disp = NULL;
   free(gfx);
 }
 
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  /* UNUSED */
-  (void)gfx;
+  GFX_UNUSED(gfx);
 }
 
 int

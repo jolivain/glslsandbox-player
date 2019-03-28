@@ -105,8 +105,8 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
   gfx->win = &gfx->window_data;
 
-  (void)xpos; /* UNUSED */
-  (void)ypos; /* UNUSED */
+  GFX_UNUSED(xpos);
+  GFX_UNUSED(ypos);
 }
 
 void
@@ -125,7 +125,7 @@ native_gfx_close_display(native_gfx_t *gfx)
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  (void)gfx; /* UNUSED */
+  GFX_UNUSED(gfx);
 }
 
 int

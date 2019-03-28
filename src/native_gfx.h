@@ -12,6 +12,8 @@
 
 #include <EGL/egl.h>
 
+#define GFX_UNUSED(x)  ((void)(x))
+
 /* We just declare here the typedef
  * the struct itself will be declared
  * in the specific native gfx implementation. */
