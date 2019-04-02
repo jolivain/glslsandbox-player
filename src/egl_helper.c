@@ -110,6 +110,16 @@ __xegl_check_error(const char *file, int line, const char *func)
   }
 }
 
+EGLDisplay
+__xegl_eglGetCurrentDisplay(const char *file, int line)
+{
+  EGLDisplay ret;
+
+  ret = eglGetCurrentDisplay();
+  __xegl_check_error(file, line, "eglGetCurrentDisplay");
+
+  return (ret);
+}
 
 EGLDisplay
 __xegl_eglGetDisplay(const char *file, int line,

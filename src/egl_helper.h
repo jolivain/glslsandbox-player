@@ -63,6 +63,9 @@ void
 __xegl_check_error(const char *file, int line, const char *func);
 
 EGLDisplay
+__xegl_eglGetCurrentDisplay(const char *file, int line);
+
+EGLDisplay
 __xegl_eglGetDisplay(const char *file, int line,
                      EGLNativeDisplayType display_id);
 
@@ -128,6 +131,9 @@ EGLBoolean
 __xegl_eglTerminate(const char *file, int line,
                     EGLDisplay dpy);
 
+#define XeglGetCurrentDisplay() \
+  __xegl_eglGetCurrentDisplay(__FILE__, __LINE__)
+
 #define XeglGetDisplay(display_id) \
   __xegl_eglGetDisplay(__FILE__, __LINE__, display_id)
 
@@ -176,6 +182,9 @@ __xegl_eglTerminate(const char *file, int line,
   __xegl_eglTerminate(__FILE__, __LINE__, dpy)
 
 #else /* defined(XEGL_STRICT) */
+
+#define XeglGetCurrentDisplay(display_id) \
+  eglGetCurrentDisplay(display_id)
 
 #define XeglGetDisplay(display_id) \
   eglGetDisplay(display_id)
