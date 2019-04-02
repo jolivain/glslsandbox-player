@@ -13,6 +13,7 @@ AC_PROG_MKDIR_P
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
   Makefile
+  scripts/Makefile
   src/Makefile
   tests/Makefile
   tests/atlocal
@@ -44,6 +45,11 @@ AC_ARG_ENABLE([install-testsuite],
                AS_HELP_STRING([--enable-install-testsuite], [Install testsuite]),
               [], [enable_install_testsuite=no])
 AM_CONDITIONAL([ENABLE_INSTALL_TESTSUITE], [test "x$enable_install_testsuite" == "xyes"])
+
+AC_ARG_ENABLE([install-scripts],
+               AS_HELP_STRING([--enable-install-scripts], [Install additional scripts]),
+              [], [enable_install_scripts=no])
+AM_CONDITIONAL([ENABLE_INSTALL_SCRIPTS], [test "x$enable_install_scripts" == "xyes"])
 
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
@@ -190,4 +196,5 @@ AC_MSG_RESULT([
     shader list: ${with_shader_list}
     testing: ${enable_testing}
     install testsuite: ${enable_install_testsuite}
+    install scripts: ${enable_install_scripts}
 ])
