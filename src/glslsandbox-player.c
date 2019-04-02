@@ -1696,16 +1696,23 @@ fprintf_gles_info(FILE *fp, int verbose)
 }
 
 static void
-fprintf_egl_info(egl_t *egl, FILE *fp, int verbose)
+fprintf_egl_info(FILE *fp, int verbose)
 {
   const char *client_apis;
   const char *vendor;
   const char *version;
   const char *exts;
+  EGLDisplay dpy;
+
+  dpy = XeglGetCurrentDisplay();
+  if (dpy == EGL_NO_DISPLAY) {
+    fprintf(stderr, "ERROR: eglGetCurrentDisplay() returned EGL_NO_DISPLAY\n");
+    exit(EXIT_FAILURE);
+  }
 
   fprintf(fp, "EGL driver information      :\n");
 
-  vendor = XeglQueryString(egl->dpy,  EGL_VENDOR);
+  vendor = XeglQueryString(dpy,  EGL_VENDOR);
   if (vendor == NULL) {
     fprintf(stderr, "ERROR: eglQueryString(EGL_VENDOR) returned NULL\n");
     exit(EXIT_FAILURE);
@@ -1713,7 +1720,7 @@ fprintf_egl_info(egl_t *egl, FILE *fp, int verbose)
 
   fprintf(fp, "EGL_VENDOR                  : %s\n", vendor);
 
-  version = XeglQueryString(egl->dpy,  EGL_VERSION);
+  version = XeglQueryString(dpy,  EGL_VERSION);
   if (version == NULL) {
     fprintf(stderr, "ERROR: eglQueryString(EGL_VERSION) returned NULL\n");
     exit(EXIT_FAILURE);
@@ -1722,7 +1729,7 @@ fprintf_egl_info(egl_t *egl, FILE *fp, int verbose)
   fprintf(fp, "EGL_VERSION                 : %s\n", version);
 
   if (verbose > 1) {
-    client_apis = XeglQueryString(egl->dpy, EGL_CLIENT_APIS);
+    client_apis = XeglQueryString(dpy, EGL_CLIENT_APIS);
     if (client_apis == NULL) {
       fprintf(stderr, "ERROR: eglQueryString(EGL_CLIENT_APIS) returned NULL\n");
       exit(EXIT_FAILURE);
@@ -1730,7 +1737,7 @@ fprintf_egl_info(egl_t *egl, FILE *fp, int verbose)
 
     fprintf(fp, "EGL_CLIENT_APIS             : %s\n", client_apis);
 
-    exts = XeglQueryString(egl->dpy, EGL_EXTENSIONS);
+    exts = XeglQueryString(dpy, EGL_EXTENSIONS);
     if (exts == NULL) {
       fprintf(stderr, "ERROR: eglQueryString(EGL_EXTENSIONS); returned NULL\n");
       exit(EXIT_FAILURE);
@@ -1945,7 +1952,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "Video system                : %s\n\n",
             SDL_GetCurrentVideoDriver());
 #endif /* ENABLE_SDL2 */
-    fprintf_egl_info(ctx->egl, stderr, ctx->verbose);
+    fprintf_egl_info(stderr, ctx->verbose);
     fprintf_gles_info(stderr, ctx->verbose);
 
     if (is_using_builtin_shader(ctx)) {
