@@ -310,7 +310,7 @@ dump_framebuffer_to_ppm(const context_t *ctx)
 static GLuint
 load_shader(GLenum type,
             GLsizei count,
-            const GLchar * const *shaderSrc,
+            const GLchar * GL_SHADER_SOURCE_CONST *shaderSrc,
             int verbose)
 {
   GLuint shader;
@@ -348,9 +348,9 @@ load_shader(GLenum type,
 
 static void
 load_program(GLint v_shader_count,
-             const GLchar * const *v_shader_src,
+             const GLchar * GL_SHADER_SOURCE_CONST *v_shader_src,
              GLint f_shader_count,
-             const GLchar * const *f_shader_src,
+             const GLchar * GL_SHADER_SOURCE_CONST *f_shader_src,
              GLuint *vshader, GLuint *fshader, GLuint *program,
              int verbose)
 {
