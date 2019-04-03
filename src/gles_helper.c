@@ -451,13 +451,8 @@ __xgles_glReleaseShaderCompiler(const char *file, int line)
   __xgles_check_error(file, line, "glReleaseShaderCompiler");
 }
 
-#if defined(ENABLE_RPI) || defined(ENABLE_TISGX) || defined(ENABLE_MALI)
 void
-__xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar **string, const GLint *length)
-#else
-void
-__xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length)
-#endif
+__xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar * GL_SHADER_SOURCE_CONST *string, const GLint *length)
 {
   glShaderSource(shader, count, string, length);
   __xgles_check_error(file, line, "glShaderSource");
