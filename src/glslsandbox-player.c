@@ -1695,6 +1695,7 @@ fprintf_gles_info(FILE *fp, int verbose)
   fprintf(fp, "\n");
 }
 
+#ifndef ENABLE_SDL2
 static void
 fprintf_egl_info(FILE *fp, int verbose)
 {
@@ -1749,6 +1750,7 @@ fprintf_egl_info(FILE *fp, int verbose)
 
   fprintf(fp, "\n");
 }
+#endif /* ENABLE_SDL2 */
 
 static void
 report_fps(FILE *fp, context_t *ctx)
@@ -1951,8 +1953,9 @@ main(int argc, char *argv[])
     fprintf(stderr, "SDL2                        :\n");
     fprintf(stderr, "Video system                : %s\n\n",
             SDL_GetCurrentVideoDriver());
-#endif /* ENABLE_SDL2 */
+#else
     fprintf_egl_info(stderr, ctx->verbose);
+#endif /* ENABLE_SDL2 */
     fprintf_gles_info(stderr, ctx->verbose);
 
     if (is_using_builtin_shader(ctx)) {
