@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <assert.h>
 
 #include <EGL/egl.h>
 #include <X11/Xlib.h>
@@ -81,8 +80,13 @@ void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
   XEvent e;
-  int r;
+  Status r;
   XWindowAttributes a;
+  Window parent_win;
+  unsigned long black;
+  unsigned long border;
+  unsigned long background;
+  const unsigned long border_width = 0;
 
   if (width == 0)
     width = gfx->disp_width;
@@ -90,33 +94,56 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   if (height == 0)
     height = gfx->disp_height;
 
+  parent_win = RootWindow(gfx->disp, gfx->scr);
+  black = BlackPixel(gfx->disp, gfx->scr);
+  border = black;
+  background = black;
+
   gfx->win = XCreateSimpleWindow(gfx->disp,
-                                 RootWindow(gfx->disp, gfx->scr),
+                                 parent_win,
                                  xpos, ypos,
                                  width, height,
-                                 0, // border_width
-                                 BlackPixel(gfx->disp, gfx->scr), // border
-                                 WhitePixel(gfx->disp, gfx->scr)); // background
-
+                                 border_width,
+                                 border,
+                                 background);
   if (gfx->win == None) {
-    fprintf(stderr, "native_gfx_create_window(): XCreateSimpleWindow(): Can't create window.\n");
+    fprintf(stderr,
+            "native_gfx_create_window(): XCreateSimpleWindow(): "
+            "Can't create window.\n");
     exit(EXIT_FAILURE);
   }
 
   r = XSelectInput(gfx->disp, gfx->win, ExposureMask|KeyPressMask);
-  assert(r);
+  if (r == 0) {
+    fprintf(stderr,
+            "native_gfx_create_window(): XSelectInput(): failed\n");
+    exit(EXIT_FAILURE);
+  }
 
   r = XMapWindow(gfx->disp, gfx->win);
-  assert(r);
+  if (r == 0) {
+    fprintf(stderr,
+            "native_gfx_create_window(): XMapWindow(): failed\n");
+    exit(EXIT_FAILURE);
+  }
 
   r = XStoreName(gfx->disp, gfx->win, "glslsandbox-player");
-  assert(r);
+  if (r == 0) {
+    fprintf(stderr,
+            "native_gfx_create_window(): XStoreName(): failed\n");
+    exit(EXIT_FAILURE);
+  }
 
-  XNextEvent(gfx->disp, &e);        // Dummy call to make window appear (fails).
+  XNextEvent(gfx->disp, &e); /* Dummy call to make window appear (fails). */
 
-  // The window manager may have resized us; query our actual dimensions.
+  /* The window manager may have resized us; query our actual dimensions. */
   r = XGetWindowAttributes(gfx->disp, gfx->win, &a);
-  assert(r);
+  if (r == 0) {
+    fprintf(stderr,
+            "native_gfx_create_window(): XGetWindowAttributes(): failed\n");
+    exit(EXIT_FAILURE);
+  }
+
   gfx->win_width = a.width;
   gfx->win_height = a.height;
 }
