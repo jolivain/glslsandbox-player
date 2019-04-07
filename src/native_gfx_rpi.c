@@ -127,11 +127,11 @@ get_dispman_layer_opacity(VC_DISPMANX_ALPHA_T *alpha)
   opacity = 255;
   alpha_ptr = NULL;
 
-  opacity_str = getenv("GLSLSANDBOX_PLAYER_RPI_LAYER_OPACITY");
+  opacity_str = getenv("GSP_RPI_LAYER_OPACITY");
   if (opacity_str != NULL) {
     opacity = atoi(opacity_str);
     if (opacity < 0 || opacity >= 256) {
-      fprintf(stderr, "Warning: GLSLSANDBOX_PLAYER_RPI_LAYER_OPACITY must be "
+      fprintf(stderr, "Warning: GSP_RPI_LAYER_OPACITY must be "
               "non-negative and less than 256. Setting to 255.\n");
       opacity = 255;
     }
