@@ -296,7 +296,7 @@ init_drm(native_gfx_t *gfx)
   const char **drv_array;
   size_t drv_count;
 
-  drm_driver_name = getenv("GLSLSANDBOX_PLAYER_DRM_DRIVER");
+  drm_driver_name = getenv("GSP_DRM_DRIVER");
   if (drm_driver_name != NULL) {
     drv_array = &drm_driver_name;
     drv_count = 1;

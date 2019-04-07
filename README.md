@@ -604,7 +604,7 @@ dependencies needs to be installed with the command:
   By default, the program will try to load all DRM drivers, stopping
 at the first one that will successfully load.  This behavior can be
 changed to try to load only one DRM driver, setting the driver name to
-the environement variable `GLSLSANDBOX_PLAYER_DRM_DRIVER`.
+the environment variable `GSP_DRM_DRIVER`.
 
 glslsandbox-player will select, by default, the first connected DRM
 connector for display output. In case of multiple display system, this
