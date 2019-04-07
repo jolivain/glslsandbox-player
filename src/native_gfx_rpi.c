@@ -104,11 +104,11 @@ get_dispman_layer(void)
 
   layer = 0;
 
-  layer_str = getenv("GLSLSANDBOX_PLAYER_RPI_LAYER");
+  layer_str = getenv("GSP_RPI_LAYER");
   if (layer_str != NULL) {
     layer = atoi(layer_str);
     if (layer < 0 || layer >= 128) {
-      fprintf(stderr, "Warning: GLSLSANDBOX_PLAYER_RPI_LAYER must be "
+      fprintf(stderr, "Warning: GSP_RPI_LAYER must be "
               "non-negative and less than 128. Setting to 0.\n");
       layer = 0;
     }
