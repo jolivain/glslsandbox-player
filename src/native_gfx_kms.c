@@ -167,7 +167,8 @@ init_vt(void)
 static const char *modules_g[] = {
   "i915", "amdgpu", "radeon", "nouveau", "vmwgfx", "omapdrm", "exynos",
   "tilcdc", "msm", "sti", "tegra", "imx-drm", "rockchip", "atmel-hlcdc",
-  "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111",
+  "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111", "stm",
+  "sun4i-drm", "armada-drm",
 };
 
 
