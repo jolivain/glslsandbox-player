@@ -612,6 +612,13 @@ behavior can be changed by setting the desired connector ID to the
 `GSP_DRM_CONN` environment variable (ex: `export GSP_DRM_CONN=42`).
 Valid connector IDs can be found with the `modetest` command.
 
+The default CRTC selected is the current one bound to the encoder
+connected to the selected connector (see `man drm-kms` for
+definitions). If no CRTC is bound, then a suitable one is selected
+from the "possible CRTCs" exposed by the DRM driver. A specific CRTC
+can be selected by setting the desired CRTC ID to the `GSP_DRM_CRTC`
+environment variable.
+
 The default display mode (resolution) is the one marked as "preferred"
 by the DRM driver (see `modetest` output). This mode can be changed by
 setting the mode name in the `GSP_DRM_MODE` environment variable (ex:
