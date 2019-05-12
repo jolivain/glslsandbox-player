@@ -71,7 +71,6 @@ struct native_gfx_s
   drmModeRes *drm_moderes;
   drmModeConnector *drm_conn;
   drmModeModeInfo *drm_mode;
-  drmModeEncoder *drm_enc;
   uint32_t drm_crtc_id;
   uint32_t drm_connector_id;
 };
@@ -356,9 +355,10 @@ init_drm(native_gfx_t *gfx)
     return (-1);
   }
 
-  gfx->drm_enc = encoder;
   gfx->drm_crtc_id = encoder->crtc_id;
   gfx->drm_connector_id = gfx->drm_conn->connector_id;
+
+  drmModeFreeEncoder(encoder);
 
   init_vt();
 
@@ -368,7 +368,6 @@ init_drm(native_gfx_t *gfx)
 static void
 clean_drm(native_gfx_t *gfx)
 {
-  drmModeFreeEncoder(gfx->drm_enc);
   drmModeFreeConnector(gfx->drm_conn);
   drmModeFreeResources(gfx->drm_moderes);
   drmClose(gfx->drm_fd);
