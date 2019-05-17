@@ -44,6 +44,9 @@ shader-list-check:
 .SECONDARY: $(SHADER_FILES)
 
 %.inc: %.frag $(srcdir)/glslsandbox-shaders.h
+if ENABLE_SHADER_VALIDATION
+	$(GLSLANGVALIDATOR) $<
+endif
 	$(FRAG2INC) $(SHADER_LIST) $< > $@.tmp
 	mv -f $@.tmp $@
 

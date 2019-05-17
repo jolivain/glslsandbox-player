@@ -97,6 +97,11 @@ case:
 
 https://www.khronos.org/registry/webgl/sdk/tests/conformance/glsl/misc/global-variable-init.html
 
+  Some extra care is taken to make sure that all the shaders included
+in the default reference list are conformant to the GLSL
+specification. See the section [Validating Builtin
+Shaders](#validating-builtin-shaders).
+
   Finally, some shaders can be GPU-time consuming depending of the GPU
 being tested. This is why a relevant selection of shader suited for
 your driver and GPU would be better that a bare dump of the whole
@@ -159,6 +164,7 @@ The build dependencies of glslsandbox are:
   Raspberry Pi, Wayland EGL, SDL2, libdrm and libgbm (for KMS)
 - optional: libpng library and header files for texture support
 - optional: netpbm commands are used by testsuite
+- optional: glslang to validate builtin shaders
 
   Compiling glslsandbox-player should be straightforward if all
 dependencies are present since it's an autotools package (aka
@@ -469,6 +475,28 @@ the target file system. In that case, use the configure command:
   The `make install` command will also install a wrapper script
 `glslsandbox-player-testsuite` that will execute the test suite, as
 same as the `make check` command for native tests.
+
+
+Validating Builtin Shaders
+--------------------------
+
+  To make sure builtin shaders included in a glslsandbox-player build
+are conformant to the GLSL specification, it is possible to add an
+extra validation step at configuration time. This step pass the
+included shaders into the Khronos Group glslang reference
+compiler/validator. See https://github.com/KhronosGroup/glslsang
+
+  If the command `glslangValidator` is found in the PATH, this feature
+is automatically enabled. If the `glslangValidator` is available, but
+the shader validation is not desired, it can be explicitly disabled at
+configuration time, with:
+
+    ./configure --disable-shader-validation
+
+  If the `glslangValidator` program is installed to a custom path, or
+under some other names, it can be forced with the command:
+
+    ac_cv_path_GLSLANGVALIDATOR=/path/to/customValidator ./configure
 
 
 Using glslsandbox-player for Automatic Testing

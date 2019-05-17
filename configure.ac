@@ -30,6 +30,22 @@ AS_IF([test "x$enable_debug" = "xyes"], [
         AC_DEFINE(ENABLE_DEBUG, [1], [Debug messages.])
 ])
 
+AC_PATH_PROG([GLSLANGVALIDATOR], [glslangValidator])
+AC_ARG_ENABLE([shader-validation],
+        AS_HELP_STRING([--enable-shader-validation], [enable shader validation @<:@default=disabled@:>@]),
+        [
+if test -z "$ac_cv_path_GLSLANGVALIDATOR" ; then
+   AC_MSG_ERROR([glslangValidator is needed for shader validation])
+fi
+], [
+if test -z "$ac_cv_path_GLSLANGVALIDATOR" ; then
+    enable_shader_validation=no
+else
+    enable_shader_validation=yes
+fi
+])
+AM_CONDITIONAL([ENABLE_SHADER_VALIDATION], [test "x$enable_shader_validation" = "xyes"])
+
 AC_ARG_WITH([shader-list],
     AS_HELP_STRING([--with-shader-list=LIST], [Define the shader list file @<:@default=shader.list@:>@]),
     [], [with_shader_list=shader.list]
@@ -197,4 +213,5 @@ AC_MSG_RESULT([
     testing: ${enable_testing}
     install testsuite: ${enable_install_testsuite}
     install scripts: ${enable_install_scripts}
+    shader validation: ${enable_shader_validation}
 ])
