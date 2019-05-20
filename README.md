@@ -425,7 +425,7 @@ use the following fragment shader, the the file `texture.glslf`:
     glslsandbox-player -F texture.glslf -0 image.png
 
   For now, supported PNG formats are one to four 8-bit channels
-(Luminance, Luminance+Alpha, RGB and RGBA). Pallete and 16-bit PNG
+(Luminance, Luminance+Alpha, RGB and RGBA). Palette and 16-bit PNG
 files are not supported. Use an image converter if an image is in an
 unsupported format.
 
