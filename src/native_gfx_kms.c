@@ -209,7 +209,7 @@ drm_find_connector_by_id(const native_gfx_t *gfx, uint32_t id)
 }
 
 static drmModeConnector *
-drm_find_connector(native_gfx_t *gfx)
+drm_find_connector(const native_gfx_t *gfx)
 {
   const char *drm_conn_name;
   drmModeConnector *conn = NULL;
@@ -268,7 +268,7 @@ drm_find_mode_by_name(const native_gfx_t *gfx, const char *mode_name)
 }
 
 static drmModeModeInfo *
-drm_find_mode(native_gfx_t *gfx)
+drm_find_mode(const native_gfx_t *gfx)
 {
   const char *drm_mode_name;
   drmModeModeInfo *mode = NULL;
