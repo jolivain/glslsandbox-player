@@ -68,7 +68,6 @@ struct native_gfx_s
 
   /* DRM */
   int drm_fd;
-  drmModeRes *drm_moderes;
   drmModeConnector *drm_conn;
   drmModeModeInfo *drm_mode;
   uint32_t drm_crtc_id;
@@ -171,14 +170,15 @@ static const char *modules_g[] = {
 
 
 static drmModeConnector *
-drm_find_connector_connected(const native_gfx_t *gfx)
+drm_find_connector_connected(const native_gfx_t *gfx,
+                             const drmModeRes *moderes)
 {
   drmModeConnector *connector = NULL;
   int i;
 
-  for (i = 0; i < gfx->drm_moderes->count_connectors; i++) {
+  for (i = 0; i < moderes->count_connectors; i++) {
     connector = drmModeGetConnector(gfx->drm_fd,
-                                    gfx->drm_moderes->connectors[i]);
+                                    moderes->connectors[i]);
     if (connector->connection == DRM_MODE_CONNECTED) {
       break ;
     }
@@ -190,14 +190,16 @@ drm_find_connector_connected(const native_gfx_t *gfx)
 }
 
 static drmModeConnector *
-drm_find_connector_by_id(const native_gfx_t *gfx, uint32_t id)
+drm_find_connector_by_id(const native_gfx_t *gfx,
+                         const drmModeRes *moderes,
+                         uint32_t id)
 {
   drmModeConnector *connector = NULL;
   int i;
 
-  for (i = 0; i < gfx->drm_moderes->count_connectors; ++i) {
+  for (i = 0; i < moderes->count_connectors; ++i) {
     connector = drmModeGetConnector(gfx->drm_fd,
-                                    gfx->drm_moderes->connectors[i]);
+                                    moderes->connectors[i]);
     if (connector->connector_id == id) {
       break ;
     }
@@ -209,21 +211,22 @@ drm_find_connector_by_id(const native_gfx_t *gfx, uint32_t id)
 }
 
 static drmModeConnector *
-drm_find_connector(const native_gfx_t *gfx)
+drm_find_connector(const native_gfx_t *gfx,
+                   const drmModeRes *moderes)
 {
   const char *drm_conn_name;
   drmModeConnector *conn = NULL;
 
   drm_conn_name = getenv("GSP_DRM_CONN");
   if (drm_conn_name == NULL) {
-    conn = drm_find_connector_connected(gfx);
+    conn = drm_find_connector_connected(gfx, moderes);
   }
   else {
     char *endptr;
     unsigned long id;
     id = strtoul(drm_conn_name, &endptr, 10);
     if (endptr[0] == '\0') {
-      conn = drm_find_connector_by_id(gfx, id);
+      conn = drm_find_connector_by_id(gfx, moderes, id);
     }
     else {
       fprintf(stderr,
@@ -286,15 +289,16 @@ drm_find_mode(const native_gfx_t *gfx)
 
 /* Find the current crtc attached to the encoder of the selected connected */
 static uint32_t
-drm_find_crtc_current(const native_gfx_t *gfx)
+drm_find_crtc_current(const native_gfx_t *gfx,
+                      const drmModeRes *moderes)
 {
   drmModeEncoder *encoder = NULL;
   uint32_t crtc_id = 0;
   int i;
 
   /* find encoder: */
-  for (i = 0; i < gfx->drm_moderes->count_encoders; i++) {
-    encoder = drmModeGetEncoder(gfx->drm_fd, gfx->drm_moderes->encoders[i]);
+  for (i = 0; i < moderes->count_encoders; i++) {
+    encoder = drmModeGetEncoder(gfx->drm_fd, moderes->encoders[i]);
     if (encoder->encoder_id == gfx->drm_conn->encoder_id)
       break ;
     drmModeFreeEncoder(encoder);
@@ -351,40 +355,43 @@ drm_find_crtc_for_connector(int drm_fd,
 }
 
 static uint32_t
-drm_find_crtc_possible(const native_gfx_t *gfx)
+drm_find_crtc_possible(const native_gfx_t *gfx,
+                       const drmModeRes *moderes)
 {
   uint32_t crtc_id;
 
   crtc_id = drm_find_crtc_for_connector(gfx->drm_fd,
-                                        gfx->drm_moderes,
+                                        moderes,
                                         gfx->drm_conn);
 
   return (crtc_id);
 }
 
 static uint32_t
-drm_find_crtc_default(const native_gfx_t *gfx)
+drm_find_crtc_default(const native_gfx_t *gfx,
+                      const drmModeRes *moderes)
 {
   uint32_t crtc_id;
 
-  crtc_id = drm_find_crtc_current(gfx);
+  crtc_id = drm_find_crtc_current(gfx, moderes);
 
   if (crtc_id == 0) {
-    crtc_id = drm_find_crtc_possible(gfx);
+    crtc_id = drm_find_crtc_possible(gfx, moderes);
   }
 
   return (crtc_id);
 }
 
 static uint32_t
-drm_find_crtc_id(const native_gfx_t *gfx)
+drm_find_crtc_id(const native_gfx_t *gfx,
+                 const drmModeRes *moderes)
 {
   const char *drm_crtc_id_str;
   uint32_t drm_crtc_id = 0;
 
   drm_crtc_id_str = getenv("GSP_DRM_CRTC");
   if (drm_crtc_id_str == NULL) {
-    drm_crtc_id = drm_find_crtc_default(gfx);
+    drm_crtc_id = drm_find_crtc_default(gfx, moderes);
   }
   else {
     char *endptr;
@@ -441,9 +448,7 @@ init_drm(native_gfx_t *gfx)
     return (-1);
   }
 
-  gfx->drm_moderes = moderes;
-
-  gfx->drm_conn = drm_find_connector(gfx);
+  gfx->drm_conn = drm_find_connector(gfx, moderes);
   if (gfx->drm_conn == NULL) {
     fprintf(stderr, "ERROR: no connected connector!\n");
     return (-1);
@@ -457,11 +462,13 @@ init_drm(native_gfx_t *gfx)
     return (-1);
   }
 
-  gfx->drm_crtc_id = drm_find_crtc_id(gfx);
+  gfx->drm_crtc_id = drm_find_crtc_id(gfx, moderes);
   if (gfx->drm_crtc_id == 0) {
     fprintf(stderr, "ERROR: could not find a CRTC id!\n");
     return (-1);
   }
+
+  drmModeFreeResources(moderes);
 
   init_vt();
 
@@ -472,7 +479,6 @@ static void
 clean_drm(native_gfx_t *gfx)
 {
   drmModeFreeConnector(gfx->drm_conn);
-  drmModeFreeResources(gfx->drm_moderes);
   drmClose(gfx->drm_fd);
 }
 
