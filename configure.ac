@@ -206,12 +206,15 @@ AS_IF([test "x$native_gfx" = "x"], [
 AC_OUTPUT
 
 AC_MSG_RESULT([
-    debug: ${enable_debug}
-    native-gfx:   ${with_native_gfx}
-    libpng support: ${have_libpng}
-    shader list: ${with_shader_list}
-    testing: ${enable_testing}
-    install testsuite: ${enable_install_testsuite}
-    install scripts: ${enable_install_scripts}
-    shader validation: ${enable_shader_validation}
+---------------------
+Configuration summary
+---------------------
+                debug : ${enable_debug}
+           native-gfx : ${with_native_gfx}
+       libpng support : ${have_libpng}
+          shader list : ${with_shader_list}
+              testing : ${enable_testing}
+    install testsuite : ${enable_install_testsuite}
+      install scripts : ${enable_install_scripts}
+    shader validation : ${enable_shader_validation}
 ])
