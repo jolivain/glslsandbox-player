@@ -71,8 +71,6 @@ static const GLenum gl_texture_g[] = {
 static void
 player_cleanup(context_t *ctx)
 {
-  XglFinish();
-
   if (ctx->use_fbo) {
     XglBindFramebuffer(GL_FRAMEBUFFER, 0);
     XglDeleteFramebuffers(2, &ctx->fbo_id[0]);
@@ -1881,6 +1879,8 @@ player_render_loop(context_t *ctx)
     if (last_frame)
       break ;
   }
+
+  XglFinish();
 
   if (ctx->verbose > 0) {
     float render_time;
