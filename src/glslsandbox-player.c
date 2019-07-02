@@ -889,8 +889,8 @@ list_shaders(FILE *fp)
   fprintf(fp, "# 1st column: internal id\n");
   fprintf(fp, "# 2nd column: glslsandbox.com id\n");
   fprintf(fp, "# 3rd column: nickname\n");
-  fprintf(fp, "# 4th column: line of glsl code\n");
-  fprintf(fp, "# 5th column: line of glsl statement code (line including a ';')\n");
+  fprintf(fp, "# 4th column: lines of glsl code\n");
+  fprintf(fp, "# 5th column: lines of glsl statement code (lines including a ';')\n");
 
   s = glslsandbox_shaders_g;
   for (i = 0; s[i].nick != NULL; ++i) {\
