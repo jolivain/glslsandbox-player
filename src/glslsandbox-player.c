@@ -889,6 +889,8 @@ list_shaders(FILE *fp)
 {
   const glslsandbox_shaders_t *s;
   int i;
+  int tot_ln;
+  int tot_st;
 
   fprintf(fp, "# Builtin shader list:\n");
   fprintf(fp, "#\n");
@@ -898,14 +900,20 @@ list_shaders(FILE *fp)
   fprintf(fp, "# 4th column: lines of glsl code\n");
   fprintf(fp, "# 5th column: lines of glsl statement code (lines including a ';')\n");
 
+  tot_ln = 0;
+  tot_st = 0;
   s = glslsandbox_shaders_g;
-  for (i = 0; s[i].nick != NULL; ++i) {\
+  for (i = 0; s[i].nick != NULL; ++i) {
       int ln;
       int st;
       get_line_counts(s[i].frag, &ln, &st);
       fprintf(fp, "%i\t%6i.%-3i\t%-24s\t%i\t%i\n", i, s[i].id, s[i].rev, s[i].nick,
               ln, st);
+      tot_ln += ln;
+      tot_st += st;
   }
+
+  fprintf(fp, "# Total:\t\t\t\t\t\t%i\t%i\n", tot_ln, tot_st);
 }
 
 
