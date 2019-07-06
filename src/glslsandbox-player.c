@@ -573,7 +573,13 @@ load_png_texture(context_t *ctx, int tex)
 
   free(img);
 #else
-  fprintf(stderr, "WARNING: libpng support is not was not enabled at compilation.\n");
+  /* UNUSED agruments */
+  (void)ctx;
+  (void)tex;
+  fprintf(stderr,
+          "WARNING: libpng support is not was not enabled at compilation.\n");
+  fprintf(stderr,
+          "WARNING: texture file ignored and NOT loaded.\n");
 #endif /* HAVE_LIBPNG */
 }
 
