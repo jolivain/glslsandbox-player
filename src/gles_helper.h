@@ -20,6 +20,9 @@ void
 __xgles_check_error(const char *file, int line, const char *func);
 
 void
+__xgles_glActiveTexture(const char *file, int line, GLenum texture);
+
+void
 __xgles_glAttachShader(const char *file, int line, GLuint program, GLuint shader);
 
 void
@@ -212,6 +215,9 @@ void
 __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, GLsizei height);
 
 
+#define XglActiveTexture(texture) \
+  __xgles_glActiveTexture(__FILE__, __LINE__, texture)
+
 #define XglAttachShader(program, shader) \
   __xgles_glAttachShader(__FILE__, __LINE__, program, shader)
 
@@ -399,6 +405,9 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
   __xgles_glViewport(__FILE__, __LINE__, x, y, width, height)
 
 #else /* defined(XGLES_STRICT) */
+
+#define XglActiveTexture(texture) \
+  glActiveTexture(texture)
 
 #define XglAttachShader(program, shader) \
   glAttachShader(program, shader)

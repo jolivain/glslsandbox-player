@@ -71,6 +71,13 @@ __xgles_check_error(const char *file, int line, const char *func)
 }
 
 void
+__xgles_glActiveTexture(const char *file, int line, GLenum texture)
+{
+  glActiveTexture(texture);
+  __xgles_check_error(file, line, "glActiveTexture");
+}
+
+void
 __xgles_glAttachShader(const char *file, int line, GLuint program, GLuint shader)
 {
   glAttachShader(program, shader);
