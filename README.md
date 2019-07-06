@@ -23,7 +23,7 @@ For Ubuntu from 14.04 to 18.04 LTS:
       git curl make gcc autoconf automake libx11-dev \
       libegl1-mesa-dev libgles2-mesa-dev
 
-For Fedora (tested on version 21 to 27):
+For Fedora (tested on version 21 to 30):
 
     sudo dnf install \
       git curl make gcc autoconf automake libX11-devel \
