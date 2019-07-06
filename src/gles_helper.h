@@ -12,6 +12,12 @@
 
 #define XGLES_STRICT 1
 
+#if defined(ENABLE_RPI) || defined(ENABLE_TISGX) || defined(ENABLE_MALI)
+#define GL_SHADER_SOURCE_CONST
+#else
+#define GL_SHADER_SOURCE_CONST const
+#endif
+
 #if defined(XGLES_STRICT)
 
 #include <GLES2/gl2.h>
@@ -168,12 +174,6 @@ __xgles_glReadPixels(const char *file, int line, GLint x, GLint y, GLsizei width
 
 void
 __xgles_glReleaseShaderCompiler(const char *file, int line);
-
-#if defined(ENABLE_RPI) || defined(ENABLE_TISGX) || defined(ENABLE_MALI)
-#define GL_SHADER_SOURCE_CONST
-#else
-#define GL_SHADER_SOURCE_CONST const
-#endif
 
 void
 __xgles_glShaderSource(const char *file, int line, GLuint shader, GLsizei count, const GLchar * GL_SHADER_SOURCE_CONST *string, const GLint *length);
