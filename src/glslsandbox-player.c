@@ -590,7 +590,7 @@ setup_textures(context_t *ctx)
     ctx->texture[i].u_tex = XglGetUniformLocation(ctx->gl_prog, u_name);
 
     if (ctx->texture[i].u_tex >= 0) {
-      glActiveTexture(gl_texture_g[i]);
+      XglActiveTexture(gl_texture_g[i]);
       load_png_texture(ctx, i);
       XglUniform1i(ctx->texture[i].u_tex, i);
     }
@@ -761,7 +761,7 @@ draw_frame(context_t *ctx)
 
   for (i = 0; i < MAX_TEXTURES; ++i) {
     if (ctx->texture[i].u_tex >= 0) {
-      glActiveTexture(gl_texture_g[i]);
+      XglActiveTexture(gl_texture_g[i]);
       XglBindTexture(GL_TEXTURE_2D, ctx->texture[i].id);
       XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       XglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
