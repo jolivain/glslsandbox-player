@@ -1750,13 +1750,31 @@ fprintf_egl_info(FILE *fp, int verbose)
 
     fprintf(fp, "EGL_CLIENT_APIS             : %s\n", client_apis);
 
+    /* EGL 1.5 has distinct notion of "Client" and "Display"
+     * extensions. "Client" extensions are global to the
+     * implementation (usually native platforms). "Display" are
+     * specific to the initialized display.
+     * See: https://www.khronos.org/registry/EGL/specs/eglspec.1.5.pdf
+     * Section 3.3: EGL Queries, eglQueryString()
+     */
+    if (strcmp("1.5", version) == 0) {
+      exts = XeglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+      if (exts == NULL) {
+        fprintf(stderr, "ERROR: eglQueryString(EGL_EXTENSIONS); returned NULL\n");
+        exit(EXIT_FAILURE);
+      }
+
+      fprintf(fp, "EGL_EXTENSIONS (client)     :\n");
+      fprintf_gl_extensions(stderr, "    ", exts, "\n");
+    }
+
     exts = XeglQueryString(dpy, EGL_EXTENSIONS);
     if (exts == NULL) {
       fprintf(stderr, "ERROR: eglQueryString(EGL_EXTENSIONS); returned NULL\n");
       exit(EXIT_FAILURE);
     }
 
-    fprintf(fp, "EGL_EXTENSIONS              :\n");
+    fprintf(fp, "EGL_EXTENSIONS (display)    :\n");
     fprintf_gl_extensions(stderr, "    ", exts, "\n");
   }
 
