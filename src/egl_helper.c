@@ -602,7 +602,7 @@ egl_swap_interval(egl_t *egl, int interval)
 #endif /* ENABLE_SDL2 */
 
 /*
-* Copyright (c) 2015-2019, Julien Olivain <juju@cotds.org>
+* Copyright (c) 2015-2020, Julien Olivain <juju@cotds.org>
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
