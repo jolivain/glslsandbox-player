@@ -1,26 +1,32 @@
-#! /usr/bin/env bash
+#! /bin/sh
 
-if [[ -x "src/glslsandbox-player" ]] ; then
-    : "${GLSLSANDBOX_PLAYER:=src/glslsandbox-player}"
+WORK_DIR="$(dirname "$0")"
+
+DEFAULT_BIN=$(readlink -f "${WORK_DIR}/../src/glslsandbox-player" || :)
+if [ -x "${DEFAULT_BIN}" ] ; then
+    : "${GLSLSANDBOX_PLAYER:=${DEFAULT_BIN}}"
 else
     : "${GLSLSANDBOX_PLAYER:=glslsandbox-player}"
 fi
 
-${GLSLSANDBOX_PLAYER} -l |
-    awk '1 == /^[0-9]+/ {print $3;}' |
+# If "timeout" knows --foreground option, use it:
+TIMEOUT_FG=""
+timeout --foreground 1 true && TIMEOUT_FG="--foreground"
+
+"${WORK_DIR}"/ls-shaders -n |
     while read -r shader_name ; do
         echo
         echo "---------------------------------------------------"
         echo "Running shader ${shader_name}"
         timeout \
-            --foreground \
-            --kill-after=1 30 \
+            ${TIMEOUT_FG} \
+            -s KILL 60 \
             "${GLSLSANDBOX_PLAYER}" -W 640 -H 360 -t 3 -w 0 -S "${shader_name}"
         RET=$?
 
-        if [[ $RET -eq 124 ]] ; then
+        if [ $RET -eq 124 ] ; then
             echo "Execution of shader ${shader_name} timed out"
-        elif [[ $RET -ne 0 ]] ; then
+        elif [ $RET -ne 0 ] ; then
             echo "Execution of shader ${shader_name} failed"
         fi
 done
