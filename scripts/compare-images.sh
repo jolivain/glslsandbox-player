@@ -1,8 +1,8 @@
-#! /bin/bash
+#! /bin/sh
 
 set -u
 
-if [[ $# -ne 3 ]] ; then
+if [ $# -ne 3 ] ; then
     echo "Usage: $0 <png-dir1> <png-dir2> <compare-output>"
     exit 1
 fi
@@ -13,7 +13,7 @@ OUT_DIR="$3"
 
 mkdir -p "${OUT_DIR}"
 
-for image1 in ${IMG_DIR1}/*.png ; do
+for image1 in "${IMG_DIR1}"/*.png ; do
     img="$(basename "${image1}")"
     image2="${IMG_DIR2}/${img}"
     if [ -f "${image2}" ] ; then
