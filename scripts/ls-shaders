@@ -1,0 +1,100 @@
+#! /bin/sh
+
+WORK_DIR="$(dirname "$0")"
+
+DEFAULT_BIN=$(readlink -f "${WORK_DIR}/../src/glslsandbox-player" || :)
+if [ -x "${DEFAULT_BIN}" ] ; then
+    : "${GLSLSANDBOX_PLAYER:=${DEFAULT_BIN}}"
+else
+    : "${GLSLSANDBOX_PLAYER:=glslsandbox-player}"
+fi
+
+do_sort_by_name()
+{
+    # builtin shaders are already sorted
+    cat
+}
+
+do_sort_by_rev_name()
+{
+    # builtin shaders are already sorted
+    tac
+}
+
+do_sort_by_id()
+{
+    sort -n -k2
+}
+
+do_sort_by_rev_id()
+{
+    sort -r -n -k2
+}
+
+do_sort_by_linecount()
+{
+    sort -n -k4
+}
+
+do_sort_by_rev_linecount()
+{
+    sort -r -n -k4
+}
+
+do_sort_by_size()
+{
+    sort -n -k6
+}
+
+do_sort_by_rev_size()
+{
+    sort -r -n -k6
+}
+
+do_sort_random()
+{
+    shuf
+}
+
+do_list_shaders()
+{
+    "${GLSLSANDBOX_PLAYER}" -l |
+        awk '1 == /^[0-9]+/ {print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6;}'
+}
+
+: ${SORT_ORDER:=by_name}
+
+case "${1:-}" in
+    -n)
+        SORT_ORDER="by_name"
+        ;;
+    -N)
+        SORT_ORDER="by_rev_name"
+        ;;
+    -i)
+        SORT_ORDER="by_id"
+        ;;
+    -I)
+        SORT_ORDER="by_rev_id"
+        ;;
+    -l)
+        SORT_ORDER="by_linecount"
+        ;;
+    -L)
+        SORT_ORDER="by_rev_linecount"
+        ;;
+    -s)
+        SORT_ORDER="by_size"
+        ;;
+    -S)
+        SORT_ORDER="by_rev_size"
+        ;;
+    -r)
+        SORT_ORDER="random"
+        ;;
+esac
+
+do_list_shaders | do_sort_${SORT_ORDER} |
+    while read -r _ _ shader_name _ ; do
+        echo "${shader_name}"
+    done
