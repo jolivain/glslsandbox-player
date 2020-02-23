@@ -139,7 +139,7 @@ __xegl_eglGetDisplay(const char *file, int line,
   return (ret);
 }
 
-#if defined(EGL_VERSION_1_5)
+#if defined(EGL_VERSION_1_5) && defined(HAVE_EGLGETPLATFORMDISPLAY)
 EGLDisplay
 __xegl_eglGetPlatformDisplay(const char *file, int line,
                              EGLenum platform,
@@ -529,7 +529,7 @@ egl_init(int width, int height, int xpos, int ypos)
 
   egl->native_gfx = native_gfx_open_display();
   egl_native_disp = native_gfx_get_egl_native_display(egl->native_gfx);
-#if defined(ENABLE_KMS) && defined(EGL_VERSION_1_5) && defined(EGL_KHR_platform_gbm)
+#if defined(ENABLE_KMS) && defined(EGL_VERSION_1_5) && defined(EGL_KHR_platform_gbm) && defined(HAVE_EGLGETPLATFORMDISPLAY)
   egl->dpy = XeglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, egl_native_disp, NULL);
 #else
   egl->dpy = XeglGetDisplay(egl_native_disp);

@@ -69,7 +69,7 @@ EGLDisplay
 __xegl_eglGetDisplay(const char *file, int line,
                      EGLNativeDisplayType display_id);
 
-#if defined(EGL_VERSION_1_5)
+#if defined(EGL_VERSION_1_5) && defined(HAVE_EGLGETPLATFORMDISPLAY)
 EGLDisplay
 __xegl_eglGetPlatformDisplay(const char *file, int line,
                              EGLenum platform,
@@ -137,7 +137,7 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglGetDisplay(display_id) \
   __xegl_eglGetDisplay(__FILE__, __LINE__, display_id)
 
-#if defined(EGL_VERSION_1_5)
+#if defined(EGL_VERSION_1_5) && defined(HAVE_EGLGETPLATFORMDISPLAY)
 #define XeglGetPlatformDisplay(platform, native_display, attrib_list) \
   __xegl_eglGetPlatformDisplay(__FILE__, __LINE__, platform, native_display, attrib_list)
 #endif
@@ -189,7 +189,7 @@ __xegl_eglTerminate(const char *file, int line,
 #define XeglGetDisplay(display_id) \
   eglGetDisplay(display_id)
 
-#if defined(EGL_VERSION_1_5)
+#if defined(EGL_VERSION_1_5) && defined(HAVE_EGLGETPLATFORMDISPLAY)
 #define XeglGetPlatformDisplay(platform, native_display, attrib_list) \
   eglGetPlatformDisplay(platform, native_display, attrib_list)
 #endif

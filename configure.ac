@@ -74,6 +74,8 @@ AC_CHECK_HEADERS([EGL/eglext.h], [], [],
 [[#include <EGL/egl.h>
 ]])
 
+AC_CHECK_FUNCS([eglGetPlatformDisplay])
+
 AC_ARG_WITH([libpng],
     AS_HELP_STRING([--with-libpng], [Enable libpng support @<:@default=enabled@:>@]),
     [], [with_libpng=yes]
