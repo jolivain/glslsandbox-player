@@ -187,6 +187,47 @@ x11_setup_window_fullscreen(native_gfx_t *gfx)
   }
 }
 
+static void
+x11_hide_cursor(native_gfx_t *gfx)
+{
+  Cursor invisible_cursor;
+  Pixmap bitmap_nodata;
+  XColor black;
+  static char nodata[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+  black.red = 0;
+  black.green = 0;
+  black.blue = 0;
+
+  bitmap_nodata = XCreateBitmapFromData(gfx->disp, gfx->win, nodata, 8, 8);
+  invisible_cursor = XCreatePixmapCursor(gfx->disp,
+                                         bitmap_nodata, bitmap_nodata,
+                                         &black, &black, 0, 0);
+  XDefineCursor(gfx->disp, gfx->win, invisible_cursor);
+  XFreeCursor(gfx->disp, invisible_cursor);
+  XFreePixmap(gfx->disp, bitmap_nodata);
+}
+
+static void
+x11_setup_cursor(native_gfx_t *gfx)
+{
+  const char *cursor;
+
+  cursor = getenv("GSP_X11_CURSOR");
+  if (cursor != NULL) {
+    if (strcmp(cursor, "0") == 0) {
+      x11_hide_cursor(gfx);
+    }
+  }
+  else {
+    /* if environment variable is undefined, and fullscreen was
+       requested, automatically hide the cursor. */
+    if (gfx->fullscreen != 0) {
+      x11_hide_cursor(gfx);
+    }
+  }
+}
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -251,6 +292,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   x11_setup_delete_message(gfx);
   x11_setup_window_stacking_order(gfx);
   x11_setup_window_fullscreen(gfx);
+  x11_setup_cursor(gfx);
 
   /* The window manager may have resized us; query our actual dimensions. */
   status = XGetWindowAttributes(gfx->disp, gfx->win, &a);

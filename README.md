@@ -646,6 +646,12 @@ windows having transparent areas).
 environment variable to `1`. If the window manager honor the request,
 the window surface will have the same dimension as the screen.
 
+  Mouse cursor can be disabled/hidden by setting `GSP_X11_CURSOR`
+environment variable to `0`. When the variable is unset, the standard
+cursor is kept in windowed mode, and automatically disabled when
+fullscreen is requested. The mouse cursor can be forced to be shown by
+setting `GSP_X11_CURSOR` to `1`.
+
 
 Notes on KMS DRM Native Windowing
 ---------------------------------
