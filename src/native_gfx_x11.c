@@ -80,7 +80,8 @@ void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
   XEvent e;
-  Status r;
+  Status status;
+  int ret;
   XWindowAttributes a;
   Window parent_win;
   unsigned long black;
@@ -113,22 +114,22 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
-  r = XSelectInput(gfx->disp, gfx->win, ExposureMask|KeyPressMask);
-  if (r == 0) {
+  status = XSelectInput(gfx->disp, gfx->win, ExposureMask|KeyPressMask);
+  if (status == False) {
     fprintf(stderr,
             "native_gfx_create_window(): XSelectInput(): failed\n");
     exit(EXIT_FAILURE);
   }
 
-  r = XMapWindow(gfx->disp, gfx->win);
-  if (r == 0) {
+  status = XMapWindow(gfx->disp, gfx->win);
+  if (status == False) {
     fprintf(stderr,
             "native_gfx_create_window(): XMapWindow(): failed\n");
     exit(EXIT_FAILURE);
   }
 
-  r = XStoreName(gfx->disp, gfx->win, "glslsandbox-player");
-  if (r == 0) {
+  ret = XStoreName(gfx->disp, gfx->win, "glslsandbox-player");
+  if (ret == 0) {
     fprintf(stderr,
             "native_gfx_create_window(): XStoreName(): failed\n");
     exit(EXIT_FAILURE);
@@ -137,8 +138,8 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   XNextEvent(gfx->disp, &e); /* Dummy call to make window appear (fails). */
 
   /* The window manager may have resized us; query our actual dimensions. */
-  r = XGetWindowAttributes(gfx->disp, gfx->win, &a);
-  if (r == 0) {
+  status = XGetWindowAttributes(gfx->disp, gfx->win, &a);
+  if (status == False) {
     fprintf(stderr,
             "native_gfx_create_window(): XGetWindowAttributes(): failed\n");
     exit(EXIT_FAILURE);
