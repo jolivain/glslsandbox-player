@@ -618,6 +618,16 @@ For more details, refer to apitrace documentation:
 http://apitrace.github.io/
 
 
+Notes on X11 Native Windowing
+-----------------------------
+
+  By default, the program will start a X11 window with decoration
+covering the full screen. The actual window surface will depend on the
+window manager (menu bars, etc). The window size can be controlled
+with `-W` and `-H` command line arguments. The program can be
+terminated with keys `q`, `Q` or `Escape`.
+
+
 Notes on KMS DRM Native Windowing
 ---------------------------------
 

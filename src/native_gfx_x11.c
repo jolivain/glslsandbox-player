@@ -18,6 +18,7 @@
 
 #include <EGL/egl.h>
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 
 #include "native_gfx.h"
 
@@ -164,10 +165,44 @@ native_gfx_close_display(native_gfx_t *gfx)
   free(gfx);
 }
 
+static void
+x11_check_events(native_gfx_t *gfx)
+{
+  while (XPending(gfx->disp) > 0) {
+    XEvent xev;
+
+    memset(&xev, 0, sizeof (xev));
+    XNextEvent(gfx->disp, &xev);
+
+    if (xev.type == KeyPress) {
+      KeySym keysym;
+      const char *keystr;
+
+      keysym = XkbKeycodeToKeysym(gfx->disp, xev.xkey.keycode, 0, 0);
+      if (keysym == NoSymbol) {
+        fprintf(stderr, "WARNING: XkbKeycodeToKeysym() returned NoSymbol.");
+        continue ;
+      }
+
+      keystr = XKeysymToString(keysym);
+      if (keystr == NULL)
+        continue ;
+
+      if (strcmp("Escape", keystr) == 0
+          || strcmp("q", keystr) == 0
+          || strcmp("Q", keystr) == 0) {
+        exit(EXIT_SUCCESS);
+      }
+    }
+  }
+}
+
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  GFX_UNUSED(gfx);
+  /* Read and dispatch events in the swap buffers callback.
+   * There is no specific hook to do various maintenance tasks. */
+  x11_check_events(gfx);
 }
 
 int
