@@ -635,6 +635,17 @@ window will have an empty title. This is useful to work with X11
 programs (`xprop`, `xwininfo`, `wmctrl`, ...) identifying windows with
 their name, and there is several instance of the program running.
 
+  The window stacking order can be controlled with the
+`GSP_X11_WIN_STACKING` environment variable. If set to `above` the
+window will be always on top other windows (which have a default
+stacking order). If set to `below`, the window will be below other
+windows (this can be useful to put the the program behind other
+windows having transparent areas).
+
+  Complete full screen can be requsted by setting `GSP_X11_FULLSCREEN`
+environment variable to `1`. If the window manager honor the request,
+the window surface will have the same dimension as the screen.
+
 
 Notes on KMS DRM Native Windowing
 ---------------------------------

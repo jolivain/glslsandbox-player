@@ -31,6 +31,7 @@ struct native_gfx_s
   int disp_height;
   int win_width;
   int win_height;
+  int fullscreen;
   Atom wmDeleteMessage;
 };
 
@@ -98,6 +99,94 @@ x11_window_name_string(void)
   return (win_name);
 }
 
+static void
+x11_set_wm_state_add(native_gfx_t *gfx,
+                     const char *atom_name)
+{
+  Atom wm_state;
+  Atom wm_state_prop;
+  XEvent event;
+
+  wm_state = XInternAtom(gfx->disp, "_NET_WM_STATE", False);
+  wm_state_prop = XInternAtom(gfx->disp, atom_name, False);
+  if ((wm_state != None) && (wm_state_prop != None)) {
+    event.xclient.type = ClientMessage;
+    event.xclient.serial = 0;
+    event.xclient.send_event = True;
+    event.xclient.display = gfx->disp;
+    event.xclient.window = gfx->win;
+    event.xclient.message_type = wm_state;
+    event.xclient.format = 32;
+    event.xclient.data.l[0] = 1; /* _NET_WM_STATE_ADD */
+    event.xclient.data.l[1] = wm_state_prop;
+    event.xclient.data.l[2] = 0;
+    event.xclient.data.l[3] = 1;
+    event.xclient.data.l[4] = 0;
+
+    XSendEvent(gfx->disp, DefaultRootWindow(gfx->disp), False,
+               SubstructureRedirectMask | SubstructureNotifyMask, &event);
+  }
+}
+
+static void
+x11_set_window_above(native_gfx_t *gfx)
+{
+  x11_set_wm_state_add(gfx, "_NET_WM_STATE_ABOVE");
+}
+
+static void
+x11_set_window_below(native_gfx_t *gfx)
+{
+  x11_set_wm_state_add(gfx, "_NET_WM_STATE_BELOW");
+}
+
+static void
+x11_setup_window_stacking_order(native_gfx_t *gfx)
+{
+  const char *stacking;
+
+  stacking = getenv("GSP_X11_WIN_STACKING");
+  if (stacking != NULL) {
+    if (strcmp(stacking, "above") == 0) {
+      x11_set_window_above(gfx);
+    }
+    else if (strcmp(stacking, "below") == 0) {
+      x11_set_window_below(gfx);
+    }
+    else {
+      fprintf(stderr,
+              "WARNING: Invalid value of GSP_X11_WIN_STACKING variable.\n"
+              "WARNING: Ignoring. Valid values are "
+              "\"above\" or \"below\".\n");
+    }
+  }
+}
+
+static void
+x11_set_window_fullscreen(native_gfx_t *gfx)
+{
+  x11_set_wm_state_add(gfx, "_NET_WM_STATE_FULLSCREEN");
+  gfx->fullscreen = 1;
+}
+
+static void
+x11_setup_window_fullscreen(native_gfx_t *gfx)
+{
+  const char *fullscreen;
+
+  fullscreen = getenv("GSP_X11_FULLSCREEN");
+  if (fullscreen != NULL) {
+    if (strcmp(fullscreen, "1") == 0) {
+      x11_set_window_fullscreen(gfx);
+    }
+    else {
+      fprintf(stderr,
+              "WARNING: Invalid value of GSP_X11_FULLSCREEN variable.\n"
+              "WARNING: Ignoring. Valid value is \"1\".\n");
+    }
+  }
+}
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -160,6 +249,8 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   XNextEvent(gfx->disp, &e); /* Dummy call to make window appear (fails). */
 
   x11_setup_delete_message(gfx);
+  x11_setup_window_stacking_order(gfx);
+  x11_setup_window_fullscreen(gfx);
 
   /* The window manager may have resized us; query our actual dimensions. */
   status = XGetWindowAttributes(gfx->disp, gfx->win, &a);
