@@ -24,6 +24,7 @@ echo "  {"
 echo "    ${FRAG_ID}, ${FRAG_REV}, \"${FRAG_NICK}\","
 
 sed -r \
+    -e 's/[[:blank:]]+$//' \
     -e 's/\\/\\\\/g' \
     -e 's/"/\\"/g' \
     -e 's/^/"/' \
