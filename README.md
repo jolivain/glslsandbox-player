@@ -625,7 +625,8 @@ Notes on X11 Native Windowing
 covering the full screen. The actual window surface will depend on the
 window manager (menu bars, etc). The window size can be controlled
 with `-W` and `-H` command line arguments. The program can be
-terminated with keys `q`, `Q` or `Escape`.
+terminated with keys `q`, `Q` or `Escape`. The program can also be
+close by using the "Close Window" X button in window title bar.
 
 
 Notes on KMS DRM Native Windowing

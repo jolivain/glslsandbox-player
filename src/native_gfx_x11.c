@@ -31,6 +31,7 @@ struct native_gfx_s
   int disp_height;
   int win_width;
   int win_height;
+  Atom wmDeleteMessage;
 };
 
 char *
@@ -75,6 +76,13 @@ NativeWindowType
 native_gfx_get_egl_native_window(const native_gfx_t *gfx)
 {
   return (gfx->win);
+}
+
+static void
+x11_setup_delete_message(native_gfx_t *gfx)
+{
+  gfx->wmDeleteMessage = XInternAtom(gfx->disp, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols(gfx->disp, gfx->win, &gfx->wmDeleteMessage, 1);
 }
 
 void
@@ -138,6 +146,8 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
   XNextEvent(gfx->disp, &e); /* Dummy call to make window appear (fails). */
 
+  x11_setup_delete_message(gfx);
+
   /* The window manager may have resized us; query our actual dimensions. */
   status = XGetWindowAttributes(gfx->disp, gfx->win, &a);
   if (status == False) {
@@ -191,6 +201,11 @@ x11_check_events(native_gfx_t *gfx)
       if (strcmp("Escape", keystr) == 0
           || strcmp("q", keystr) == 0
           || strcmp("Q", keystr) == 0) {
+        exit(EXIT_SUCCESS);
+      }
+    }
+    else if (xev.type == ClientMessage) {
+      if ((Atom)(xev.xclient.data.l[0]) == gfx->wmDeleteMessage) {
         exit(EXIT_SUCCESS);
       }
     }
