@@ -85,6 +85,19 @@ x11_setup_delete_message(native_gfx_t *gfx)
   XSetWMProtocols(gfx->disp, gfx->win, &gfx->wmDeleteMessage, 1);
 }
 
+static const char *
+x11_window_name_string(void)
+{
+  const char *win_name;
+
+  win_name = getenv("GSP_X11_WIN_NAME");
+  if (win_name == NULL) {
+    win_name = "glslsandbox-player";
+  }
+
+  return (win_name);
+}
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -137,7 +150,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
-  ret = XStoreName(gfx->disp, gfx->win, "glslsandbox-player");
+  ret = XStoreName(gfx->disp, gfx->win, x11_window_name_string());
   if (ret == 0) {
     fprintf(stderr,
             "native_gfx_create_window(): XStoreName(): failed\n");

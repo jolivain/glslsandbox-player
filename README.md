@@ -628,6 +628,13 @@ with `-W` and `-H` command line arguments. The program can be
 terminated with keys `q`, `Q` or `Escape`. The program can also be
 close by using the "Close Window" X button in window title bar.
 
+  By default, the window name (title) is "glslsandbox-player". The
+name of the window can be changed by setting the `GSP_X11_WIN_NAME`
+environment variable. If the variable is set to the empty string "",
+window will have an empty title. This is useful to work with X11
+programs (`xprop`, `xwininfo`, `wmctrl`, ...) identifying windows with
+their name, and there is several instance of the program running.
+
 
 Notes on KMS DRM Native Windowing
 ---------------------------------
