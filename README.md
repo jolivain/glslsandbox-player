@@ -652,6 +652,11 @@ cursor is kept in windowed mode, and automatically disabled when
 fullscreen is requested. The mouse cursor can be forced to be shown by
 setting `GSP_X11_CURSOR` to `1`.
 
+  Window decorations can be disabled by setting `GSP_X11_DECORATION`
+environment variable to `0`. Note this function is implemented using
+the "_MOTIF_WM_HINTS" X11 window property. The window manager must
+respond to that property to actually disable the decoration.
+
 
 Notes on KMS DRM Native Windowing
 ---------------------------------

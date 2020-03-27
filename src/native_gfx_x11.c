@@ -228,6 +228,46 @@ x11_setup_cursor(native_gfx_t *gfx)
   }
 }
 
+typedef struct
+{
+  unsigned long flags;
+  unsigned long functions;
+  unsigned long decorations;
+  long input_mode;
+  unsigned long status;
+} MotifWmHints;
+
+static void
+x11_disable_decoration(native_gfx_t *gfx)
+{
+  MotifWmHints hints;
+  Atom property;
+  int nelements;
+
+  memset(&hints, 0, sizeof (hints));
+  hints.flags = 2;
+
+  property = XInternAtom(gfx->disp, "_MOTIF_WM_HINTS", False);
+  nelements = sizeof (hints) / sizeof (long);
+
+  XChangeProperty(gfx->disp, gfx->win,
+                  property, property, 32, PropModeReplace,
+                  (unsigned char *)&hints, nelements);
+}
+
+static void
+x11_setup_decoration(native_gfx_t *gfx)
+{
+  const char *decoration;
+
+  decoration = getenv("GSP_X11_DECORATION");
+  if (decoration != NULL) {
+    if (strcmp(decoration, "0") == 0) {
+      x11_disable_decoration(gfx);
+    }
+  }
+}
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -289,6 +329,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
   XNextEvent(gfx->disp, &e); /* Dummy call to make window appear (fails). */
 
+  x11_setup_decoration(gfx);
   x11_setup_delete_message(gfx);
   x11_setup_window_stacking_order(gfx);
   x11_setup_window_fullscreen(gfx);
