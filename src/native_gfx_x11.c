@@ -268,6 +268,17 @@ x11_setup_decoration(native_gfx_t *gfx)
   }
 }
 
+static Bool
+x11_window_is_visible(Display *display, XEvent *event, XPointer arg)
+{
+    Window window = (Window)arg;
+
+    GFX_UNUSED(display);
+
+    return (event->type == MapNotify) && (event->xmap.window == window);
+}
+
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -276,6 +287,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   int ret;
   XWindowAttributes a;
   Window parent_win;
+  long event_mask;
   unsigned long black;
   unsigned long border;
   unsigned long background;
@@ -306,7 +318,9 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
-  status = XSelectInput(gfx->disp, gfx->win, ExposureMask|KeyPressMask);
+  event_mask = ExposureMask | KeyPressMask
+    | StructureNotifyMask | SubstructureNotifyMask;
+  status = XSelectInput(gfx->disp, gfx->win, event_mask);
   if (status == False) {
     fprintf(stderr,
             "native_gfx_create_window(): XSelectInput(): failed\n");
@@ -327,13 +341,14 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
-  XNextEvent(gfx->disp, &e); /* Dummy call to make window appear (fails). */
-
   x11_setup_decoration(gfx);
   x11_setup_delete_message(gfx);
   x11_setup_window_stacking_order(gfx);
   x11_setup_window_fullscreen(gfx);
   x11_setup_cursor(gfx);
+
+  /* Wait for the window to appear */
+  XPeekIfEvent(gfx->disp, &e, &x11_window_is_visible, (XPointer)(gfx->win) );
 
   /* The window manager may have resized us; query our actual dimensions. */
   status = XGetWindowAttributes(gfx->disp, gfx->win, &a);
