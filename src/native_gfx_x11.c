@@ -278,6 +278,24 @@ x11_window_is_visible(Display *display, XEvent *event, XPointer arg)
     return (event->type == MapNotify) && (event->xmap.window == window);
 }
 
+/* Set the window min/max size hints to the actual window size.  Most
+ * window manager will detect that and will remove the ability to
+ * resize the window, and also remove the maximize button in title
+ * bar. */
+static void
+x11_setup_window_size_hints(native_gfx_t *gfx)
+{
+  XSizeHints sizeHints;
+
+  memset(&sizeHints, 0, sizeof (sizeHints));
+  sizeHints.flags = PMinSize | PMaxSize;
+  sizeHints.min_width = gfx->win_width;
+  sizeHints.min_height = gfx->win_height;
+  sizeHints.max_width = gfx->win_width;
+  sizeHints.max_height = gfx->win_height;
+
+  XSetWMNormalHints(gfx->disp, gfx->win, &sizeHints);
+}
 
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
@@ -360,6 +378,8 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
   gfx->win_width = a.width;
   gfx->win_height = a.height;
+
+  x11_setup_window_size_hints(gfx);
 }
 
 void
