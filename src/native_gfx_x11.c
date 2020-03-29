@@ -359,6 +359,10 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
+  /* Position defined at window creation is not enough.
+   * Explicitly move the window at the requested position. */
+  XMoveWindow( gfx->disp, gfx->win, xpos, ypos );
+
   x11_setup_decoration(gfx);
   x11_setup_delete_message(gfx);
   x11_setup_window_stacking_order(gfx);
