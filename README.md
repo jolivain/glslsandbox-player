@@ -159,7 +159,7 @@ The build dependencies of glslsandbox are:
 - awk
 - grep
 - coreutils (sort, cat)
-- Python 2.6 or greater (also works with Python 3.x)
+- Python 3.x or greater (also works with older Python >= 2.6)
 - Development files for an OpenGL ES 2.0 and EGL library
 - One of the following native window library: X11, Vivante/libGAL,
   Raspberry Pi, Wayland EGL, SDL2, libdrm and libgbm (for KMS)
