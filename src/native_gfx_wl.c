@@ -29,6 +29,10 @@
 #include <wayland-client.h>
 #include <wayland-egl.h>
 
+#ifdef ENABLE_WL_XDG
+#include "xdg-shell-client-protocol.h"
+#endif /* ENABLE_WL_XDG */
+
 #ifdef ENABLE_WL_IVI
 # include <sys/types.h>
 # include <unistd.h>
@@ -55,11 +59,30 @@ struct native_gfx_s
   /* struct wl_region *region; */
   struct wl_shell *shell;
   struct wl_shell_surface *shell_surface;
+#ifdef ENABLE_WL_XDG
+  struct xdg_wm_base *xdg_wm_base;
+  struct xdg_surface *xdg_surface;
+  struct xdg_toplevel *xdg_toplevel;
+  int wait_for_configure;
+#endif /* ENABLE_WL_XDG */
 #ifdef ENABLE_WL_IVI
   struct ivi_application *ivi_app;
   struct ivi_surface *ivi_surface;
 #endif /* ENABLE_WL_IVI */
 };
+
+#ifdef ENABLE_WL_XDG
+static void
+xdg_wm_base_ping(void *data, struct xdg_wm_base *shell, uint32_t serial)
+{
+  GFX_UNUSED(data);
+  xdg_wm_base_pong(shell, serial);
+}
+
+static const struct xdg_wm_base_listener wm_base_listener = {
+  xdg_wm_base_ping,
+};
+#endif /* ENABLE_WL_XDG */
 
 static void
 global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
@@ -80,6 +103,13 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
     ctx->shell = wl_registry_bind(registry, id,
                                   &wl_shell_interface, 1);
   }
+#ifdef ENABLE_WL_XDG
+  else if (strcmp(interface, "xdg_wm_base") == 0) {
+    ctx->xdg_wm_base = wl_registry_bind(registry, id,
+                                        &xdg_wm_base_interface, 1);
+    xdg_wm_base_add_listener(ctx->xdg_wm_base, &wm_base_listener, ctx);
+  }
+#endif /* ENABLE_WL_XDG */
 #ifdef ENABLE_WL_IVI
   else if (strcmp(interface, "ivi_application") == 0) {
     ctx->ivi_app = wl_registry_bind(registry, id,
@@ -122,6 +152,9 @@ get_server_references(native_gfx_t *gfx)
   }
 
   if ((gfx->shell == NULL)
+#ifdef ENABLE_WL_XDG
+      && (gfx->xdg_wm_base == NULL)
+#endif /* ENABLE_WL_XDG */
 #ifdef ENABLE_WL_IVI
       && (gfx->ivi_app == NULL)
 #endif /* ENABLE_WL_IVI */
@@ -129,6 +162,9 @@ get_server_references(native_gfx_t *gfx)
     fprintf(stderr,
             "ERROR: Can't find wl_shell"
 #ifdef ENABLE_WL_XDG
+            " or xdg_wm_base"
+#endif /* ENABLE_WL_XDG */
+#ifdef ENABLE_WL_IVI
             " or ivi_application shell"
 #endif /* ENABLE_WL_IVI */
             "\n");
@@ -139,7 +175,12 @@ get_server_references(native_gfx_t *gfx)
 char *
 native_gfx_get_name(void)
 {
-  return ("Wayland EGL");
+  return (
+          "Wayland EGL"
+#ifdef ENABLE_WL_XDG
+          ", w/ xdg-shell support"
+#endif /* ENABLE_WL_XDG */
+          );
 }
 
 native_gfx_t *
@@ -190,6 +231,23 @@ create_ivi_surface(native_gfx_t *gfx)
 }
 #endif /* ENABLE_WL_IVI */
 
+#ifdef ENABLE_WL_XDG
+static void
+handle_surface_configure(void *data, struct xdg_surface *surface,
+                         uint32_t serial)
+{
+  native_gfx_t *gfx = (native_gfx_t *)data;
+
+  xdg_surface_ack_configure(surface, serial);
+
+  gfx->wait_for_configure = 0;
+}
+
+static const struct xdg_surface_listener xdg_surface_listener = {
+  handle_surface_configure
+};
+#endif /* ENABLE_WL_XDG */
+
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
 {
@@ -202,6 +260,19 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
     exit(EXIT_FAILURE);
   }
 
+#ifdef ENABLE_WL_XDG
+  if (gfx->xdg_wm_base != NULL) {
+    gfx->xdg_surface = xdg_wm_base_get_xdg_surface(gfx->xdg_wm_base,
+                                                   gfx->surface);
+    xdg_surface_add_listener(gfx->xdg_surface,
+                             &xdg_surface_listener, gfx);
+
+    gfx->xdg_toplevel = xdg_surface_get_toplevel(gfx->xdg_surface);
+    xdg_toplevel_set_title(gfx->xdg_toplevel, "glslsandbox-player");
+    wl_surface_commit(gfx->surface);
+    wl_display_roundtrip(gfx->display);
+  } else
+#endif /* ENABLE_WL_XDG */
   if (gfx->shell != NULL) {
     gfx->shell_surface = wl_shell_get_shell_surface(gfx->shell, gfx->surface);
     wl_shell_surface_set_toplevel(gfx->shell_surface);

@@ -88,7 +88,24 @@ glslsandbox_player_SOURCES += native_gfx_rpi.c
 endif
 
 if ENABLE_WL
+.SECONDEXPANSION:
+define protostability
+$(if $(findstring unstable,$1),unstable,stable)
+endef
+define protoname
+$(shell echo $1 | $(SED) 's/\([a-z\-]\+\)-[a-z]\+-v[0-9]\+/\1/')
+endef
+
+%-client-protocol.h : $(WAYLAND_PROTOCOLS_DATADIR)/$$(call protostability,$$*)/$$(call protoname,$$*)/$$*.xml
+	$(wayland_scanner) client-header < $< > $@
+%-protocol.c : $(WAYLAND_PROTOCOLS_DATADIR)/$$(call protostability,$$*)/$$(call protoname,$$*)/$$*.xml
+	$(wayland_scanner) private-code < $< > $@
+
 glslsandbox_player_SOURCES += native_gfx_wl.c
+if ENABLE_WL_XDG
+BUILT_SOURCES += xdg-shell-protocol.c xdg-shell-client-protocol.h
+nodist_glslsandbox_player_SOURCES += xdg-shell-protocol.c xdg-shell-client-protocol.h
+endif
 if ENABLE_WL_IVI
 glslsandbox_player_SOURCES += ivi-application-protocol.c
 endif

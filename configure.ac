@@ -152,6 +152,27 @@ AS_IF([test "x$enable_ivi" = "xyes"], [
 ])
 AM_CONDITIONAL([ENABLE_WL_IVI], [test "x$enable_ivi" = "xyes"])
 
+AC_ARG_ENABLE([wlxdg],
+    AS_HELP_STRING([--enable-wlxdg], [enable Wayland XDG shell protocol]),
+    [], [enable_wlxdg=yes])
+AS_IF([test "x$enable_wlxdg" = "xyes"], [
+    AC_DEFINE(ENABLE_WL_XDG, [1], [Enable Wayland XDG shell.])
+])
+AM_CONDITIONAL([ENABLE_WL_XDG], [test "x$enable_wlxdg" = "xyes"])
+
+# Wayland xdg-shell protocol became stable in wayland-protocols v1.12
+AS_IF([test "x$with_native_gfx" = "xwl" -a "x$enable_wlxdg" = "xyes"], [
+    PKG_CHECK_MODULES([wayland_protocols], [wayland-protocols >= 1.12],
+                      [ac_wayland_protocols_pkgdatadir=`$PKG_CONFIG --variable=pkgdatadir wayland-protocols`])
+    AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, $ac_wayland_protocols_pkgdatadir)
+
+    AC_PATH_PROG([wayland_scanner], [wayland-scanner])
+    if test "x$wayland_scanner" = "x"; then
+        PKG_CHECK_MODULES([wayland_scanner], [wayland-scanner])
+        wayland_scanner=`$PKG_CONFIG --variable=wayland_scanner wayland-scanner`
+    fi
+])
+
 AS_IF([test "x$with_native_gfx" = "xkms"], [
     native_gfx=kms
     AC_DEFINE([ENABLE_KMS], [1], [Enable KMS/GBM/DRM])
