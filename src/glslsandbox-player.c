@@ -12,6 +12,7 @@
 #endif
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 #include <GLES2/gl2.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -1552,6 +1553,10 @@ fprintf_info(FILE *fp)
 
 #ifdef HAVE_LIBPNG
   fprintf(fp, "libpng support version      : %s\n", PNG_LIBPNG_VER_STRING);
+#endif
+
+#if defined (EGL_EGLEXT_VERSION)
+  fprintf(fp, "eglext.h EGL_EGLEXT_VERSION : %i\n", EGL_EGLEXT_VERSION);
 #endif
 
   fprintf(fp, "\n");
