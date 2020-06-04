@@ -485,7 +485,7 @@ Validating Builtin Shaders
 are conformant to the GLSL specification, it is possible to add an
 extra validation step at configuration time. This step pass the
 included shaders into the Khronos Group glslang reference
-compiler/validator. See https://github.com/KhronosGroup/glslsang
+compiler/validator. See https://github.com/KhronosGroup/glslang
 
   If the command `glslangValidator` is found in the PATH, this feature
 is automatically enabled. If the `glslangValidator` is available, but
