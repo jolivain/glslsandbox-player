@@ -6,9 +6,6 @@ else
     : "${GLSLSANDBOX_PLAYER:=glslsandbox-player}"
 fi
 
-# Limit Virtual Size to 1G to prevent system crash by memory exhaustion
-ulimit -S -v $(( 1024 * 1024 ))
-
 ${GLSLSANDBOX_PLAYER} -l |
     awk '1 == /^[0-9]+/ {print $3;}' |
     shuf |
