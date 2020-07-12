@@ -1788,8 +1788,6 @@ fprintf_egl_info(FILE *fp, int verbose)
     fprintf(fp, "EGL_EXTENSIONS (display)    :\n");
     fprintf_gl_extensions(stderr, "    ", exts, "\n");
   }
-
-  fprintf(fp, "\n");
 }
 #endif /* ENABLE_SDL2 */
 
@@ -1998,7 +1996,14 @@ main(int argc, char *argv[])
             SDL_GetCurrentVideoDriver());
 #else
     fprintf_egl_info(stderr, ctx->verbose);
+    if (ctx->verbose > 2) {
+      fprintf(stderr, "EGL Config Attributes       :\n");
+      egl_fprintf_config_attribs(stderr, "    ",
+                                 ctx->egl->dpy, ctx->egl->cfg);
+    }
+    fprintf(stderr, "\n");
 #endif /* ENABLE_SDL2 */
+
     fprintf_gles_info(stderr, ctx->verbose);
 
     if (is_using_builtin_shader(ctx)) {
