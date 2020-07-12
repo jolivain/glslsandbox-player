@@ -30,6 +30,7 @@ struct egl_s {
   SDL_Window *sdlwin;
   SDL_GLContext sdlctx;
 #else /* ENABLE_SDL2 */
+  EGLConfig  cfg;
   EGLSurface surf;
   EGLDisplay dpy;
   EGLContext ctx;

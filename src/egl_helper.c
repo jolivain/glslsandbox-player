@@ -502,7 +502,6 @@ egl_init(int width, int height, int xpos, int ypos)
     EGL_NONE
   };
 
-  EGLConfig config = { 0 };
   EGLint num_configs = 0;
 
   static const EGLint win_attribList[] = {
@@ -536,7 +535,7 @@ egl_init(int width, int height, int xpos, int ypos)
 #endif
   XeglInitialize(egl->dpy, &egl->major, &egl->minor);
 
-  XeglChooseConfig(egl->dpy, conf_attribList, &config, 1, &num_configs);
+  XeglChooseConfig(egl->dpy, conf_attribList, &egl->cfg, 1, &num_configs);
   if (num_configs != 1) {
     fprintf(stderr, "ERROR: Can't find an EGL config.\n");
     exit(EXIT_FAILURE);
@@ -545,12 +544,12 @@ egl_init(int width, int height, int xpos, int ypos)
   native_gfx_create_window(egl->native_gfx, width, height, xpos, ypos);
 
   egl_native_win = native_gfx_get_egl_native_window(egl->native_gfx);
-  egl->surf = XeglCreateWindowSurface(egl->dpy, config, egl_native_win, win_attribList);
+  egl->surf = XeglCreateWindowSurface(egl->dpy, egl->cfg, egl_native_win, win_attribList);
 
   XeglQuerySurface(egl->dpy, egl->surf, EGL_WIDTH, &egl->width);
   XeglQuerySurface(egl->dpy, egl->surf, EGL_HEIGHT, &egl->height);
 
-  egl->ctx = XeglCreateContext(egl->dpy, config, EGL_NO_CONTEXT, ctx_attribList);
+  egl->ctx = XeglCreateContext(egl->dpy, egl->cfg, EGL_NO_CONTEXT, ctx_attribList);
 
   XeglMakeCurrent(egl->dpy, egl->surf, egl->surf, egl->ctx);
 
