@@ -600,6 +600,140 @@ egl_swap_interval(egl_t *egl, int interval)
 
 #endif /* ENABLE_SDL2 */
 
+static const char *
+streglattrib(EGLint attrib)
+{
+  const char *str;
+
+  str = NULL;
+
+  switch (attrib) {
+
+#define STR_EGL_ATTRIB_CASE(x) \
+  case (x):                   \
+  str = #x;                   \
+  break
+
+    /* EGL config attributes */
+    STR_EGL_ATTRIB_CASE(EGL_ALPHA_MASK_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_ALPHA_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_BIND_TO_TEXTURE_RGB);
+    STR_EGL_ATTRIB_CASE(EGL_BIND_TO_TEXTURE_RGBA);
+    STR_EGL_ATTRIB_CASE(EGL_BLUE_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_BUFFER_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_COLOR_BUFFER_TYPE);
+    STR_EGL_ATTRIB_CASE(EGL_CONFIG_CAVEAT);
+    STR_EGL_ATTRIB_CASE(EGL_CONFIG_ID);
+    STR_EGL_ATTRIB_CASE(EGL_CONFORMANT);
+    STR_EGL_ATTRIB_CASE(EGL_DEPTH_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_GREEN_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_LEVEL);
+    STR_EGL_ATTRIB_CASE(EGL_LUMINANCE_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_MATCH_NATIVE_PIXMAP);
+    STR_EGL_ATTRIB_CASE(EGL_MAX_PBUFFER_HEIGHT);
+    STR_EGL_ATTRIB_CASE(EGL_MAX_PBUFFER_PIXELS);
+    STR_EGL_ATTRIB_CASE(EGL_MAX_PBUFFER_WIDTH);
+    STR_EGL_ATTRIB_CASE(EGL_MAX_SWAP_INTERVAL);
+    STR_EGL_ATTRIB_CASE(EGL_MIN_SWAP_INTERVAL);
+    STR_EGL_ATTRIB_CASE(EGL_NATIVE_RENDERABLE);
+    STR_EGL_ATTRIB_CASE(EGL_NATIVE_VISUAL_ID);
+    STR_EGL_ATTRIB_CASE(EGL_NATIVE_VISUAL_TYPE);
+    STR_EGL_ATTRIB_CASE(EGL_RED_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_RENDERABLE_TYPE);
+    STR_EGL_ATTRIB_CASE(EGL_SAMPLES);
+    STR_EGL_ATTRIB_CASE(EGL_SAMPLE_BUFFERS);
+    STR_EGL_ATTRIB_CASE(EGL_STENCIL_SIZE);
+    STR_EGL_ATTRIB_CASE(EGL_SURFACE_TYPE);
+    STR_EGL_ATTRIB_CASE(EGL_TRANSPARENT_BLUE_VALUE);
+    STR_EGL_ATTRIB_CASE(EGL_TRANSPARENT_GREEN_VALUE);
+    STR_EGL_ATTRIB_CASE(EGL_TRANSPARENT_RED_VALUE);
+    STR_EGL_ATTRIB_CASE(EGL_TRANSPARENT_TYPE);
+
+    /* EGL context attributes */
+    STR_EGL_ATTRIB_CASE(EGL_CONTEXT_CLIENT_VERSION);
+
+    /* EGL window attributes */
+    STR_EGL_ATTRIB_CASE(EGL_RENDER_BUFFER);
+    STR_EGL_ATTRIB_CASE(EGL_VG_ALPHA_FORMAT);
+    STR_EGL_ATTRIB_CASE(EGL_VG_COLORSPACE);
+
+#undef STR_EGL_ATTRIB_CASE
+
+  default:
+    break ;
+  }
+
+  return (str);
+}
+
+static EGLint egl_cfg_attrs_g[] = {
+    EGL_ALPHA_MASK_SIZE,
+    EGL_ALPHA_SIZE,
+    EGL_BIND_TO_TEXTURE_RGB,
+    EGL_BIND_TO_TEXTURE_RGBA,
+    EGL_BLUE_SIZE,
+    EGL_BUFFER_SIZE,
+    EGL_COLOR_BUFFER_TYPE,
+    EGL_CONFIG_CAVEAT,
+    EGL_CONFIG_ID,
+    EGL_CONFORMANT,
+    EGL_DEPTH_SIZE,
+    EGL_GREEN_SIZE,
+    EGL_LEVEL,
+    EGL_LUMINANCE_SIZE,
+    EGL_MAX_PBUFFER_HEIGHT,
+    EGL_MAX_PBUFFER_PIXELS,
+    EGL_MAX_PBUFFER_WIDTH,
+    EGL_MAX_SWAP_INTERVAL,
+    EGL_MIN_SWAP_INTERVAL,
+    EGL_NATIVE_RENDERABLE,
+    EGL_NATIVE_VISUAL_ID,
+    EGL_NATIVE_VISUAL_TYPE,
+    EGL_RED_SIZE,
+    EGL_RENDERABLE_TYPE,
+    EGL_SAMPLES,
+    EGL_SAMPLE_BUFFERS,
+    EGL_STENCIL_SIZE,
+    EGL_SURFACE_TYPE,
+    EGL_TRANSPARENT_BLUE_VALUE,
+    EGL_TRANSPARENT_GREEN_VALUE,
+    EGL_TRANSPARENT_RED_VALUE,
+    EGL_TRANSPARENT_TYPE,
+    EGL_NONE
+};
+
+void
+egl_fprintf_config_attribs(FILE *fp,
+                           const char *line_prefix,
+                           EGLDisplay dpy, EGLConfig cfg)
+{
+  const char *attrib_name;
+  const EGLint *attrib;
+  EGLint attrib_val;
+  EGLBoolean ret;
+
+  if (NULL == line_prefix) {
+    line_prefix = "";
+  }
+
+  for (attrib = egl_cfg_attrs_g; EGL_NONE != attrib[0]; ++attrib) {
+    attrib_name = streglattrib(attrib[0]);
+    if (NULL == attrib_name) {
+      attrib_name = "UNKNOWN";
+    }
+
+    ret = eglGetConfigAttrib(dpy, cfg, attrib[0], &attrib_val);
+    if (EGL_FALSE == ret) {
+      fprintf(fp, "%sERROR in eglGetConfigAttrib() for attr %08x (%s)\n",
+              line_prefix, attrib[0], attrib_name);
+    }
+
+    fprintf(fp, "%s%-28s (0x%04x) = 0x%08x (%i) \n",
+            line_prefix, attrib_name, attrib[0], attrib_val, attrib_val);
+  }
+}
+
+
 /*
 * Copyright (c) 2015-2020, Julien Olivain <juju@cotds.org>
 * All rights reserved.

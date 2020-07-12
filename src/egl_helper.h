@@ -46,6 +46,9 @@ egl_t *
 egl_init(int width, int height, int xpos, int ypos);
 
 void
+egl_fprintf_config_attribs(FILE *fp, const char *prefix, EGLDisplay dpy, EGLConfig cfg);
+
+void
 egl_swap_buffers(egl_t *egl);
 
 void
