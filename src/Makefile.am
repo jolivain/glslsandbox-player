@@ -62,6 +62,8 @@ bin_PROGRAMS = glslsandbox-player
 
 BUILT_SOURCES = glslsandbox-shaders.c
 
+nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c
+
 glslsandbox_player_SOURCES = \
   glslsandbox-player.c glslsandbox-player.h \
   egl_helper.c egl_helper.h \
@@ -107,5 +109,3 @@ endif
 if ENABLE_MALI
 glslsandbox_player_SOURCES += native_gfx_mali.c
 endif
-
-nodist_glslsandbox_player_SOURCES = glslsandbox-shaders.c
