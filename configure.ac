@@ -148,9 +148,9 @@ AC_ARG_ENABLE([ivi],
     AS_HELP_STRING([--enable-ivi], [enable IVI support for Wayland]),
     [], [enable_ivi=no])
 AS_IF([test "x$enable_ivi" = "xyes"], [
-    AC_DEFINE(ENABLE_IVI, [1], [Enable Wayland IVI.])
+    AC_DEFINE(ENABLE_WL_IVI, [1], [Enable Wayland IVI.])
 ])
-AM_CONDITIONAL([ENABLE_IVI], [test "x$enable_ivi" = "xyes"])
+AM_CONDITIONAL([ENABLE_WL_IVI], [test "x$enable_ivi" = "xyes"])
 
 AS_IF([test "x$with_native_gfx" = "xkms"], [
     native_gfx=kms
