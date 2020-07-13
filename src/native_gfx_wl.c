@@ -177,6 +177,9 @@ native_gfx_get_name(void)
 {
   return (
           "Wayland EGL"
+#ifdef ENABLE_WL_IVI
+          ", w/ ivi support"
+#endif /* ENABLE_WL_IVI */
 #ifdef ENABLE_WL_XDG
           ", w/ xdg-shell support"
 #endif /* ENABLE_WL_XDG */
