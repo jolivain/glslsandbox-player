@@ -4,7 +4,9 @@ demoscripts_SCRIPTS = \
 	compare-images.sh \
 	dl-shader \
 	json2code \
+	ls-shaders \
 	mk-catalog.sh \
+	run-demo-latest.sh \
 	run-demo-random.sh \
 	run-demo.sh \
 	run-tests.sh \
