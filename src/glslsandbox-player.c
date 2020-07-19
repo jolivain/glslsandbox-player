@@ -741,7 +741,8 @@ draw_frame(context_t *ctx)
                  0.5f + sinf(0.250f * m) * 0.4f);
   }
 
-  XglClear(GL_COLOR_BUFFER_BIT);
+  if (ctx->clear_frame)
+    XglClear(GL_COLOR_BUFFER_BIT);
 
   XglVertexAttribPointer(ctx->a_pos, 2, GL_FLOAT, GL_FALSE, 0, plane);
 
@@ -981,6 +982,7 @@ player_usage(void)
   fprintf(stderr, "  -d: dump each frame as PPM\n");
   fprintf(stderr, "  -D: dump only the last frame as PPM\n");
   fprintf(stderr, "  -E: disable dithering\n");
+  fprintf(stderr, "  -C: don't clear frame before redrawing\n");
   fprintf(stderr, "  -0 <file.png>: Load \"file.png\" and bind it to TEXTURE0\n");
   fprintf(stderr, "  -1 to -7: same as -0 for TEXTUREn\n");
   fprintf(stderr, "  -v: increase verbosity level\n");
@@ -1110,8 +1112,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int opt;
   char *endptr;
 
-  /* available short option: AabCcGgJjKkn89 */
-  while ((opt = getopt(argc, argv, "BdDe:Ef:F:hH:i:I:lLmM:No:O:pP:Q:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
+  /* available short option: AabcGgJjKkn89 */
+  while ((opt = getopt(argc, argv, "BCdDe:Ef:F:hH:i:I:lLmM:No:O:pP:Q:qr:R:s:S:t:T:uU:vV:w:W:x:X:y:Y:0:1:2:3:4:5:6:7:")) != -1) {
 
     switch (opt) {
 
@@ -1128,6 +1130,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
 
     case 'B':
       ctx->use_fbo = 1;
+      break ;
+
+    case 'C':
+      ctx->clear_frame = 0;
       break ;
 
     case 'd':
@@ -1503,6 +1509,7 @@ init_ctx(context_t *ctx)
   ctx->report_fps_count = 100;
   ctx->warmup_frames = 3;
   ctx->force_precision = "";
+  ctx->clear_frame = 1;
 
   ctx->surface_position[0] = -1.0f;
   ctx->surface_position[1] =  1.0f;
