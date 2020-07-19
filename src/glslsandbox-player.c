@@ -812,7 +812,6 @@ draw_fbo(context_t *ctx)
   XglUseProgram(ctx->fbo_prog);
   XglBindFramebuffer(GL_FRAMEBUFFER, 0);
   XglViewport(0, 0, ctx->width, ctx->height);
-  XglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   XglClear(GL_COLOR_BUFFER_BIT);
   XglUniform1i(ctx->fbo_u_tex, 0);
   XglBindTexture(GL_TEXTURE_2D, ctx->fbo_texid[ctx->frame & 1]);
