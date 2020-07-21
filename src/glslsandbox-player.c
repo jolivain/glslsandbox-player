@@ -641,7 +641,7 @@ setup(context_t *ctx)
     XglEnableVertexAttribArray(ctx->a_surfacePosition);
   }
 
-  XglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  XglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
   ctx->u_time = XglGetUniformLocation(ctx->gl_prog, "time");
   ctx->u_resolution = XglGetUniformLocation(ctx->gl_prog, "resolution");
@@ -784,7 +784,7 @@ prepare_fbo(context_t *ctx)
 {
   XglBindFramebuffer(GL_FRAMEBUFFER, ctx->fbo_id[ctx->frame & 1]);
   XglViewport(0, 0, ctx->fbo_width, ctx->fbo_height);
-  XglClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  XglClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   XglClear(GL_COLOR_BUFFER_BIT);
 }
 
