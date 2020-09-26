@@ -664,6 +664,12 @@ setup(context_t *ctx)
     XglUniform2f(ctx->u_mouse, 0.5f, 0.5f);
   }
 
+  ctx->u_frame = XglGetUniformLocation(ctx->gl_prog, "frame");
+
+  if (ctx->u_frame >= 0) {
+    XglUniform1i(ctx->u_frame, 0);
+  }
+
   ctx->u_backbuf = XglGetUniformLocation(ctx->gl_prog, "backbuffer");
 
   if (ctx->u_backbuf >= 0) {
@@ -730,6 +736,10 @@ draw_frame(context_t *ctx)
 
   if (ctx->u_time >= 0) {
     XglUniform1f(ctx->u_time, ctx->time_offset + ctx->time * ctx->time_factor);
+  }
+
+  if (ctx->u_frame >= 0) {
+    XglUniform1i(ctx->u_frame, ctx->frame);
   }
 
   if (ctx->u_mouse >= 0 && ctx->enable_mouse_emu) {

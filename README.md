@@ -430,6 +430,12 @@ use the following fragment shader, the the file `texture.glslf`:
 files are not supported. Use an image converter if an image is in an
 unsupported format.
 
+  glslsandbox-player also provide an integer uniform named "frame",
+passing the rendered frame number to the shader. This allow one to
+have an accurate synchronization with the frame sequence, disregarding
+the actual frame rate, frame time, or vertical synchronization with
+the display.
+
 
 Testing the glslsandbox-player program
 --------------------------------------

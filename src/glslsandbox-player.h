@@ -47,7 +47,7 @@ struct context_s {
   egl_t *egl;
   EGLint swap_interval;
   GLint a_pos, a_surfacePosition;
-  GLint u_time, u_mouse, u_resolution, u_surfaceSize;
+  GLint u_time, u_mouse, u_resolution, u_surfaceSize, u_frame;
   GLint u_backbuf;
   texture_t texture[MAX_TEXTURES];
   GLuint gl_prog;
