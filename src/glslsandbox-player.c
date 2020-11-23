@@ -33,6 +33,11 @@
 #include "pngio.h"
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#endif
+
 #include "glslsandbox-shaders.h"
 #include "native_gfx.h"
 #include "egl_helper.h"
@@ -1961,6 +1966,44 @@ player_render_loop_end(context_t *ctx)
   }
 }
 
+#ifdef __EMSCRIPTEN__
+static void em_render_frame(void *arg)
+{
+  context_t *ctx = (context_t *)arg;
+  int run;
+
+  run = player_render_loop_iter(ctx);
+
+  if (run == 0) {
+    emscripten_cancel_main_loop();
+    player_render_loop_end(ctx);
+    player_cleanup(ctx);
+    cleanup_ctx(ctx);
+
+    /* We use emscripten_force_exit() instead of exit() because we are
+     * in an Emscripten emulated infinite main loop. Emulation is done
+     * with an asynchronous operation, which will prevent the
+     * Emscripten runtime to quit with a normal exit(). */
+    emscripten_force_exit(EXIT_SUCCESS);
+  }
+}
+
+static void
+player_render_loop(context_t *ctx)
+{
+  static const int fps = 0;
+  static const int simulate_infinite_loop = EM_TRUE;
+
+  player_render_loop_begin(ctx);
+  emscripten_set_main_loop_arg(em_render_frame, (void *)ctx,
+                               fps, simulate_infinite_loop);
+  /* emscripten_set_main_loop_arg() never returns, because
+   * simulate_infinite_loop is EM_TRUE. See Emscripten function
+   * documentation. */
+}
+
+#else /* __EMSCRIPTEN__ */
+
 static void
 player_render_loop(context_t *ctx)
 {
@@ -1975,6 +2018,7 @@ player_render_loop(context_t *ctx)
 
   player_render_loop_end(ctx);
 }
+#endif /* __EMSCRIPTEN__ */
 
 int
 main(int argc, char *argv[])
