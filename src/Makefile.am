@@ -126,3 +126,7 @@ endif
 if ENABLE_MALI
 glslsandbox_player_SOURCES += native_gfx_mali.c
 endif
+
+if ENABLE_EM
+glslsandbox_player_SOURCES += native_gfx_em.c
+endif

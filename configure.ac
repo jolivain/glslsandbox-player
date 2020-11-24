@@ -96,7 +96,7 @@ AS_IF([test "x$with_libpng" = "xyes"], [
 AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,tisgx,mali,wgl]),
+        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,tisgx,mali,wgl,em]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
@@ -222,6 +222,15 @@ AS_IF([test "x$with_native_gfx" = "xmali"], [
     AC_MSG_NOTICE([Arm Mali support disabled])
 ])
 AM_CONDITIONAL([ENABLE_MALI], [test "x$with_native_gfx" = "xmali"])
+
+AS_IF([test "x$with_native_gfx" = "xem"], [
+    native_gfx=em
+    AC_DEFINE([ENABLE_EM], [1], [Enable Native Emscripten/Wasm])
+    AC_MSG_NOTICE([Emscripten/Wasm support enabled])
+], [
+    AC_MSG_NOTICE([Emscripten/Wasm support disabled])
+])
+AM_CONDITIONAL([ENABLE_EM], [test "x$with_native_gfx" = "xem"])
 
 AS_IF([test "x$native_gfx" = "x"], [
     AC_MSG_ERROR([unknown native gfx selected: $with_native_gfx])
