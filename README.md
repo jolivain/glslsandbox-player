@@ -700,6 +700,174 @@ setting the mode name in the `GSP_DRM_MODE` environment variable (ex:
 `export GSP_DRM_MODE="640x480"`).
 
 
+Notes on Emscripten/WebAssembly Native Windowing
+------------------------------------------------
+
+glslsandbox-player includes a native windowing for WebAssembly/Wasm to
+run into a web browser. See https://webassembly.org/
+
+Wait a minute?! The very purpose of glslsandbox-player _is_ to run
+glslsandbox shaders _without_ a web browser or any of its
+dependency. So why adding a web browser support?
+
+Well, there is several answers to that: because we can! because it's
+fun! because it give closure to extract shaders from the browser then
+put it back, because it adds yet another runtime environment in which
+this program run shaders. This also gives an example how to write
+simple C/C++ OpenGL ES2 code targetting embedded systems AND other
+web-based targets.
+
+For testing this native windowing, use the following instructions.
+
+
+### Step 1: Install the Emscripten SDK ###
+
+Follow instructions from:
+https://emscripten.org/docs/getting_started/downloads.html
+
+Typically, this is done with commands:
+
+    git clone https://github.com/emscripten-core/emsdk.git
+    cd emsdk
+    git pull
+    ./emsdk install latest
+    ./emsdk activate latest
+    source ./emsdk_env.sh
+    cd ..
+
+Those commands were tested with Emscripten version 2.0.10.
+
+
+### Step 2: Compile using the Emscripten SDK ###
+
+Start with standard commands:
+
+    git clone https://github.com/jolivain/glslsandbox-player.git
+    cd glslsandbox-player
+    autoreconf -vfi
+
+Then, continue with Emscripten specific commands:
+
+    emconfigure ./configure \
+        --with-native-gfx=em \
+        --without-libpng \
+        --with-shader-list=shader-local.list \
+        LDFLAGS="-s FULL_ES2=1 --emrun"
+    emmake make EXEEXT=.html
+
+Note 1: those commands will only build a simple program with a single
+builtin shader. For more complex examples, see notes at the end of
+this section.
+
+Note 2: the `FULL_ES2=1` link option is needed for this program to
+run. See:
+https://emscripten.org/docs/porting/multimedia_and_graphics/OpenGL-support.html#opengl-es-2-0-3-0-emulation
+
+
+### Step 3: Execute the program in a browser ###
+
+There is several options for executing Emscripten compiled code.
+
+
+#### Option 1: Using the `emrun` helper tool ####
+
+Emscripten SDK provides the `emrun` helper tool, to emulate command
+line program invocations and terminal experience. It automatically
+setup a local web server, and start a browser pointing to it. It can
+read program command arguments and pass those to the program running
+in the browser. It also forward the standard output/error streams of
+the program to print messages and the calling console.
+
+Simple invocation example:
+
+    emrun --browser firefox src/glslsandbox-player.html
+
+Example passing arguments to the program:
+
+    emrun --browser chrome src/glslsandbox-player.html -- -W 512 -H 512 -v
+
+Example killing the browser, when program exit is caught:
+
+    emrun --kill_exit --browser firefox src/glslsandbox-player.html -- -f 300
+
+See `emrun --help` and documentation at:
+https://emscripten.org/docs/compiling/Running-html-files-with-emrun.html
+
+
+#### Option 2: Using a local web server ####
+
+Note: for security reasons, browsers are not always allowing direct
+file system access for execution of javascript. It's better to go
+trough a local network access.
+
+A simple, minimalistic web server can be started with Python:
+
+    python3 -m http.server -d src &
+
+Or with busybox:
+
+    busybox httpd -h src -p 8000
+
+Then, program can be started by launching a browser, with command:
+
+    firefox http://localhost:8000/glslsandbox-player.html &
+
+Command line arguments can be passed in URL parameters:
+
+    firefox 'http://localhost:8000/glslsandbox-player.html?-W&512&-H&512&-vvv' &
+
+Note that argument passing will work only if the program was linked
+with the `--emrun` option.
+
+
+#### Option 3: using a real web server ####
+
+Copy `glslsanbox-player.{html,js,wasm}` files on your web server and
+point to it.
+
+    scp \
+        src/glslsanbox-player.{html,js,wasm} \
+        user@ssh.example.org:/path/to/www/html/dir/
+
+Then access your web server URL, for example:
+http://www.example.org/dir/glslsandbox-player.html
+
+
+### Note on shell template ###
+
+The default Emscripten shell template can be changed by adding a
+`--shell-file` option in LDFLAGS. See Emscripten `emcc` documentation
+for more details. For example, to use Emscripten `minimal_shell`:
+
+    emconfigure ./configure \
+        --with-native-gfx=em \
+        --without-libpng \
+        --with-shader-list=shader-local.list \
+        LDFLAGS="-s FULL_ES2=1 --shell-file html_template/shell_minimal.html"
+
+A fully customized shell can also be created, starting from this
+minimal shell distributed with Emscripten:
+https://github.com/emscripten-core/emscripten/blob/2.0.10/src/shell_minimal.html
+Copy this file in the project, giving it another name (for example in:
+`src/my_customized_shell.html`), then add `--shell-file
+$PWD/src/my_customized_shell.html` in LDFLAGS.
+
+
+### Note on memory limits ###
+
+Emscripten is limiting initial program memory to 16M by default. See:
+https://github.com/emscripten-core/emscripten/blob/2.0.10/src/settings.js#L152
+
+In order to include more shaders, this limit needs to be inceased. For
+example, to increase to 32M:
+
+    emconfigure ./configure \
+        --with-native-gfx=em \
+        --without-libpng \
+        LDFLAGS="-s FULL_ES2=1 -s INITIAL_MEMORY=33554432 --emrun"
+    emmake make EXEEXT=.html
+
+
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
