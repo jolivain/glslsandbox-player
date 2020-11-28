@@ -1551,6 +1551,11 @@ fprintf_info(FILE *fp)
           __clang_major__, __clang_minor__, __clang_patchlevel__);
 #endif
 
+#if defined (__EMSCRIPTEN_major__) && defined (__EMSCRIPTEN_minor__) && defined (__EMSCRIPTEN_tiny__)
+  fprintf(fp, "Emscripten version          : %i.%i.%i\n",
+          __EMSCRIPTEN_major__, __EMSCRIPTEN_minor__, __EMSCRIPTEN_tiny__);
+#endif
+
 #if defined(__GNUC__) && defined(__GNUC_MINOR__) && defined(__GNUC_PATCHLEVEL__)
   fprintf(fp, "GCC version                 : %i.%i.%i\n",
           __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
