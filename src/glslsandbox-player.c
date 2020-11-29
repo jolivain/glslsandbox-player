@@ -1901,17 +1901,18 @@ is_last_frame(const context_t *ctx)
 }
 
 static void
-player_render_loop(context_t *ctx)
+player_render_loop_begin(context_t *ctx)
 {
-  int last_frame;
-
   if (ctx->verbose > 0) {
     fprintf(stderr, "Using origin of time: %lu.%09lu\n",
             ctx->shader_origin_time.tv_sec, ctx->shader_origin_time.tv_nsec);
   }
-  
-  last_frame = 0;
-  for (;;) {
+}
+
+static int
+player_render_loop_iter(context_t *ctx)
+{
+    int last_frame;
 
     last_frame = is_last_frame(ctx);
 
@@ -1934,9 +1935,14 @@ player_render_loop(context_t *ctx)
     ctx->frame++;
 
     if (last_frame)
-      break ;
-  }
+      return 0;
 
+    return 1;
+}
+
+static void
+player_render_loop_end(context_t *ctx)
+{
   XglFinish();
 
   if (ctx->verbose > 0) {
@@ -1953,6 +1959,21 @@ player_render_loop(context_t *ctx)
             render_time,
             (float)f / render_time);
   }
+}
+
+static void
+player_render_loop(context_t *ctx)
+{
+  int run;
+
+  player_render_loop_begin(ctx);
+
+  run = 1;
+  while (run != 0) {
+    run = player_render_loop_iter(ctx);
+  }
+
+  player_render_loop_end(ctx);
 }
 
 int
