@@ -1,5 +1,5 @@
 AC_PREREQ([2.68])
-AC_INIT([glslsandbox-player], [1.0], [juju@cotds.org])
+AC_INIT([glslsandbox-player],[1.0],[ju.o@free.fr])
 AM_INIT_AUTOMAKE([-Wall -Wno-portability subdir-objects foreign])
 AC_CONFIG_TESTDIR([tests], [src])
 

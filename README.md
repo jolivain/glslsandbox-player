@@ -883,4 +883,4 @@ http://glslsandbox.com/ authors and all its contributors.
   This glslsandbox-player code is distributed under the 2-Clause BSD
 License. See the LICENSE file for details.
 
-Julien Olivain <juju@cotds.org>
+Julien Olivain <ju.o@free.fr>
