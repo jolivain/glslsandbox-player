@@ -868,6 +868,29 @@ example, to increase to 32M:
     emmake make EXEEXT=.html
 
 
+### Note on redirecting stderr in browser ###
+
+The default Emscripten shell has a console output in the browser. This
+console output shows only `stdout`. The `stderr` is logged in the
+browser javascript console (which can generally be displayed when
+pressing the F12 key). Since glslsandbox-player print all its messages
+on `stderr`, they are not displayed in the main Emscripten console. To
+show glslsandbox-player message on the main console, `strerr` can be
+redirected to `stdout`, by redefining the `printErr` function to
+`print`, using the `--pre-js` option of `emcc`. See:
+https://emscripten.org/docs/tools_reference/emcc.html#emcc-pre-js
+https://emscripten.org/docs/api_reference/module.html
+
+This can be achieved by adding `--pre-js=$PWD/src/em-pre.js` to
+LDFLAGS. For example, with configuration command:
+
+    emconfigure ./configure \
+        --with-native-gfx=em \
+        --without-libpng \
+        LDFLAGS="-s FULL_ES2=1 -s INITIAL_MEMORY=33554432 --pre-js=$PWD/src/em-pre.js --emrun"
+    emmake make EXEEXT=.html
+
+
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
