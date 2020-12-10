@@ -224,7 +224,7 @@ AS_IF([test "x$with_native_gfx" = "xmali"], [
 AM_CONDITIONAL([ENABLE_MALI], [test "x$with_native_gfx" = "xmali"])
 
 AS_IF([test "x$native_gfx" = "x"], [
-    AC_ERROR([unknown native gfx selected: $with_native_gfx])
+    AC_MSG_ERROR([unknown native gfx selected: $with_native_gfx])
 ], [])
 
 AC_OUTPUT
