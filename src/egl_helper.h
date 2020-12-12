@@ -59,8 +59,6 @@ _egl_no_error(const char *file, int line);
 
 #define egl_no_error()  _egl_no_error(__FILE__, __LINE__)
 
-#define XEGL_STRICT 1
-
 #if defined(XEGL_STRICT)
 
 void
