@@ -68,6 +68,13 @@ AC_ARG_ENABLE([install-scripts],
               [], [enable_install_scripts=no])
 AM_CONDITIONAL([ENABLE_INSTALL_SCRIPTS], [test "x$enable_install_scripts" == "xyes"])
 
+AC_ARG_ENABLE([strict-egl],
+    AS_HELP_STRING([--disable-strict-egl], [disable eglGetError() checks at each EGL call @<:@default=enabled@:>@]),
+    [], [enable_strict_egl=yes])
+AS_IF([test "x$enable_strict_egl" = "xyes"], [
+    AC_DEFINE(XEGL_STRICT, [1], [Enable strict XEGL wrapper.])
+])
+
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
@@ -243,6 +250,7 @@ AC_MSG_RESULT([
 Configuration summary
 ---------------------
                 debug : ${enable_debug}
+           strict EGL : ${enable_strict_egl}
            native-gfx : ${with_native_gfx}
        libpng support : ${have_libpng}
           shader list : ${with_shader_list}
