@@ -75,6 +75,13 @@ AS_IF([test "x$enable_strict_egl" = "xyes"], [
     AC_DEFINE(XEGL_STRICT, [1], [Enable strict XEGL wrapper.])
 ])
 
+AC_ARG_ENABLE([strict-gles],
+    AS_HELP_STRING([--disable-strict-gles], [disable glGetError() checks at each GLES call @<:@default=enabled@:>@]),
+    [], [enable_strict_gles=yes])
+AS_IF([test "x$enable_strict_gles" = "xyes"], [
+    AC_DEFINE(XGLES_STRICT, [1], [Enable strict XGLES wrapper.])
+])
+
 PKG_CHECK_MODULES([egl], [egl >= 1])
 PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
 
@@ -251,6 +258,7 @@ Configuration summary
 ---------------------
                 debug : ${enable_debug}
            strict EGL : ${enable_strict_egl}
+         strict GLES2 : ${enable_strict_gles}
            native-gfx : ${with_native_gfx}
        libpng support : ${have_libpng}
           shader list : ${with_shader_list}
