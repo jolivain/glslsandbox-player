@@ -10,8 +10,6 @@
 #ifndef GLES_HELPER_H
 #define GLES_HELPER_H
 
-#define XGLES_STRICT 1
-
 #if defined(ENABLE_RPI) || defined(ENABLE_TISGX) || defined(ENABLE_MALI)
 #define GL_SHADER_SOURCE_CONST
 #else
