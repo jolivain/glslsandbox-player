@@ -35,7 +35,7 @@ AT_CLEANUP
 dnl --------------------------------------------------------
 AT_SETUP([option -q])
 AT_KEYWORDS([option quiet])
-AT_CHECK([glslsandbox-player -W64 -H64 -S ColorRipples -w0 -f1 -q],
+AT_CHECK([EGL_LOG_LEVEL=fatal glslsandbox-player -W64 -H64 -S ColorRipples -w0 -f1 -q],
          [0], [], [])
 AT_CLEANUP
 
