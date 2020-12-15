@@ -76,16 +76,17 @@ file of an arbitrary pseudo-random selection of nice looking shaders.
   One would be tempted to include all available shaders on the website
 (after all, more tests would mean more chances to find bugs). Users
 should be aware that a lot of glslsandbox.com shaders are forks and
-have a lot of similitude. Moreover some shaders just include syntax
-error or typos (e.g. 8477.0). Some other shaders, may include driver
-workaround that may not be fully GLSL compliant (e.g. shader 2606.0
-with OS X AMD cos workaround that redefine the cos() function). Other
-compilation failures may be due to garbage after #else or #endif
-preprocessor directive present in some shaders (e.g. shader
-26529.0). Moreover, some web browsers are using OpenGL to implement
-WebGL (instead of OpenGL ES). There is slight differences in the GL
-shading language between ES and non-ES version, that could make a
-glslsandbox shader work in such a browser, but fail on a conformant
+have a lot of similitude. Also, glslsandbox.com site is not moderated:
+some entries may include inappropriate content. Moreover some shaders
+just include syntax error or typos (e.g. 8477.0). Some other shaders,
+may include driver workaround that may not be fully GLSL compliant
+(e.g. shader 2606.0 with OS X AMD cos workaround that redefine the
+cos() function). Other compilation failures may be due to garbage
+after #else or #endif preprocessor directive present in some shaders
+(e.g. shader 26529.0). Moreover, some web browsers are using OpenGL to
+implement WebGL (instead of OpenGL ES). There is slight differences in
+the GL shading language between ES and non-ES version, that could make
+a glslsandbox shader work in such a browser, but fail on a conformant
 GLES2 driver. For example, GLSL ES 1.0.17 explicitly forbids the usage
 of a user-defined function as a constant expression initializer (even
 if the function evaluates to something constant). This is the case for
