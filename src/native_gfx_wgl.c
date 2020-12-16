@@ -119,20 +119,6 @@ native_gfx_open_display(void)
 
   memset(gfx, 0, sizeof (*gfx));
 
-  gfx->hwnd = createWindow(256, 256);
-  if (gfx->hwnd == NULL) {
-    fprintf(stderr, "native_gfx_open_display(): CreateWindow() failed\n");
-    exit(EXIT_FAILURE);
-  }
-
-  gfx->hdc = GetDC(gfx->hwnd);
-  if (gfx->hdc == NULL) {
-    fprintf(stderr,
-            "native_gfx_open_display(): "
-            "Can't get device context: GetDC() failed\n");
-    exit(EXIT_FAILURE);
-  }
-
   return (gfx);
 }
 
@@ -160,10 +146,19 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   if (height == 0)
     height = 256;
 
-  /* Nothing to do here.  The window was already created at display
-     initialization.*/
+  gfx->hwnd = createWindow(width, height);
+  if (gfx->hwnd == NULL) {
+    fprintf(stderr, "native_gfx_create_window(): CreateWindow() failed\n");
+    exit(EXIT_FAILURE);
+  }
 
-  /* XXX: We need to resize here the window to requested value */
+  gfx->hdc = GetDC(gfx->hwnd);
+  if (gfx->hdc == NULL) {
+    fprintf(stderr,
+            "native_gfx_create_window(): "
+            "Can't get device context: GetDC() failed\n");
+    exit(EXIT_FAILURE);
+  }
 
   gfx->win_width = width;
   gfx->win_height = height;
