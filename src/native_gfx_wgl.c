@@ -40,25 +40,20 @@ struct native_gfx_s
 };
 
 static LRESULT CALLBACK
-wndProc(HWND hwnd, unsigned int msg, WPARAM wParam, LPARAM lParam)
+wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+  LRESULT res;
+
   switch (msg) {
 
     case WM_CLOSE: {
-      //quit = true;
-      DestroyWindow(hwnd);
-      PostQuitMessage(0);
-      return 0;
-    }
-
-    case WM_SIZE: {
-      //winWidth = LOWORD(lParam);
-      //winHeight = HIWORD(lParam);
-      return 0;
+      exit(EXIT_SUCCESS);
     }
   }
 
-  return (DefWindowProc(hwnd, msg, wParam, lParam));
+  res = DefWindowProc(hwnd, msg, wParam, lParam);
+
+  return (res);
 }
 
 static HWND
@@ -80,8 +75,9 @@ createWindow(int width, int height)
   wcex.lpfnWndProc = wndProc;
 
   RegisterClassEx(&wcex);
+
   RECT rect = { 0, 0, width, height };
-  int style = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME;
+  DWORD style = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
   AdjustWindowRect(&rect, style, FALSE);
 
   HWND hwnd = CreateWindow("glslsandbox-player",
@@ -97,7 +93,7 @@ createWindow(int width, int height)
                            NULL);
   ShowWindow(hwnd, SW_SHOW);
 
-  return hwnd;
+  return (hwnd);
 }
 
 char *
@@ -169,14 +165,11 @@ native_gfx_destroy_window(native_gfx_t *gfx)
 {
   DestroyWindow(gfx->hwnd);
   gfx->hwnd = NULL;
-  // XXX: Destroy window
 }
 
 void
 native_gfx_close_display(native_gfx_t *gfx)
 {
-  // XXX: close display
-  //gfx->disp = NULL;
   free(gfx);
 }
 
