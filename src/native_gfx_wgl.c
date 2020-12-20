@@ -46,6 +46,12 @@ wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
   switch (msg) {
 
+    case WM_KEYDOWN: {
+      if (wParam == VK_ESCAPE || wParam == 'Q') {
+        exit(EXIT_SUCCESS);
+      }
+      return (0);
+    }
     case WM_CLOSE: {
       exit(EXIT_SUCCESS);
     }
