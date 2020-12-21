@@ -91,6 +91,20 @@ AC_CHECK_HEADERS([EGL/eglext.h], [], [],
 
 AC_CHECK_FUNCS([eglGetPlatformDisplay])
 
+AC_MSG_CHECKING([whether GL_GLEXT_PROTOTYPES is needed for core ES2 functions])
+AC_PREPROC_IFELSE(
+   [AC_LANG_PROGRAM([[
+#include <GLES2/gl2.h>
+#ifndef GL_GLES_PROTOTYPES
+# error "GL_GLES_PROTOTYPES is not defined"
+#endif
+]])],
+   [AC_MSG_RESULT([no])],
+   [
+     AC_MSG_RESULT([yes])
+     AC_DEFINE(GL_GLEXT_PROTOTYPES, [1], [GLES prototypes are needed])
+   ])
+
 AC_ARG_WITH([libpng],
     AS_HELP_STRING([--with-libpng], [Enable libpng support @<:@default=enabled@:>@]),
     [], [with_libpng=yes]
