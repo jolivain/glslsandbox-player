@@ -1574,6 +1574,10 @@ fprintf_info(FILE *fp)
   fprintf(fp, "compiler __VERSION__ macro  : %s\n", __VERSION__);
 #endif
 
+#if defined (__ghs__) && defined (__GHS_VERSION_NUMBER)
+  fprintf(fp, "Greenhills compiler version : %d\n", __GHS_VERSION_NUMBER);
+#endif
+
   fprintf(fp, "Native window system        : %s\n",
           native_gfx_get_name());
 
