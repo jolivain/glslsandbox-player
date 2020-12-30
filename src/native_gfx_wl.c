@@ -18,12 +18,29 @@
 #include "config.h"
 #endif
 
+/* In case -Wextra is passed to GCC, it will also enable
+ * -Wmissing-field-initializers. Wayland headers may declare
+ * structures with more members than the one initialized in this code,
+ * if protocol has greater version. We disable this specific warning
+ * for this file. Same comment for "-Wunused-parameter", as many
+ * callbacks needs to be declared empty, with many unused
+ * parameters. Pragma is protected for gcc >= 4.2 since it's the first
+ * version supporting this diagnostic pragma. */
+#if (__GNUC__) > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ >= 2))
+# pragma GCC diagnostic ignored "-Wunused-parameter"
+# pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include <EGL/egl.h>
+
+/* For KEY codes */
+#include <linux/input.h>
 
 #include <wayland-client.h>
 #include <wayland-egl.h>
@@ -55,6 +72,8 @@ struct native_gfx_s
   struct wl_compositor *compositor;
   struct wl_surface *surface;
   struct wl_egl_window *egl_window;
+  struct wl_seat *seat;
+  struct wl_keyboard *keyboard;
   /* struct wl_region *region; */
   struct wl_shell *shell;
   struct wl_shell_surface *shell_surface;
@@ -84,6 +103,74 @@ static const struct xdg_wm_base_listener wm_base_listener = {
 #endif /* ENABLE_WL_XDG */
 
 static void
+keyboard_handle_keymap(void *data, struct wl_keyboard *keyboard,
+                       uint32_t format, int fd, uint32_t size)
+{
+  /* Don’t leak the keymap fd */
+  close(fd);
+}
+
+static void
+keyboard_handle_enter(void *data, struct wl_keyboard *keyboard,
+                      uint32_t serial, struct wl_surface *surface,
+                      struct wl_array *keys)
+{
+}
+
+static void
+keyboard_handle_leave(void *data, struct wl_keyboard *keyboard,
+                      uint32_t serial, struct wl_surface *surface)
+{
+}
+
+static void
+keyboard_handle_modifiers(void *data, struct wl_keyboard *keyboard,
+                          uint32_t serial, uint32_t mods_depressed,
+                          uint32_t mods_latched, uint32_t mods_locked,
+                          uint32_t group)
+{
+}
+
+static void
+keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
+                    uint32_t serial, uint32_t time, uint32_t key,
+                    uint32_t state)
+{
+  if ((state == WL_KEYBOARD_KEY_STATE_PRESSED) &&
+      ((key == KEY_ESC) || (key == KEY_Q))) {
+    exit(EXIT_SUCCESS);
+  }
+}
+
+static const struct wl_keyboard_listener keyboard_listener = {
+  keyboard_handle_keymap,
+  keyboard_handle_enter,
+  keyboard_handle_leave,
+  keyboard_handle_key,
+  keyboard_handle_modifiers,
+};
+
+static void
+seat_handle_capabilities(void *data, struct wl_seat *seat,
+                         enum wl_seat_capability caps)
+{
+  native_gfx_t *gfx = (native_gfx_t *)data;
+
+  if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !gfx->keyboard) {
+    gfx->keyboard = wl_seat_get_keyboard(seat);
+    wl_keyboard_add_listener(gfx->keyboard, &keyboard_listener, gfx);
+  }
+  else if (!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && gfx->keyboard) {
+    wl_keyboard_destroy(gfx->keyboard);
+    gfx->keyboard = NULL;
+  }
+}
+
+static const struct wl_seat_listener seat_listener = {
+  seat_handle_capabilities,
+};
+
+static void
 global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
                         const char *interface, uint32_t version)
 {
@@ -101,6 +188,11 @@ global_registry_handler(void *data, struct wl_registry *registry, uint32_t id,
   } else if (strcmp(interface, "wl_shell") == 0) {
     ctx->shell = wl_registry_bind(registry, id,
                                   &wl_shell_interface, 1);
+  }
+  else if (strcmp(interface, "wl_seat") == 0) {
+    ctx->seat = wl_registry_bind(registry, id,
+                                 &wl_seat_interface, 1);
+    wl_seat_add_listener(ctx->seat, &seat_listener, ctx);
   }
 #ifdef ENABLE_WL_XDG
   else if (strcmp(interface, "xdg_wm_base") == 0) {
