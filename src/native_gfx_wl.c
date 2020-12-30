@@ -341,7 +341,15 @@ native_gfx_close_display(native_gfx_t *gfx)
 void
 native_gfx_swap_buffers(native_gfx_t *gfx)
 {
-  GFX_UNUSED(gfx);
+  int ret;
+
+  ret = wl_display_dispatch_pending(gfx->display);
+
+  if (ret < 0) {
+    fprintf(stderr,
+            "ERROR: wl_display_dispatch_pending() returned %i\n", ret);
+    exit(EXIT_FAILURE);
+  }
 }
 
 int
