@@ -665,6 +665,17 @@ the "_MOTIF_WM_HINTS" X11 window property. The window manager must
 respond to that property to actually disable the decoration.
 
 
+Notes on Wayland Native Windowing
+---------------------------------
+
+  For building the Wayland support, use the configure command:
+
+    ./configure --with-native-gfx=wl
+
+  Complete full screen can be requested by setting `GSP_WL_FULLSCREEN`
+environment variable to `1`. This requires Wayland XDG shell protocol.
+
+
 Notes on KMS DRM Native Windowing
 ---------------------------------
 

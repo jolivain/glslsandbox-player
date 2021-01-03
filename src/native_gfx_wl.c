@@ -82,6 +82,7 @@ struct native_gfx_s
   struct xdg_surface *xdg_surface;
   struct xdg_toplevel *xdg_toplevel;
   int wait_for_configure;
+  int fullscreen;
 #endif /* ENABLE_WL_XDG */
 #ifdef ENABLE_WL_IVI
   struct ivi_application *ivi_app;
@@ -340,7 +341,48 @@ handle_surface_configure(void *data, struct xdg_surface *surface,
 static const struct xdg_surface_listener xdg_surface_listener = {
   handle_surface_configure
 };
+
+static void
+handle_toplevel_configure(void *data, struct xdg_toplevel *toplevel,
+                          int32_t width, int32_t height,
+                          struct wl_array *states)
+{
+  native_gfx_t *gfx = (native_gfx_t *)data;
+
+  if (width > 0 && height > 0) {
+    gfx->disp_width = width;
+    gfx->disp_height = height;
+  }
+}
+
+static void
+handle_toplevel_close(void *data, struct xdg_toplevel *xdg_toplevel)
+{
+}
+
+static const struct xdg_toplevel_listener xdg_toplevel_listener = {
+  handle_toplevel_configure,
+  handle_toplevel_close,
+};
 #endif /* ENABLE_WL_XDG */
+
+static void
+wl_setup_window_fullscreen(native_gfx_t *gfx)
+{
+  const char *fullscreen;
+
+  fullscreen = getenv("GSP_WL_FULLSCREEN");
+  if (fullscreen != NULL) {
+    if (strcmp(fullscreen, "1") == 0) {
+      gfx->fullscreen = 1;
+    }
+    else {
+      fprintf(stderr,
+              "WARNING: Invalid value of GSP_WL_FULLSCREEN variable.\n"
+              "WARNING: Ignoring. Valid value is \"1\".\n");
+    }
+  }
+}
 
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
@@ -356,13 +398,19 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
 #ifdef ENABLE_WL_XDG
   if (gfx->xdg_wm_base != NULL) {
+    wl_setup_window_fullscreen(gfx);
     gfx->xdg_surface = xdg_wm_base_get_xdg_surface(gfx->xdg_wm_base,
                                                    gfx->surface);
     xdg_surface_add_listener(gfx->xdg_surface,
                              &xdg_surface_listener, gfx);
 
     gfx->xdg_toplevel = xdg_surface_get_toplevel(gfx->xdg_surface);
+    xdg_toplevel_add_listener(gfx->xdg_toplevel,
+                              &xdg_toplevel_listener, gfx);
     xdg_toplevel_set_title(gfx->xdg_toplevel, "glslsandbox-player");
+    if (gfx->fullscreen)
+      xdg_toplevel_set_fullscreen(gfx->xdg_toplevel, NULL);
+    gfx->wait_for_configure = 1;
     wl_surface_commit(gfx->surface);
     wl_display_roundtrip(gfx->display);
   } else
@@ -383,6 +431,11 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 
   if (height == 0)
     height = default_wayland_window_height;
+
+  if (gfx->fullscreen) {
+    width = gfx->disp_width;
+    height = gfx->disp_height;
+  }
 
   gfx->egl_window = wl_egl_window_create(gfx->surface, width, height);
   if (gfx->egl_window == EGL_NO_SURFACE) {
