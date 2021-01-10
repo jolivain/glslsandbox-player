@@ -892,6 +892,95 @@ LDFLAGS. For example, with configuration command:
     emmake make EXEEXT=.html
 
 
+Notes on Windows WGL Native Windowing
+-------------------------------------
+
+glslsandbox-player is initially mean to run on Unix Posix
+systems. However, it's possible to use it on a Microsoft Windows
+system. Since few vendor drivers are providing EGL/GLES2 drivers on
+desktops, and most drivers are for DirectX, it's possible workaround
+those limitation using the Google Angle project:
+http://angleproject.org/
+
+One can follow instructions from Google Angle to compile a program to
+use it. A project will need to be created to compile
+glslsandbox-player (e.g. a Visual Studio project). Instructions to
+achieve this is outside the scope of this document.
+
+Another way to generate a native Windows executable from Posix source,
+is to use the Gcc MinGW compiler. Fedora Linux includes this compiler
+and other needed libraries.
+
+For generating a Windows native binary from a Fedora system:
+(Tested on Fedora 33)
+
+### Install dependencies ###
+
+    dnf install \
+      autoconf automake make \
+      mingw32-gcc mingw32-angleproject mingw32-libpng
+
+### Build program ###
+
+Start with standard commands:
+
+    git clone https://github.com/jolivain/glslsandbox-player.git
+    cd glslsandbox-player
+    autoreconf -vfi
+
+Then continue with MinGW build:
+
+    mkdir -p build-mingw32
+    cd build-mingw32
+
+    egl_CFLAGS=" " \
+    egl_LIBS="-lEGL" \
+    glesv2_CFLAGS=" " \
+    glesv2_LIBS="-lGLESv2" \
+      mingw32-configure --with-native-gfx=wgl
+
+    mingw32-make -j$(nproc)
+
+The generated binary will be `src/glslsandbox-player.exe`.
+
+
+### Running the Windows Binary on Linux ###
+
+The generated binary can be directly tested on the Linux system using
+the Wine Windows emulator. The path where MinGW DLLs resides needs to
+be defined:
+
+    export WINEPATH="$(rpm --eval '%{mingw32_bindir}')"
+    wine ./src/glslsandbox-player.exe
+
+Note: if the shader fail to compile, an original D3D Compiler can be
+installed with Winetricks, using the commands:
+
+    winetricks d3dcompiler_47
+
+
+### Generating a Zip Archive to Run on a Windows System ###
+
+To generate a standalone archive containing the main binary and all
+the dependencies, use the following commands after building the
+program from the previous instructions:
+
+    export WINEPATH="$(rpm --eval '%{mingw32_bindir}')"
+    mkdir -p gsp-win32
+    
+    cp \
+      src/glslsandbox-player.exe \
+      $WINEPATH/lib{gcc_s_dw2-1,stdc++-6,ssp-0,winpthread-1}.dll \
+      $WINEPATH/lib{EGL,GLESv2,png16-16}.dll \
+      $WINEPATH/zlib1.dll \
+      ./gsp-win32/
+    
+    zip -r gsp-win32.zip gsp-win32/
+
+The `gsp-win32.zip` can be copied on a Windows system, and the program
+can be called from the command line.
+
+
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
