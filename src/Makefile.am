@@ -130,3 +130,24 @@ endif
 if ENABLE_EM
 glslsandbox_player_SOURCES += native_gfx_em.c
 endif
+
+if ENABLE_OSX
+glslsandbox_player_SOURCES += native_gfx_osx.m
+glslsandbox_player_OBJCFLAGS = ${egl_CFLAGS} ${glesv2_CFLAGS}
+glslsandbox_player_LDFLAGS = -framework Cocoa
+# Automake has a specific way to chose the linker. See:
+# http://www.gnu.org/software/automake/manual/html_node/How-the-Linker-is-Chosen.html
+# It seems that in case an Objective-C file is conditionally included,
+# the Objective-C linker is still selected, even when this file is not
+# included in the compiled sources. Also, the AC_PROG_OBJC autoconf
+# macro cannot be used conditionally. This introduces issues when
+# cross-compiling, for example: the toolchain may not include the
+# Objective-C compiler. Autoconf may default to the host "gcc",
+# introducing link failures. The workaround here is to explicitly
+# change the linker command depending on the condition.
+glslsandbox_player_LINK = $(OBJCLD) $(glslsandbox_player_OBJCFLAGS) \
+        $(OBJCFLAGS) $(glslsandbox_player_LDFLAGS) $(LDFLAGS) -o $@
+else
+glslsandbox_player_LINK = $(CCLD) $(glslsandbox_player_CFLAGS) \
+        $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+endif

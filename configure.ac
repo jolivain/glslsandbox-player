@@ -6,6 +6,7 @@ AC_CONFIG_TESTDIR([tests], [src])
 AC_PROG_AWK
 AM_PROG_AR
 AC_PROG_CC
+AC_PROG_OBJC
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
@@ -259,6 +260,15 @@ AS_IF([test "x$with_native_gfx" = "xem"], [
     AC_MSG_NOTICE([Emscripten/Wasm support disabled])
 ])
 AM_CONDITIONAL([ENABLE_EM], [test "x$with_native_gfx" = "xem"])
+
+AS_IF([test "x$with_native_gfx" = "xosx"], [
+    native_gfx=osx
+    AC_DEFINE([ENABLE_OSX], [1], [Enable Native OS X])
+    AC_MSG_NOTICE([OS X support enabled])
+], [
+    AC_MSG_NOTICE([OS X support disabled])
+])
+AM_CONDITIONAL([ENABLE_OSX], [test "x$with_native_gfx" = "xosx"])
 
 AS_IF([test "x$native_gfx" = "x"], [
     AC_MSG_ERROR([unknown native gfx selected: $with_native_gfx])
