@@ -9,7 +9,7 @@ if [ $# -ne 1 ] ; then
 fi
 
 BASENAME="$(dirname "$0")"
-SHADER_ID="$(echo "$1" | sed -r 's@^http://(www\.)?glslsandbox\.com/e#@@')"
+SHADER_ID="$(echo "$1" | sed -E 's@^http://(www\.)?glslsandbox\.com/e#@@')"
 URL_PREFIX="http://glslsandbox.com/item/"
 CURL="curl"
 JSON2FRAG="${BASENAME}/json2code"
