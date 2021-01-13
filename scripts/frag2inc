@@ -14,7 +14,7 @@ FRAGFILE="$(basename "${FRAGPATH}")"
 FRAGSTR="${FRAGFILE%.frag}"
 FRAG_ID="${FRAGSTR%.*}"
 FRAG_REV="${FRAGSTR#*.}"
-FRAG_NICK="$(grep -E "^${FRAGSTR}[[:blank:]]" "${SHADER_LIST}" | sed -r 's/^[0-9]+\.[0-9]+[[:blank:]]+//')"
+FRAG_NICK="$(grep -E "^${FRAGSTR}[[:blank:]]" "${SHADER_LIST}" | sed -E 's/^[0-9]+\.[0-9]+[[:blank:]]+//')"
 
 if [ -z "${FRAG_NICK}" ] ; then
     FRAG_NICK="${FRAGSTR}"
@@ -23,7 +23,7 @@ fi
 echo "  {"
 echo "    ${FRAG_ID}, ${FRAG_REV}, \"${FRAG_NICK}\","
 
-sed -r \
+sed -E \
     -e 's/[[:blank:]]+$//' \
     -e 's/\\/\\\\/g' \
     -e 's/"/\\"/g' \
