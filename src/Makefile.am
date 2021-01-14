@@ -1,29 +1,8 @@
-AM_CFLAGS = -W -Wall -Wextra -Wshadow -Wpointer-arith -Wmissing-prototypes -Wcast-align \
-		${egl_CFLAGS} ${glesv2_CFLAGS} \
-		${x11_CFLAGS}
+glslsandbox_player_CFLAGS = \
+	-W -Wall -Wextra -Wshadow -Wpointer-arith -Wmissing-prototypes -Wcast-align \
+	${egl_CFLAGS} ${glesv2_CFLAGS}
 
-LDADD = \
-	${egl_LIBS} ${glesv2_LIBS} \
-	${x11_LIBS} -lm
-
-if HAVE_LIBPNG
-LDADD += ${libpng_LIBS}
-endif
-
-if ENABLE_WL
-AM_CFLAGS += ${wayland_client_CFLAGS} ${wayland_egl_CFLAGS}
-LDADD += ${wayland_client_LIBS} ${wayland_egl_LIBS}
-endif
-
-if ENABLE_KMS
-AM_CFLAGS += ${drm_CFLAGS} ${gbm_CFLAGS}
-LDADD += ${drm_LIBS} ${gbm_LIBS}
-endif
-
-if ENABLE_SDL2
-AM_CFLAGS += ${sdl2_CFLAGS}
-LDADD += ${sdl2_LIBS}
-endif
+glslsandbox_player_LDADD = ${egl_LIBS} ${glesv2_LIBS} -lm
 
 GEN_SHADER_IDS = $(top_srcdir)/scripts/gen-shader-ids
 DL_SHADER = $(top_srcdir)/scripts/dl-shader
@@ -73,10 +52,14 @@ glslsandbox_player_SOURCES = \
 
 if HAVE_LIBPNG
 glslsandbox_player_SOURCES += pngio.c pngio.h
+glslsandbox_player_CFLAGS += ${libpng_CFLAGS}
+glslsandbox_player_LDADD += ${libpng_LIBS}
 endif
 
 if ENABLE_X11
 glslsandbox_player_SOURCES += native_gfx_x11.c
+glslsandbox_player_CFLAGS += ${x11_CFLAGS}
+glslsandbox_player_LDADD += ${x11_LIBS}
 endif
 
 if ENABLE_VIVFB
@@ -102,6 +85,8 @@ endef
 	$(wayland_scanner) private-code < $< > $@
 
 glslsandbox_player_SOURCES += native_gfx_wl.c
+glslsandbox_player_CFLAGS += ${wayland_client_CFLAGS} ${wayland_egl_CFLAGS}
+glslsandbox_player_LDADD += ${wayland_client_LIBS} ${wayland_egl_LIBS}
 if ENABLE_WL_XDG
 BUILT_SOURCES += xdg-shell-protocol.c xdg-shell-client-protocol.h
 nodist_glslsandbox_player_SOURCES += xdg-shell-protocol.c xdg-shell-client-protocol.h
@@ -113,6 +98,8 @@ endif
 
 if ENABLE_KMS
 glslsandbox_player_SOURCES += native_gfx_kms.c
+glslsandbox_player_CFLAGS += ${drm_CFLAGS} ${gbm_CFLAGS}
+glslsandbox_player_LDADD += ${drm_LIBS} ${gbm_LIBS}
 endif
 
 if ENABLE_WGL
@@ -150,4 +137,9 @@ glslsandbox_player_LINK = $(OBJCLD) $(glslsandbox_player_OBJCFLAGS) \
 else
 glslsandbox_player_LINK = $(CCLD) $(glslsandbox_player_CFLAGS) \
         $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+endif
+
+if ENABLE_SDL2
+glslsandbox_player_CFLAGS += ${sdl2_CFLAGS}
+glslsandbox_player_LDADD += ${sdl2_LIBS}
 endif
