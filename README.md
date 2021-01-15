@@ -992,6 +992,88 @@ The `gsp-win32.zip` can be copied on a Windows system, and the program
 can be called from the command line.
 
 
+Notes on the Apple Cocoa OS X Native Windowing
+----------------------------------------------
+
+glslsandbox-player includes a minimal support for the Apple Cocoa OS X
+Native Windowing. Since OpenGL and OpenGL ES support was deprecated in
+iOS and OS X in favor of the Apple Metal API, it's possible to
+workaround those limitation using the Google Angle project:
+http://angleproject.org/
+
+In the following instructions, we assume we will work from a new empty
+directory. Adjust to your actual environment.
+
+    GSP_WORKDIR="$HOME/glslsanbox-player-workdir"
+    mkdir -p "$GSP_WORKDIR"
+    cd "$GSP_WORKDIR"
+
+### Step 1: Install dependencies ###
+
+#### Xcode ####
+
+First, Xcode needs to be installed, from the App Store. The full Xcode
+is needed (the command line tools won't be enough).
+
+#### Google Angle ####
+
+Install Google Angle following instructions from:
+https://chromium.googlesource.com/angle/angle/+/master/doc/DevSetup.md
+
+Following commands were tested with project at commit:
+https://chromium.googlesource.com/angle/angle/+/c600e47812c88d45087582122dbb004851ae966b
+
+    git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+    export PATH="$PWD"/depot_tools:"$PATH"
+    git clone https://chromium.googlesource.com/angle/angle
+    cd angle
+    python scripts/bootstrap.py
+    gclient sync
+    git checkout master
+    gn gen out/Release
+    ninja -C out/Release
+
+Angle library can be tested with a simple test program:
+
+    ./out/Release/hello_triangle
+
+
+#### Homebrew and Few Other Packages ####
+
+Following instructions from: https://brew.sh/
+
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+Then install some required packages:
+
+    brew install automake autoconf pkg-config libtool libpng
+
+
+### Step 2: Build Program ###
+
+Start with standard commands:
+
+    cd "$GSP_WORKDIR"
+    git clone https://github.com/jolivain/glslsandbox-player.git
+    cd glslsandbox-player
+    autoreconf -vfi
+
+Then configure and build for OS X using Angle:
+
+    egl_CFLAGS="-I$GSP_WORKDIR/angle/include" \
+    egl_LIBS="-L$GSP_WORKDIR/angle/out/Release -lEGL" \
+    glesv2_CFLAGS="-I$GSP_WORKDIR/angle/include" \
+    glesv2_LIBS="-L$GSP_WORKDIR/angle/out/Release -lGLESv2" \
+        ./configure --with-native-gfx=osx
+
+    make
+
+Finally, the program can be started with:
+
+    export DYLD_FALLBACK_LIBRARY_PATH="$GSP_WORKDIR/angle/out/Release"
+    ./src/glslsandbox-player
+
+
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
