@@ -649,9 +649,10 @@ stacking order). If set to `below`, the window will be below other
 windows (this can be useful to put the the program behind other
 windows having transparent areas).
 
-  Complete full screen can be requsted by setting `GSP_X11_FULLSCREEN`
-environment variable to `1`. If the window manager honor the request,
-the window surface will have the same dimension as the screen.
+  Complete full screen can be requested by setting
+`GSP_X11_FULLSCREEN` environment variable to `1`. If the window
+manager honor the request, the window surface will have the same
+dimension as the screen.
 
   Mouse cursor can be disabled/hidden by setting `GSP_X11_CURSOR`
 environment variable to `0`. When the variable is unset, the standard
