@@ -19,7 +19,7 @@ timeout --foreground 1 true && TIMEOUT_FG="--foreground"
         timeout \
             ${TIMEOUT_FG} \
             -s KILL 60 \
-            "${GLSLSANDBOX_PLAYER}" -W 640 -H 360 -t 3 -w 0 -q -S "${shader_name}"
+            "${GLSLSANDBOX_PLAYER}" -W 640 -H 360 -t 3 -w 1 -q -S "${shader_name}"
         RET=$?
 
         if [ $RET -eq 124 ] ; then
