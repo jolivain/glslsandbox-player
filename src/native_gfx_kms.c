@@ -166,6 +166,9 @@ static const char *modules_g[] = {
   "tilcdc", "msm", "sti", "tegra", "imx-drm", "rockchip", "atmel-hlcdc",
   "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111", "stm",
   "sun4i-drm", "armada-drm", "komeda", "imx-dcss", "mxsfb-drm",
+
+  /* Not in drm tests/util/kms.c, but added here for convenience: */
+  "rcar-du", "vkms",
 };
 
 
