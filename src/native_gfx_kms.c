@@ -409,6 +409,30 @@ drm_find_crtc_id(const native_gfx_t *gfx,
   return (drm_crtc_id);
 }
 
+static void
+drm_print_version(const native_gfx_t *gfx)
+{
+  drmVersionPtr ver;
+
+  ver = drmGetLibVersion(gfx->drm_fd);
+  if (ver != NULL) {
+     fprintf(stderr,
+            "drm: lib version: %i.%i.%i\n",
+            ver->version_major,
+            ver->version_minor,
+            ver->version_patchlevel);
+    drmFreeVersion(ver);
+  }
+
+  ver = drmGetVersion(gfx->drm_fd);
+  if (ver != NULL) {
+    fprintf(stderr,
+            "drm: kernel: name: %s, date: %s, desc: %s\n",
+            ver->name, ver->date, ver->desc);
+    drmFreeVersion(ver);
+  }
+}
+
 static int
 init_drm(native_gfx_t *gfx)
 {
@@ -450,6 +474,8 @@ init_drm(native_gfx_t *gfx)
             errno, strerror(errno));
     return (-1);
   }
+
+  drm_print_version(gfx);
 
   gfx->drm_conn = drm_find_connector(gfx, moderes);
   if (gfx->drm_conn == NULL) {
