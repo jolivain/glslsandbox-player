@@ -90,7 +90,13 @@ AC_CHECK_HEADERS([EGL/eglext.h], [], [],
 [[#include <EGL/egl.h>
 ]])
 
+# Automake part is defining libs using values returned by pkg-config
+# So we temporarily add those values to LIBS to let AC_CHECK_FUNCS()
+# do its detection.
+OLD_LIBS="$LIBS"
+LIBS="$egl_LIBS $LIBS"
 AC_CHECK_FUNCS([eglGetPlatformDisplay])
+LIBS="$OLD_LIBS"
 
 AC_MSG_CHECKING([whether GL_GLEXT_PROTOTYPES is needed for core ES2 functions])
 AC_PREPROC_IFELSE(
