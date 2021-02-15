@@ -165,7 +165,7 @@ static const char *modules_g[] = {
   "i915", "amdgpu", "radeon", "nouveau", "vmwgfx", "omapdrm", "exynos",
   "tilcdc", "msm", "sti", "tegra", "imx-drm", "rockchip", "atmel-hlcdc",
   "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111", "stm",
-  "sun4i-drm", "armada-drm",
+  "sun4i-drm", "armada-drm", "komeda", "imx-dcss", "mxsfb-drm",
 };
 
 
