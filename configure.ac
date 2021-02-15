@@ -214,6 +214,14 @@ AS_IF([test "x$with_native_gfx" = "xkms"], [
     AC_MSG_NOTICE([KMS/GBM/DRM support enabled])
     PKG_CHECK_MODULES([drm], [libdrm])
     PKG_CHECK_MODULES([gbm], [gbm])
+
+    # Automake part is defining libs using values returned by
+    # pkg-config So we temporarily add those values to LIBS to let
+    # AC_CHECK_FUNCS() do its detection.
+    OLD_LIBS="$LIBS"
+    LIBS="$drm_LIBS $LIBS"
+    AC_CHECK_FUNCS([drmGetDevices2])
+    LIBS="$OLD_LIBS"
 ], [
     AC_MSG_NOTICE([KMS/GBM/DRM support disabled])
 ])

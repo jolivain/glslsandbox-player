@@ -41,6 +41,10 @@
 #include <linux/vt.h>
 #include <linux/major.h>
 
+#ifdef HAVE_DRMGETDEVICES2
+#include <fcntl.h>
+#endif
+
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 #include <gbm.h>
@@ -156,21 +160,6 @@ init_vt(void)
 
   return (0);
 }
-
-/*
- * See:
- * https://cgit.freedesktop.org/mesa/drm/tree/tests/util/kms.c
- */
-static const char *modules_g[] = {
-  "i915", "amdgpu", "radeon", "nouveau", "vmwgfx", "omapdrm", "exynos",
-  "tilcdc", "msm", "sti", "tegra", "imx-drm", "rockchip", "atmel-hlcdc",
-  "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111", "stm",
-  "sun4i-drm", "armada-drm", "komeda", "imx-dcss", "mxsfb-drm",
-
-  /* Not in drm tests/util/kms.c, but added here for convenience: */
-  "rcar-du", "vkms",
-};
-
 
 static drmModeConnector *
 drm_find_connector_connected(const native_gfx_t *gfx,
@@ -409,6 +398,98 @@ drm_find_crtc_id(const native_gfx_t *gfx,
   return (drm_crtc_id);
 }
 
+#ifdef HAVE_DRMGETDEVICES2
+
+#define MAX_DRM_DEVICES 64
+
+static int
+drm_find_device(drmModeRes **moderes)
+{
+  drmDevicePtr devs[MAX_DRM_DEVICES] = { NULL, };
+  int num_devs;
+  int fd = -1;
+  int i;
+
+  num_devs = drmGetDevices2(0, devs, MAX_DRM_DEVICES);
+  if (num_devs < 0) {
+    fprintf(stderr,
+            "ERROR: drmGetDevices2() error %i: %s\n",
+            -num_devs, strerror(-num_devs));
+    return (-1);
+  }
+
+  for (i = 0; i < num_devs; i++) {
+    drmDevicePtr drmdev = devs[i];
+
+    if ( ! (drmdev->available_nodes & (1 << DRM_NODE_PRIMARY)) ) {
+      continue ;
+    }
+
+    fd = open(drmdev->nodes[DRM_NODE_PRIMARY], O_RDWR);
+    if (fd < 0) {
+      continue ;
+    }
+
+    *moderes = drmModeGetResources(fd);
+    if (*moderes != NULL) {
+      break ;
+    }
+
+    close(fd);
+    fd = -1;
+  }
+
+  drmFreeDevices(devs, num_devs);
+
+  if (fd < 0) {
+    fprintf(stderr, "ERROR: no drm device found!\n");
+  }
+
+  return (fd);
+}
+
+#else /* HAVE_DRMGETDEVICES2 */
+
+/*
+ * See:
+ * https://cgit.freedesktop.org/mesa/drm/tree/tests/util/kms.c
+ */
+static const char *drm_modules_g[] = {
+  "i915", "amdgpu", "radeon", "nouveau", "vmwgfx", "omapdrm", "exynos",
+  "tilcdc", "msm", "sti", "tegra", "imx-drm", "rockchip", "atmel-hlcdc",
+  "fsl-dcu-drm", "vc4", "virtio_gpu", "mediatek", "meson", "pl111", "stm",
+  "sun4i-drm", "armada-drm", "komeda", "imx-dcss", "mxsfb-drm",
+
+  /* Not in drm tests/util/kms.c, but added here for convenience: */
+  "rcar-du", "vkms",
+};
+
+static int
+drm_find_device(drmModeRes **moderes)
+{
+  int fd;
+  int i;
+  size_t drv_count;
+
+  drv_count = ARRAY_SIZE(drm_modules_g);
+
+  for (i = 0; ((size_t)i) < drv_count; i++) {
+    fprintf(stderr, "drm: trying to load module %s...", drm_modules_g[i]);
+    fd = drmOpen(drm_modules_g[i], NULL);
+    if (fd < 0) {
+      fprintf(stderr, "failed.\n");
+    } else {
+      fprintf(stderr, "success.\n");
+      break ;
+    }
+  }
+
+  *moderes = drmModeGetResources(fd);
+
+  return (fd);
+}
+#endif /* HAVE_DRMGETDEVICES2 */
+
 static void
 drm_print_version(const native_gfx_t *gfx)
 {
@@ -436,31 +517,19 @@ drm_print_version(const native_gfx_t *gfx)
 static int
 init_drm(native_gfx_t *gfx)
 {
-  drmModeRes *moderes;
-  int i;
   const char *drm_driver_name;
-  const char **drv_array;
-  size_t drv_count;
+  drmModeRes *moderes = NULL;
 
   drm_driver_name = getenv("GSP_DRM_DRIVER");
   if (drm_driver_name != NULL) {
-    drv_array = &drm_driver_name;
-    drv_count = 1;
+    fprintf(stderr, "drm: trying to load module %s...", drm_driver_name);
+    gfx->drm_fd = drmOpen(drm_driver_name, NULL);
+    if (gfx->drm_fd >= 0) {
+      moderes = drmModeGetResources(gfx->drm_fd);
+    }
   }
   else {
-    drv_array = modules_g;
-    drv_count = ARRAY_SIZE(modules_g);
-  }
-
-  for (i = 0; ((size_t)i) < drv_count; i++) {
-    fprintf(stderr, "drm: trying to load module %s...", drv_array[i]);
-    gfx->drm_fd = drmOpen(drv_array[i], NULL);
-    if (gfx->drm_fd < 0) {
-      fprintf(stderr, "failed.\n");
-    } else {
-      fprintf(stderr, "success.\n");
-      break ;
-    }
+    gfx->drm_fd = drm_find_device(&moderes);
   }
 
   if (gfx->drm_fd < 0) {
@@ -468,7 +537,6 @@ init_drm(native_gfx_t *gfx)
     return (-1);
   }
 
-  moderes = drmModeGetResources(gfx->drm_fd);
   if (moderes == NULL) {
     fprintf(stderr, "drmModeGetResources() failed: %i %s\n",
             errno, strerror(errno));
