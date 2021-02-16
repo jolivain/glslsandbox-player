@@ -364,7 +364,6 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
   handle_toplevel_configure,
   handle_toplevel_close,
 };
-#endif /* ENABLE_WL_XDG */
 
 static void
 wl_setup_window_fullscreen(native_gfx_t *gfx)
@@ -383,6 +382,7 @@ wl_setup_window_fullscreen(native_gfx_t *gfx)
     }
   }
 }
+#endif /* ENABLE_WL_XDG */
 
 void
 native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int ypos)
@@ -432,10 +432,12 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
   if (height == 0)
     height = default_wayland_window_height;
 
+#ifdef ENABLE_WL_XDG
   if (gfx->fullscreen) {
     width = gfx->disp_width;
     height = gfx->disp_height;
   }
+#endif /* ENABLE_WL_XDG */
 
   gfx->egl_window = wl_egl_window_create(gfx->surface, width, height);
   if (gfx->egl_window == EGL_NO_SURFACE) {
