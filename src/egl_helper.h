@@ -71,7 +71,7 @@ EGLDisplay
 __xegl_eglGetDisplay(const char *file, int line,
                      EGLNativeDisplayType display_id);
 
-#if defined(EGL_VERSION_1_5) && defined(HAVE_EGLGETPLATFORMDISPLAY)
+#if defined(ENABLE_KMS) && defined(EGL_VERSION_1_5) && defined(HAVE_EGLGETPLATFORMDISPLAY)
 EGLDisplay
 __xegl_eglGetPlatformDisplay(const char *file, int line,
                              EGLenum platform,
