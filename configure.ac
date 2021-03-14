@@ -188,7 +188,7 @@ AS_IF([test "x$enable_ivi" = "xyes"], [
 AM_CONDITIONAL([ENABLE_WL_IVI], [test "x$enable_ivi" = "xyes"])
 
 AC_ARG_ENABLE([wlxdg],
-    AS_HELP_STRING([--enable-wlxdg], [enable Wayland XDG shell protocol]),
+    AS_HELP_STRING([--disable-wlxdg], [disable Wayland XDG shell protocol @<:@default=enabled@:>@]),
     [], [enable_wlxdg=yes])
 AS_IF([test "x$enable_wlxdg" = "xyes"], [
     AC_DEFINE(ENABLE_WL_XDG, [1], [Enable Wayland XDG shell.])
