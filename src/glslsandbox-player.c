@@ -1611,6 +1611,10 @@ fprintf_info(FILE *fp)
   fprintf(fp, "Greenhills compiler version : %d\n", __GHS_VERSION_NUMBER);
 #endif
 
+#if defined (__ANDROID_API__)
+  fprintf(fp, "Android API                 : %i\n", __ANDROID_API__);
+#endif
+
   fprintf(fp, "Native window system        : %s\n",
           native_gfx_get_name());
 
