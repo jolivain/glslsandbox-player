@@ -38,6 +38,10 @@
 #include <emscripten/html5.h>
 #endif
 
+#ifdef __ANDROID__
+#include "android-defs.h"
+#endif
+
 #include "glslsandbox-shaders.h"
 #include "native_gfx.h"
 #include "egl_helper.h"

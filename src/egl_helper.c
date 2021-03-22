@@ -26,6 +26,10 @@
 # include "SDL_opengles2.h"
 #endif /* ENABLE_SDL2 */
 
+#ifdef __ANDROID__
+#include "android-defs.h"
+#endif
+
 #include "native_gfx.h"
 #include "egl_helper.h"
 
