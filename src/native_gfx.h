@@ -87,6 +87,12 @@ native_gfx_get_window_width(const native_gfx_t *gfx);
 int
 native_gfx_get_window_height(const native_gfx_t *gfx);
 
+/*
+ * Returns non-zero if native windowing requested program termination.
+ */
+int
+native_gfx_request_exit(const native_gfx_t *gfx);
+
 #endif /* NATIVE_GFX_H */
 
 /*
