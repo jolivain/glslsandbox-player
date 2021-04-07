@@ -1965,6 +1965,18 @@ player_render_loop_begin(context_t *ctx)
 }
 
 static int
+player_receive_exit(const context_t *ctx)
+{
+  native_gfx_t *gfx;
+  int recv_exit;
+
+  gfx = egl_get_native_gfx(ctx->egl);
+  recv_exit = native_gfx_request_exit(gfx);
+
+  return (recv_exit);
+}
+
+static int
 player_render_loop_iter(context_t *ctx)
 {
     int last_frame;
@@ -1990,6 +2002,9 @@ player_render_loop_iter(context_t *ctx)
     ctx->frame++;
 
     if (last_frame)
+      return 0;
+
+    if (player_receive_exit(ctx))
       return 0;
 
     return 1;
