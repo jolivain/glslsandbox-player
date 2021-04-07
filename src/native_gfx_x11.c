@@ -34,6 +34,7 @@ struct native_gfx_s
   int win_height;
   int fullscreen;
   Atom wmDeleteMessage;
+  int terminate;
 };
 
 char *
@@ -428,12 +429,12 @@ x11_check_events(native_gfx_t *gfx)
       if (strcmp("Escape", keystr) == 0
           || strcmp("q", keystr) == 0
           || strcmp("Q", keystr) == 0) {
-        exit(EXIT_SUCCESS);
+        gfx->terminate = 1;
       }
     }
     else if (xev.type == ClientMessage) {
       if ((Atom)(xev.xclient.data.l[0]) == gfx->wmDeleteMessage) {
-        exit(EXIT_SUCCESS);
+        gfx->terminate = 1;
       }
     }
   }
@@ -457,6 +458,12 @@ int
 native_gfx_get_window_height(const native_gfx_t *gfx)
 {
   return (gfx->win_height);
+}
+
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  return (gfx->terminate);
 }
 
 /*
