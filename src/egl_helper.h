@@ -54,6 +54,9 @@ egl_swap_buffers(egl_t *egl);
 void
 egl_swap_interval(egl_t *egl, int interval);
 
+native_gfx_t *
+egl_get_native_gfx(const egl_t *egl);
+
 int
 _egl_no_error(const char *file, int line);
 

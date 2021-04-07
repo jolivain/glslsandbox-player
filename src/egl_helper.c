@@ -751,6 +751,17 @@ egl_fprintf_config_attribs(FILE *fp,
   }
 }
 
+native_gfx_t *
+egl_get_native_gfx(const egl_t *egl)
+{
+#ifdef ENABLE_SDL2
+  (void)egl;     /* Unused. */
+  return (NULL); /* SDL has no native_gfx context. */
+#else
+  return (egl->native_gfx);
+#endif
+}
+
 
 /*
 * Copyright (c) 2015-2021, Julien Olivain <ju.o@free.fr>
