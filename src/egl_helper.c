@@ -412,6 +412,8 @@ __xegl_eglTerminate(const char *file, int line,
 
 #ifdef ENABLE_SDL2
 
+static int g_sdl_terminate = 0;
+
 egl_t *
 egl_init(int width, int height, int xpos, int ypos)
 {
@@ -465,12 +467,12 @@ egl_swap_buffers(egl_t *egl)
 
   while (SDL_PollEvent( &e ) != 0) {
     if (e.type == SDL_QUIT) {
-      exit(EXIT_SUCCESS);
+      g_sdl_terminate = 1;
     }
     else if (e.type == SDL_KEYDOWN) {
       if (e.key.keysym.sym == SDLK_ESCAPE
           || e.key.keysym.sym == SDLK_q) {
-        exit(EXIT_SUCCESS);
+        g_sdl_terminate = 1;
       }
     }
   }
@@ -494,6 +496,13 @@ char *
 native_gfx_get_name(void)
 {
   return ("SDL2");
+}
+
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  (void)gfx; /* Unused. */
+  return (g_sdl_terminate);
 }
 
 #else /* ENABLE_SDL2 */
