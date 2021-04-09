@@ -459,7 +459,21 @@ egl_init(int width, int height, int xpos, int ypos)
 void
 egl_swap_buffers(egl_t *egl)
 {
+  SDL_Event e = { 0 };
+
   SDL_GL_SwapWindow(egl->sdlwin);
+
+  while (SDL_PollEvent( &e ) != 0) {
+    if (e.type == SDL_QUIT) {
+      exit(EXIT_SUCCESS);
+    }
+    else if (e.type == SDL_KEYDOWN) {
+      if (e.key.keysym.sym == SDLK_ESCAPE
+          || e.key.keysym.sym == SDLK_q) {
+        exit(EXIT_SUCCESS);
+      }
+    }
+  }
 }
 
 void
