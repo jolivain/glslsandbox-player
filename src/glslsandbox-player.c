@@ -895,10 +895,32 @@ get_shader_id_by_glslsbid(const char *glslsbid)
 }
 
 static int
+get_random_shader_id(void)
+{
+  int i;
+  unsigned int seed = 0;
+  struct timespec ts = { 0, 0 };
+
+  clock_gettime(CLOCK_REALTIME, &ts);
+
+  seed  = (unsigned int)(ts.tv_sec);
+  seed ^= (unsigned int)(ts.tv_nsec);
+  seed ^= (unsigned int)getpid();
+  srand(seed);
+
+  i = (int)((double)rand() / ((double)RAND_MAX + 1) * glslsandbox_shaders_count_g);
+
+  return (i);
+}
+
+static int
 get_shader_id_by_name(const char *name)
 {
   const glslsandbox_shaders_t *s;
   int i;
+
+  if (!strcmp("__RANDOM__", name))
+    return (get_random_shader_id());
 
   i = 0;
   s = glslsandbox_shaders_g;
