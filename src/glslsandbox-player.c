@@ -46,6 +46,9 @@
 #include "glslsandbox-player.h"
 
 static const char *
+cpp_predefs_g = "#define GLSLSANDBOX_PLAYER 1\n";
+
+static const char *
 vertex_shader_g =
   "precision mediump float;  \n"
   "attribute vec4 a_pos;     \n"
@@ -460,16 +463,20 @@ setup_fbo_fb(context_t *ctx, int i)
 static void
 setup_fbo(context_t *ctx)
 {
-  const GLchar *v_src[2];
-  const GLchar *f_src[2];
+  const int v_src_len = 3;
+  const GLchar *v_src[v_src_len];
+  const int f_src_len = 3;
+  const GLchar *f_src[f_src_len];
 
   v_src[0] = ctx->force_precision;
-  v_src[1] = vertex_shader_g;
+  v_src[1] = cpp_predefs_g;
+  v_src[2] = vertex_shader_g;
 
   f_src[0] = ctx->force_precision;
-  f_src[1] = fbo_frag_shader_g;
+  f_src[1] = cpp_predefs_g;
+  f_src[2] = fbo_frag_shader_g;
 
-  load_program(2, v_src, 2, f_src,
+  load_program(v_src_len, v_src, f_src_len, f_src,
                &ctx->fbo_vsh, &ctx->fbo_fsh, &ctx->fbo_prog,
                ctx->verbose);
   if (ctx->fbo_prog == 0) {
@@ -612,8 +619,10 @@ setup_textures(context_t *ctx)
 static void
 setup(context_t *ctx)
 {
-  const GLchar *v_src[2];
-  const GLchar *f_src[2];
+  const int v_src_len = 3;
+  const GLchar *v_src[v_src_len];
+  const int f_src_len = 3;
+  const GLchar *f_src[f_src_len];
 
   if (ctx->disable_dither) {
     if ((ctx->verbose > 0))
@@ -622,12 +631,14 @@ setup(context_t *ctx)
   }
 
   v_src[0] = ctx->force_precision;
-  v_src[1] = vertex_shader_g;
+  v_src[1] = cpp_predefs_g;
+  v_src[2] = vertex_shader_g;
 
   f_src[0] = ctx->force_precision;
-  f_src[1] = get_shader_code(ctx);
+  f_src[1] = cpp_predefs_g;
+  f_src[2] = get_shader_code(ctx);
 
-  load_program(2, v_src, 2, f_src,
+  load_program(v_src_len, v_src, f_src_len, f_src,
                &ctx->vertex_shader, &ctx->fragment_shader, &ctx->gl_prog,
                ctx->verbose);
   if (ctx->gl_prog == 0) {
