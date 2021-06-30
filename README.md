@@ -1075,6 +1075,255 @@ Finally, the program can be started with:
     ./src/glslsandbox-player
 
 
+Notes on the Android NDK Native Windowing
+-----------------------------------------
+
+glslsandbox-player includes a minimal support for the Android NDK
+Native Windowing. An Android application is normally written in Java
+or Kotlin. Native NDK applications are also generally using Java or
+Kotlin stubs for the application startup, which are then calling
+native function. The glslsandbox-player Android port is a fully native
+application (no Java nor Kotlin code at all), with C stubs to emulate
+a standard Unix command line program (entry point in main(), with
+command line arguments in argc/argv). Emulated command line arguments
+are stored in an Android preference store, which does not require any
+specific application permission.
+
+The following paragraphs gives the instructions to build and deploy
+glslsandbox-player on an Android device.
+
+Note 1: At the time of this writing, the android tools in Android
+Studio 4.2.2 still needs a Java 8 JRE. Android Studio ship its own
+JRE, but some tools will end up using the system JRE. Many
+distributions are now shipping Java 11 or 16 by default. To make sure
+all Android Studio tools will work correctly, you must set the
+`JAVA_HOME` environment variable to a valid JRE 8 path. Adjust
+according to your actual Android studio version and Linux
+distribution.
+
+For example, on Fedora 34, install Java 8 with the command:
+
+    sudo dnf install java-1.8.0-openjdk
+
+Then, in your user environment, set the variable:
+
+    export JAVA_HOME=/usr/lib/jvm/jre-1.8.0
+
+Note 2: Android Studio and SDK installation requires several gigabytes
+of downloads. At the time of this writing, the Android tools download
+was about 4.5 GB. Make sure your internet connection is adequate for
+this process, and expect download time at the first installation and
+build. Once all the tools are installed, subsequent builds are
+expected to be fast.
+
+
+### Step 1: Install Google Android Studio ###
+
+Download Google Android Studio for Linux 64-bit from:
+https://developer.android.com/studio
+
+Extract the downloaded archive, then start:
+
+    ./android-studio/bin/studio.sh
+
+At the first execution, the wizard starts for the SDK installation.
+For a fresh installation, do not import settings.  The wizard will
+then ask the installation type. Those instructions were made with the
+"Standard" installation, using default parameters. Then, the
+installation wizard will download and install the rest of the SDK
+components (about 2 GB). When finished, Android Studio can be closed.
+
+The following steps assume that the `ANDROID_SDK_ROOT` variable is set
+to the Android SDK installation path.
+
+For a default installation path, set the variable with the command:
+
+    export ANDROID_SDK_ROOT="${HOME}/Android/Sdk"
+
+To let the Gradle build system to automatically install dependencies,
+the Android SDK license needs to be accepted. All the licenses can be
+accepted with the command:
+
+    yes | "${ANDROID_SDK_ROOT}"/tools/bin/sdkmanager --licenses
+
+In the following instructions, we assume we will work from a new empty
+directory. Adjust to your actual environment.
+
+    GSP_WORKDIR="$HOME/glslsanbox-player-workdir"
+    mkdir -p "$GSP_WORKDIR"
+    cd "$GSP_WORKDIR"
+
+
+### Step 2: Generate the glslsandbox-shaders.c file ###
+
+The generation of the builtin shader file is not included in the
+Android CMake project build file. As a workaround, the normal autoconf
+build system can be used for that task. Check the quick start section,
+in case a dependency is missing. This can be done with the commands:
+
+    git clone https://github.com/jolivain/glslsandbox-player.git
+    cd glslsandbox-player
+    autoreconf -vfi
+    ./configure
+    make -C src -j$(nproc) glslsandbox-shaders.c
+
+
+### Step 3: Build the Android APK package ###
+
+Gradle and CMake are used to build the full Android application
+package, for all supported architectures. This can be done with the
+command:
+
+    ./build/android/gradlew -p ./build/android/ build
+
+Gradle will download and cache all the needed dependencies. The first
+build will likely include a longer download time (about 1.5 GB). Files
+downloaded by Gradle are stored in the `${HOME}/.gradle` and
+`${ANDROID_SDK_ROOT}` directories. The generated APK files are in the
+`./build/android/app/build/outputs/apk/` directory.
+
+
+### Step 4: Connect an Android device ###
+
+Now the APK is generated, it can be installed on a test device. It is
+possible to use the Android emulator, or a real device.
+
+In this section, we use the Android Debug Bridge `adb` command to test
+the connectivity with the device. You can use the version available in
+the Android SDK, in `"$ANDROID_SDK_ROOT"/platform-tools/adb` or use
+the version installed on your system. On Fedora systems, it can be
+installed with the command:
+
+    sudo dnf install android-tools
+
+
+#### Option 1: Using the Android emulator ####
+
+Create an Android virtual device using Android Studio, or using the
+command line:
+
+    "$ANDROID_SDK_ROOT"/tools/bin/avdmanager \
+        --verbose \
+        create avd \
+        --force \
+        --name "gsp" \
+        --device "pixel" \
+        --package "system-images;android-30;google_apis;x86" \
+        --abi "x86"
+
+Then start the virtual device emulator, with the command:
+
+    "$ANDROID_SDK_ROOT"/emulator/emulator -avd gsp
+
+The first startup can be longer, to setup the device. Once started,
+the device should be listed by the command:
+
+    adb devices
+
+
+#### Option 2: Using a real Android device ####
+
+Note 1: no root access is needed, no specific permissions are required
+either. Only the developer menu and USB debugging is needed, to let
+the Android Debug Bridge install the application.
+
+Note 2: WARNING: be aware that glslsandbox-player can be a very GPU
+intensive application, to a point that can make a device with low GPU
+performance unresponsive. It can also draw battery quickly or make the
+device hot. The default shader the application will show is a small
+and simple one, that most device will be able to render without any
+issue. Beware that some complex shader execution at high resolution
+might be inadequate for some devices.
+
+To enable the developer menu, go into the menu "Settings", then "About
+Phone", then tap 7 times on "Build Number". Menu may vary depending
+the Android version. For more info, see:
+https://developer.android.com/studio/debug/dev-options
+
+To enable the USB debugging, go to the "Settings" menu, then "System",
+"Advanced", "Developer Options", then enable "USB debugging". Menu may
+vary depending the Android version.
+
+Finally, connect a USB cable. The device might require a user
+acknowledgment of the connection. Then the device should be listed by
+the command:
+
+    adb devices
+
+
+### Step 5: Install a debug build ###
+
+The application package can be installed on the Android device with
+the command:
+
+    ./build/android/gradlew -p ./build/android/ installDebug
+
+Alternatively, this can also be done with the `adb` command:
+
+    adb install build/android/app/build/outputs/apk/debug/app-debug.apk
+
+
+### Step 6: Start the application ###
+
+
+#### Option 1: From Android, just tap on the application icon ####
+
+Note: default application command line is stored in preferences.  The
+default command line show a simple shader in a reduced resolution, to
+make sure it will work on a wide range of devices.
+
+To start the application, just tap on the "GLSL Sandbox Player" icon.
+
+
+#### Option 2: From the command line, using the helper scripts ####
+
+The application activity can be started with the helper script:
+
+    ./scripts/adb-gsp-start.sh
+
+It can be stopped with:
+
+    ./scripts/adb-gsp-stop.sh
+
+It can be restarted with:
+
+    ./scripts/adb-gsp-restart.sh
+
+
+### Step 7: Tweak and debug ###
+
+Other helper scripts are provided to tweak and debug the application.
+
+To change the shader name for a random shader each time the
+application is restarted, use the command line:
+
+    ./scripts/adb-gsp-set-shader.sh __RANDOM__
+
+To restore the initial shader:
+
+    ./scripts/adb-gsp-set-shader.sh TwoTweetsChallenge
+
+To show the current command line stored in the application preferences:
+
+    ./scripts/adb-gsp-show-cmdline.sh
+
+To set a new command line to be used at next application startup:
+
+    ./scripts/adb-gsp-set-cmdline.sh -q -w0 -Qhigh -R4 -S__RANDOM__
+
+To set a new command line and restart the application at once:
+
+    ./scripts/adb-gsp-run.sh -q -w0 -Qhigh -R4 -S__RANDOM__
+
+To remove the application preference store:
+
+    ./scripts/adb-gsp-rm-prefs.sh
+
+To show the output log of the application:
+
+    ./scripts/adb-gsp-logcat.sh
+
+
 Adding a New Native Windowing Library to glslsandbox-player
 -----------------------------------------------------------
 
