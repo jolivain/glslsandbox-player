@@ -9,14 +9,14 @@ if [ $# -ne 1 ] ; then
 fi
 
 BASENAME="$(dirname "$0")"
-SHADER_ID="$(echo "$1" | sed -E 's@^http://(www\.)?glslsandbox\.com/e#@@')"
-URL_PREFIX="http://glslsandbox.com/item/"
+SHADER_ID="$(echo "$1" | sed -E 's@^https?://(www\.)?glslsandbox\.com/e#@@')"
+URL_PREFIX="https://glslsandbox.com/item"
 CURL="curl"
 JSON2FRAG="${BASENAME}/json2code"
 USER_AGENT="glslsandbox-player/1.0"
 SHADER_URL="${URL_PREFIX}/${SHADER_ID}"
 
-CURL_OPTS="--silent --user-agent ${USER_AGENT}"
+CURL_OPTS="--silent --user-agent ${USER_AGENT} --location"
 
 # shellcheck disable=SC2086
 ${CURL} ${CURL_OPTS} "${SHADER_URL}" | "${JSON2FRAG}"
