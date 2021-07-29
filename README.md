@@ -1092,32 +1092,46 @@ specific application permission.
 The following paragraphs gives the instructions to build and deploy
 glslsandbox-player on an Android device.
 
-Note 1: At the time of this writing, the android tools in Android
-Studio 4.2.2 still needs a Java 8 JRE. Android Studio ship its own
-JRE, but some tools will end up using the system JRE. Many
-distributions are now shipping Java 11 or 16 by default. To make sure
-all Android Studio tools will work correctly, you must set the
-`JAVA_HOME` environment variable to a valid JRE 8 path. Adjust
-according to your actual Android studio version and Linux
-distribution.
 
-For example, on Fedora 34, install Java 8 with the command:
+### Step 1: Install Google Android Studio ###
 
-    sudo dnf install java-1.8.0-openjdk
+To build glslsandbox-player for Android, the Google Android tools are
+needed. The is two possible options: a minimal command line only
+tools, which will limit the downloads and used storage space (about
+1.5 GB when tested). The other option is a full installation of all
+the Android Studio (about 4.5 GB when tested).
 
-Then, in your user environment, set the variable:
 
-    export JAVA_HOME=/usr/lib/jvm/jre-1.8.0
+#### Option 1: Minimal Command Line Android Tool ####
 
-Note 2: Android Studio and SDK installation requires several gigabytes
+Note: when tested, this method downloaded about 1.5 GB of data.
+
+Download the Android "commandline-tools" packages for Linux at:
+https://developer.android.com/studio#cmdline-tools
+
+Then, extract the package to the desired location.  It is recommended
+to install the files in `"${ANDROID_SDK_ROOT}"/cmdline-tools/latest`:
+
+    export ANDROID_SDK_ROOT="${HOME}/Android/Sdk"
+    mkdir -p "${ANDROID_SDK_ROOT}"
+    unzip -d "${ANDROID_SDK_ROOT}/cmdline-tools/" "$(ls -1 commandlinetools-linux-*_latest.zip | tail -1)"
+    mv "${ANDROID_SDK_ROOT}"/cmdline-tools/cmdline-tools "${ANDROID_SDK_ROOT}"/cmdline-tools/latest
+
+To let the Gradle build system to automatically install dependencies,
+the Android SDK license needs to be accepted. All the licenses can be
+accepted with the command:
+
+    yes | "${ANDROID_SDK_ROOT}"/cmdline-tools/latest/bin/sdkmanager --licenses
+
+
+#### Option 2: Full Android Studio Installation ####
+
+Note: Android Studio and SDK installation requires several gigabytes
 of downloads. At the time of this writing, the Android tools download
 was about 4.5 GB. Make sure your internet connection is adequate for
 this process, and expect download time at the first installation and
 build. Once all the tools are installed, subsequent builds are
 expected to be fast.
-
-
-### Step 1: Install Google Android Studio ###
 
 Download Google Android Studio for Linux 64-bit from:
 https://developer.android.com/studio
@@ -1131,7 +1145,16 @@ For a fresh installation, do not import settings.  The wizard will
 then ask the installation type. Those instructions were made with the
 "Standard" installation, using default parameters. Then, the
 installation wizard will download and install the rest of the SDK
-components (about 2 GB). When finished, Android Studio can be closed.
+components (about 2 GB).
+
+When base components installation finished, click the "Finish" button.
+Then, also install the "commandline-tools" package, by clicking the
+"More Actions" menu, then "SDK Manager". Go on the "SDK Tools" tab,
+and check "Android SDK Command-line Tools (latest)", then click
+"OK". Click "OK" again to confirm the installation. Accept the license
+agreement by selecting "Accept" then click the "Next" button. When
+installation is done, click "Finish" to close the window. At that
+point, Android Studio can be closed.
 
 The following steps assume that the `ANDROID_SDK_ROOT` variable is set
 to the Android SDK installation path.
@@ -1144,7 +1167,7 @@ To let the Gradle build system to automatically install dependencies,
 the Android SDK license needs to be accepted. All the licenses can be
 accepted with the command:
 
-    yes | "${ANDROID_SDK_ROOT}"/tools/bin/sdkmanager --licenses
+    yes | "${ANDROID_SDK_ROOT}"/cmdline-tools/latest/bin/sdkmanager --licenses
 
 In the following instructions, we assume we will work from a new empty
 directory. Adjust to your actual environment.
