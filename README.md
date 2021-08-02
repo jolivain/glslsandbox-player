@@ -1225,7 +1225,7 @@ installed with the command:
 Create an Android virtual device using Android Studio, or using the
 command line:
 
-    "$ANDROID_SDK_ROOT"/tools/bin/avdmanager \
+    "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/avdmanager \
         --verbose \
         create avd \
         --force \
