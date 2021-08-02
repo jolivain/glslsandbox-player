@@ -1093,7 +1093,7 @@ The following paragraphs gives the instructions to build and deploy
 glslsandbox-player on an Android device.
 
 
-### Step 1: Install Google Android Studio ###
+### Step 1: Install Google Android Tools ###
 
 To build glslsandbox-player for Android, the Google Android tools are
 needed. The is two possible options: a minimal command line only
@@ -1122,6 +1122,8 @@ the Android SDK license needs to be accepted. All the licenses can be
 accepted with the command:
 
     yes | "${ANDROID_SDK_ROOT}"/cmdline-tools/latest/bin/sdkmanager --licenses
+
+When licenses are accepted, continue to step 2.
 
 
 #### Option 2: Full Android Studio Installation ####
@@ -1169,15 +1171,15 @@ accepted with the command:
 
     yes | "${ANDROID_SDK_ROOT}"/cmdline-tools/latest/bin/sdkmanager --licenses
 
+
+### Step 2: Generate the glslsandbox-shaders.c file ###
+
 In the following instructions, we assume we will work from a new empty
 directory. Adjust to your actual environment.
 
     GSP_WORKDIR="$HOME/glslsanbox-player-workdir"
     mkdir -p "$GSP_WORKDIR"
     cd "$GSP_WORKDIR"
-
-
-### Step 2: Generate the glslsandbox-shaders.c file ###
 
 The generation of the builtin shader file is not included in the
 Android CMake project build file. As a workaround, the normal autoconf
