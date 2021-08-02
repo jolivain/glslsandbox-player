@@ -1222,6 +1222,19 @@ installed with the command:
 
 #### Option 1: Using the Android emulator ####
 
+If you made the minimal commandline-tools installation, the android
+emulator needs to be installed, for example:
+
+    "${ANDROID_SDK_ROOT}"/cmdline-tools/latest/bin/sdkmanager \
+        --install emulator
+
+Install the desired system image, for example:
+
+    "${ANDROID_SDK_ROOT}"/cmdline-tools/latest/bin/sdkmanager \
+        --install "system-images;android-30;google_apis;x86"
+
+This will download (about 1.2 GB) and install the system image.
+
 Create an Android virtual device using Android Studio, or using the
 command line:
 
