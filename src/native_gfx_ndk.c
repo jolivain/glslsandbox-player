@@ -25,9 +25,7 @@
 #include <EGL/egl.h>
 #include <android_native_app_glue.h>
 
-#ifdef __ANDROID__
 #include "android-defs.h"
-#endif
 
 #include "native_gfx.h"
 
