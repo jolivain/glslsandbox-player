@@ -24,6 +24,7 @@
 #include <jni.h>
 #include <EGL/egl.h>
 #include <android_native_app_glue.h>
+#include <android/window.h> /* for AWINDOW_FLAG_KEEP_SCREEN_ON */
 
 #include "android-defs.h"
 
@@ -117,6 +118,9 @@ native_gfx_create_window(native_gfx_t *gfx,
   GFX_UNUSED(ypos);
 
   android_wait_for_window(gfx);
+
+  ANativeActivity_setWindowFlags(gfx->app->activity,
+                                 AWINDOW_FLAG_KEEP_SCREEN_ON, 0);
 }
 
 void
