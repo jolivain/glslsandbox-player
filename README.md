@@ -951,7 +951,7 @@ Then continue with MinGW build:
     glesv2_LIBS="-lGLESv2" \
       mingw32-configure --with-native-gfx=wgl
 
-    mingw32-make -j$(nproc)
+    mingw32-make -j4
 
 The generated binary will be `src/glslsandbox-player.exe`.
 
@@ -1190,7 +1190,7 @@ in case a dependency is missing. This can be done with the commands:
     cd glslsandbox-player
     autoreconf -vfi
     ./configure
-    make -C src -j$(nproc) glslsandbox-shaders.c
+    make -C src -j4 glslsandbox-shaders.c
 
 
 ### Step 3: Build the Android APK package ###
