@@ -1215,9 +1215,15 @@ possible to use the Android emulator, or a real device.
 
 In this section, we use the Android Debug Bridge `adb` command to test
 the connectivity with the device. You can use the version available in
-the Android SDK, in `"$ANDROID_SDK_ROOT"/platform-tools/adb` or use
-the version installed on your system. On Fedora systems, it can be
-installed with the command:
+the Android SDK, in `"$ANDROID_SDK_ROOT"/platform-tools/adb`
+
+This can be done by adding the Android platform tools into the
+`PATH`. This can be done with the command:
+
+    export PATH="$ANDROID_SDK_ROOT/platform-tools:$PATH"
+
+Alternatively, it's possible to use the version shipped with your
+distribution. On Fedora systems, it can be installed with the command:
 
     sudo dnf install android-tools
 
