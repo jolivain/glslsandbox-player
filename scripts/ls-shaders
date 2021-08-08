@@ -59,7 +59,7 @@ do_sort_random()
 do_list_shaders()
 {
     "${GLSLSANDBOX_PLAYER}" -l |
-        awk '1 == /^[0-9]+/ {print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6;}'
+        awk '$1 ~ /^[0-9]+$/ {print $1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6;}'
 }
 
 : ${SORT_ORDER:=by_name}
