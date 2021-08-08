@@ -18,6 +18,10 @@ AT_COLOR_TESTS
 # on this particular program will be skipped, if the program is missing.
 #
 
+AT_ARG_OPTION([enable-long-tests],
+              [AS_HELP_STRING([--enable-long-tests],
+                  [Enable long tests. (default is disabled)])])
+
 m4_include(tst-common-macros.at)
 
 # Test categories:
