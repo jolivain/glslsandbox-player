@@ -1,0 +1,13 @@
+AT_BANNER([Builtin shaders])
+
+dnl --------------------------------------------------------
+AT_SETUP([render all builtin shaders])
+AT_KEYWORDS([render shaders])
+AT_CHECK([test "$at_arg_enable_long_tests" != ":" && exit 77], [ignore])
+AT_CHECK([glslsandbox-player -l], [0], [stdout], [ignore])
+AT_CHECK([awk '$1 ~ /^[[0-9]]+/ { print $3; }' stdout], [0], [stdout])
+AT_CHECK([cat stdout | while read SHADER ; do
+    echo Testing $SHADER
+    glslsandbox-player -q -W64 -H64 -B -S $SHADER -O3 -T1 -w0 -f2 || exit 1
+done], [0], [ignore], [ignore])
+AT_CLEANUP
