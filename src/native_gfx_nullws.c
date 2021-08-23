@@ -1,5 +1,13 @@
 /*
- * Texas Instruments PowerVR SGX Native Windowing code
+ * Null Windowing System
+ *
+ * This native windowing system just does *nothing*. It allocates the
+ * maintainance structure, and will return NULL for native display.
+ *
+ * This windowing system is used at least on:
+ * - some Texas Instruments PowerVR SGX drivers
+ * - i.MX5 AMD binary driver
+ * - possibly others
  */
 
 /*
@@ -9,7 +17,7 @@
 
 /*
  * See PowerVR SDK example:
- * https://github.com/powervr-graphics/Native_SDK/blob/5.1/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp
+ * https://github.com/powervr-graphics/Native_SDK/blob/R21.1-v5.7/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp
  */
 
 #ifdef HAVE_CONFIG_H
@@ -38,7 +46,7 @@ struct native_gfx_s
 char *
 native_gfx_get_name(void)
 {
-  return ("TI SGX");
+  return ("NullWS");
 }
 
 native_gfx_t *
@@ -59,7 +67,7 @@ native_gfx_open_display(void)
   /* From the PowerVR SDK example, for Null Window system, only the
    * default display (NULL) is passed to eglGetDisplay() as native
    * display. See:
-   * https://github.com/powervr-graphics/Native_SDK/blob/5.1/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp#L78
+   * https://github.com/powervr-graphics/Native_SDK/blob/R21.1-v5.7/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp#L77
    */
 
   return (gfx);
@@ -82,7 +90,7 @@ native_gfx_create_window(native_gfx_t *gfx, int width, int height, int xpos, int
 {
   /* From the PowerVR SDK example, for Null Window system, NULL is
    * passed to eglCreateWindowSurface() as native window. See:
-   * https://github.com/powervr-graphics/Native_SDK/blob/5.1/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp#L170
+   * https://github.com/powervr-graphics/Native_SDK/blob/R21.1-v5.7/examples/OpenGLES/01_HelloAPI/OpenGLESHelloAPI_NullWS.cpp#L161
    */
   GFX_UNUSED(gfx);
   GFX_UNUSED(width);

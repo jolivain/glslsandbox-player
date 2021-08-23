@@ -106,8 +106,8 @@ if ENABLE_WGL
 glslsandbox_player_SOURCES += native_gfx_wgl.c
 endif
 
-if ENABLE_TISGX
-glslsandbox_player_SOURCES += native_gfx_tisgx.c
+if ENABLE_NULLWS
+glslsandbox_player_SOURCES += native_gfx_nullws.c
 endif
 
 if ENABLE_MALI

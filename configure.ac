@@ -131,7 +131,7 @@ AS_IF([test "x$with_libpng" = "xyes"], [
 AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,tisgx,mali,wgl,em]),
+        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,nullws,mali,wgl,em]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
@@ -248,14 +248,22 @@ AS_IF([test "x$with_native_gfx" = "xwgl"], [
 ])
 AM_CONDITIONAL([ENABLE_WGL], [test "x$with_native_gfx" = "xwgl"])
 
-AS_IF([test "x$with_native_gfx" = "xtisgx"], [
-    native_gfx=tisgx
-    AC_DEFINE([ENABLE_TISGX], [1], [Enable Native TI SGX])
-    AC_MSG_NOTICE([TI SGX support enabled])
-], [
-    AC_MSG_NOTICE([TI SGX support disabled])
+AS_IF([test "x$with_native_gfx" = "xtisgx" ], [
+    with_native_gfx="nullws"
+    AC_MSG_NOTICE([info: tisgx is deprecated. using nullws.])
 ])
-AM_CONDITIONAL([ENABLE_TISGX], [test "x$with_native_gfx" = "xtisgx"])
+AS_IF([test "x$with_native_gfx" = "xamdimx" ], [
+    with_native_gfx="nullws"
+    AC_MSG_NOTICE([info: amdimx is deprecated. using nullws.])
+])
+AS_IF([test "x$with_native_gfx" = "xnullws" ], [
+    native_gfx=nullws
+    AC_DEFINE([ENABLE_NULLWS], [1], [Enable Null Windowing System])
+    AC_MSG_NOTICE([Null Windowing System support enabled])
+], [
+    AC_MSG_NOTICE([Null Windowing System support disabled])
+])
+AM_CONDITIONAL([ENABLE_NULLWS], [test "x$with_native_gfx" = "xnullws"])
 
 AS_IF([test "x$with_native_gfx" = "xmali"], [
     native_gfx=mali
