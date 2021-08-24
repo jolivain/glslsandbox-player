@@ -139,8 +139,6 @@ AS_IF([test "x$with_native_gfx" = "xx11"], [
         PKG_CHECK_MODULES([x11], [x11 >= 1.4])
         AC_DEFINE([ENABLE_X11], [1], [Enable X11.])
         AC_MSG_NOTICE([X11 support enabled])
-], [
-        AC_MSG_NOTICE([X11 support disabled])
 ])
 AM_CONDITIONAL([ENABLE_X11], [test "x$with_native_gfx" = "xx11"])
 
@@ -150,8 +148,6 @@ AS_IF([test "x$with_native_gfx" = "xvivfb"], [
         AC_DEFINE([EGL_API_FB], [1], [Enable Vivante EGL FB])
         AC_DEFINE([LINUX], [1], [Vivante EGL FB needs LINUX to be defined])
         AC_MSG_NOTICE([VivanteFB support enabled])
-], [
-        AC_MSG_NOTICE([VivanteFB support disabled])
 ])
 AM_CONDITIONAL([ENABLE_VIVFB], [test "x$with_native_gfx" = "xvivfb"])
 
@@ -159,8 +155,6 @@ AS_IF([test "x$with_native_gfx" = "xrpi"], [
 	native_gfx=rpi
         AC_DEFINE([ENABLE_RPI], [1], [Enable Raspberry Pi])
         AC_MSG_NOTICE([Raspberry Pi support enabled])
-], [
-        AC_MSG_NOTICE([Raspberry Pi support disabled])
 ])
 AM_CONDITIONAL([ENABLE_RPI], [test "x$with_native_gfx" = "xrpi"])
 
@@ -174,8 +168,6 @@ AS_IF([test "x$with_native_gfx" = "xwl"], [
     ])
     AC_DEFINE([ENABLE_WL], [1], [Enable Wayland EGL])
     AC_MSG_NOTICE([Wayland EGL support enabled])
-], [
-    AC_MSG_NOTICE([Wayland EGL support disabled])
 ])
 AM_CONDITIONAL([ENABLE_WL], [test "x$with_native_gfx" = "xwl"])
 
@@ -222,8 +214,6 @@ AS_IF([test "x$with_native_gfx" = "xkms"], [
     LIBS="$drm_LIBS $LIBS"
     AC_CHECK_FUNCS([drmGetDevices2])
     LIBS="$OLD_LIBS"
-], [
-    AC_MSG_NOTICE([KMS/GBM/DRM support disabled])
 ])
 AM_CONDITIONAL([ENABLE_KMS], [test "x$with_native_gfx" = "xkms"])
 
@@ -234,8 +224,6 @@ AS_IF([test "x$with_native_gfx" = "xsdl2"], [
     ])
     AC_DEFINE([ENABLE_SDL2], [1], [Enable SDL2])
     AC_MSG_NOTICE([SDL2 EGL support enabled])
-], [
-    AC_MSG_NOTICE([SDL2 EGL support disabled])
 ])
 AM_CONDITIONAL([ENABLE_SDL2], [test "x$with_native_gfx" = "xsdl2"])
 
@@ -243,8 +231,6 @@ AS_IF([test "x$with_native_gfx" = "xwgl"], [
     native_gfx=wgl
     AC_DEFINE([ENABLE_WGL], [1], [Enable Native Windows WGL])
     AC_MSG_NOTICE([Windows WGL support enabled])
-], [
-    AC_MSG_NOTICE([Windows WGL support disabled])
 ])
 AM_CONDITIONAL([ENABLE_WGL], [test "x$with_native_gfx" = "xwgl"])
 
@@ -260,8 +246,6 @@ AS_IF([test "x$with_native_gfx" = "xnullws" ], [
     native_gfx=nullws
     AC_DEFINE([ENABLE_NULLWS], [1], [Enable Null Windowing System])
     AC_MSG_NOTICE([Null Windowing System support enabled])
-], [
-    AC_MSG_NOTICE([Null Windowing System support disabled])
 ])
 AM_CONDITIONAL([ENABLE_NULLWS], [test "x$with_native_gfx" = "xnullws"])
 
@@ -269,8 +253,6 @@ AS_IF([test "x$with_native_gfx" = "xmali"], [
     native_gfx=mali
     AC_DEFINE([ENABLE_MALI], [1], [Enable Native Mali])
     AC_MSG_NOTICE([Arm Mali support enabled])
-], [
-    AC_MSG_NOTICE([Arm Mali support disabled])
 ])
 AM_CONDITIONAL([ENABLE_MALI], [test "x$with_native_gfx" = "xmali"])
 
@@ -278,8 +260,6 @@ AS_IF([test "x$with_native_gfx" = "xem"], [
     native_gfx=em
     AC_DEFINE([ENABLE_EM], [1], [Enable Native Emscripten/Wasm])
     AC_MSG_NOTICE([Emscripten/Wasm support enabled])
-], [
-    AC_MSG_NOTICE([Emscripten/Wasm support disabled])
 ])
 AM_CONDITIONAL([ENABLE_EM], [test "x$with_native_gfx" = "xem"])
 
@@ -287,8 +267,6 @@ AS_IF([test "x$with_native_gfx" = "xosx"], [
     native_gfx=osx
     AC_DEFINE([ENABLE_OSX], [1], [Enable Native OS X])
     AC_MSG_NOTICE([OS X support enabled])
-], [
-    AC_MSG_NOTICE([OS X support disabled])
 ])
 AM_CONDITIONAL([ENABLE_OSX], [test "x$with_native_gfx" = "xosx"])
 
