@@ -131,7 +131,7 @@ AS_IF([test "x$with_libpng" = "xyes"], [
 AM_CONDITIONAL([HAVE_LIBPNG], [test "x$have_libpng" = "xyes"])
 
 AC_ARG_WITH([native-gfx],
-        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,nullws,mali,wgl,em]),
+        AS_HELP_STRING([--with-native-gfx=GFX],[Define the native gfx backend: x11(default),vivfb,rpi,wl,sdl2,kms,nullws,mali,wgl,em,osx]),
         [], [with_native_gfx=x11])
 
 AS_IF([test "x$with_native_gfx" = "xx11"], [
