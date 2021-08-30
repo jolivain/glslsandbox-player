@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 set -e
 set -u
@@ -10,7 +10,7 @@ WORK_DIR="$(dirname "$0")"
 TEST_DIR="${WORK_DIR}/tests"
 
 DEFAULT_BIN=$(readlink -e "${WORK_DIR}/../src/glslsandbox-player" || :)
-if [[ -x "${DEFAULT_BIN}" ]] ; then
+if [ -x "${DEFAULT_BIN}" ] ; then
     : "${GLSLSANDBOX_PLAYER:=${DEFAULT_BIN}}"
     : "${OUTPUT_DIR:=${TEST_DIR}/${OUTPUT}}"
 else
@@ -18,15 +18,12 @@ else
     : "${OUTPUT_DIR:=/var/tmp/gsp/tests/${OUTPUT}}"
 fi
 
-# Limit Virtual Size to 1G to prevent system crash by memory exhaustion
-ulimit -S -v $(( 1024 * 1024 ))
-
-function run_cleanup() {
+run_cleanup() {
     cd "${OUTPUT_DIR}/"
-    rm -fv ./*.{done,passed,failed,log,ppm,png}
+    rm -fv ./*.done ./*.passed ./*.failed ./*.log ./*.ppm ./*.png
 }
 
-function run_tests() {
+run_tests() {
     RET=0
 
     make \
@@ -42,7 +39,7 @@ function run_tests() {
 
     FAILED_COUNT="$(find "${OUTPUT_DIR}/" -type f -name '*.failed' | wc -l)"
 
-    if [[ $FAILED_COUNT -gt 0 ]] ; then
+    if [ "$FAILED_COUNT" -gt 0 ] ; then
         echo
         echo "---------------"
         echo "Failed shaders:"
@@ -55,7 +52,7 @@ function run_tests() {
     return ${RET}
 }
 
-function usage() {
+usage() {
     echo
     echo "Usage: $0 <command> <output-name>"
     echo
