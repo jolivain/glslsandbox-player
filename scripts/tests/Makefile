@@ -48,9 +48,11 @@ pngs: $(PNGS)
 
 shader = $(subst .done,,$(subst $(OUTPUT_DIR)/,,$(1)))
 
+TIMEOUT_FG_OPT := $(shell timeout --foreground 1 true && echo "--foreground")
+
 $(OUTPUT_DIR)/%.done:
 	cd $(OUTPUT_DIR) && \
-	timeout --foreground --kill-after=1 $(GLSLSANDBOX_PLAYER_TIMEOUT) \
+	timeout $(TIMEOUT_FG_OPT) -s KILL $(GLSLSANDBOX_PLAYER_TIMEOUT) \
           $(GLSLSANDBOX_PLAYER) -S $(call shader,$(@)) $(GLSLSANDBOX_PLAYER_ARGS) \
             > $(@:.done=.log) 2>&1 \
             && touch $(@:.done=.passed) \
