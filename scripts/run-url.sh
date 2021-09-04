@@ -10,7 +10,7 @@ fi
 
 BASEDIR="$(dirname "$0")"
 
-DEFAULT_BIN=$(readlink -e "${BASEDIR}/../src/glslsandbox-player" || :)
+DEFAULT_BIN=$(readlink -f "${BASEDIR}/../src/glslsandbox-player" || :)
 if [ -x "${DEFAULT_BIN}" ] ; then
     : "${GLSLSANDBOX_PLAYER:=${DEFAULT_BIN}}"
 else
