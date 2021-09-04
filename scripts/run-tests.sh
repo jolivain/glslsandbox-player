@@ -9,7 +9,7 @@ OUTPUT="${2:-output}"
 WORK_DIR="$(dirname "$0")"
 TEST_DIR="${WORK_DIR}/tests"
 
-DEFAULT_BIN=$(readlink -e "${WORK_DIR}/../src/glslsandbox-player" || :)
+DEFAULT_BIN=$(readlink -f "${WORK_DIR}/../src/glslsandbox-player" || :)
 if [ -x "${DEFAULT_BIN}" ] ; then
     : "${GLSLSANDBOX_PLAYER:=${DEFAULT_BIN}}"
     : "${OUTPUT_DIR:=${TEST_DIR}/${OUTPUT}}"
