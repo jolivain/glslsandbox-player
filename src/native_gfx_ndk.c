@@ -164,6 +164,16 @@ native_gfx_get_window_height(const native_gfx_t *gfx)
   return (gfx->win_height);
 }
 
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  GFX_UNUSED(gfx);
+
+  /* Not implemented. */
+
+  return (0);
+}
+
 static void
 android_handle_cmd(struct android_app* app, int32_t cmd)
 {
