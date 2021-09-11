@@ -85,6 +85,7 @@ struct drm_fb {
 };
 
 static struct termios save_tio;
+static volatile sig_atomic_t g_terminate = 0;
 
 static void
 restore_vt(void)
@@ -99,8 +100,10 @@ restore_vt(void)
 static void
 handle_signal(int sig)
 {
+  GFX_UNUSED(sig);
+
   restore_vt();
-  raise(sig);
+  g_terminate = 1;
 }
 
 static int
@@ -771,8 +774,10 @@ native_gfx_swap_buffers(native_gfx_t *gfx)
   while (waiting_for_flip) {
     ret = select(gfx->drm_fd + 1, &fds, NULL, NULL, NULL);
     if (ret < 0) {
-      fprintf(stderr, "ERROR: select(): errno %i: %s\n",
-              errno, strerror(errno));
+      if (errno != EINTR && errno != EAGAIN) {
+        fprintf(stderr, "ERROR: select(): errno %i: %s\n",
+                errno, strerror(errno));
+      }
       return ;
     } else if (ret == 0) {
       fprintf(stderr, "ERROR: select() timed out\n");
@@ -815,6 +820,14 @@ int
 native_gfx_get_window_height(const native_gfx_t *gfx)
 {
   return (gfx->win_height);
+}
+
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  GFX_UNUSED(gfx);
+
+  return (g_terminate);
 }
 
 /*
