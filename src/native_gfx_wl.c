@@ -83,6 +83,7 @@ struct native_gfx_s
   struct xdg_toplevel *xdg_toplevel;
   int wait_for_configure;
   int fullscreen;
+  int terminate;
 #endif /* ENABLE_WL_XDG */
 #ifdef ENABLE_WL_IVI
   struct ivi_application *ivi_app;
@@ -137,9 +138,11 @@ keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
                     uint32_t serial, uint32_t time, uint32_t key,
                     uint32_t state)
 {
+  native_gfx_t *gfx = (native_gfx_t *)data;
+
   if ((state == WL_KEYBOARD_KEY_STATE_PRESSED) &&
       ((key == KEY_ESC) || (key == KEY_Q))) {
-    exit(EXIT_SUCCESS);
+    gfx->terminate = 1;
   }
 }
 
@@ -508,6 +511,12 @@ int
 native_gfx_get_window_height(const native_gfx_t *gfx)
 {
   return (gfx->win_height);
+}
+
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  return (gfx->terminate);
 }
 
 /*
