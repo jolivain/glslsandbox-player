@@ -39,6 +39,8 @@ struct native_gfx_s
   int win_height;
 };
 
+static int g_terminate = 0;
+
 static LRESULT CALLBACK
 wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -48,12 +50,12 @@ wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     case WM_KEYDOWN: {
       if (wParam == VK_ESCAPE || wParam == 'Q') {
-        exit(EXIT_SUCCESS);
+        g_terminate = 1;
       }
       return (0);
     }
     case WM_CLOSE: {
-      exit(EXIT_SUCCESS);
+      g_terminate = 1;
     }
   }
 
@@ -202,6 +204,14 @@ int
 native_gfx_get_window_height(const native_gfx_t *gfx)
 {
   return (gfx->win_height);
+}
+
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  GFX_UNUSED(gfx);
+
+  return (g_terminate);
 }
 
 /*
