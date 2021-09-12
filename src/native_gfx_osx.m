@@ -213,6 +213,16 @@ native_gfx_get_window_height(const native_gfx_t *gfx)
   return (gfx->win_height);
 }
 
+int
+native_gfx_request_exit(const native_gfx_t *gfx)
+{
+  GFX_UNUSED(gfx);
+
+  /* Not implemented. */
+
+  return (0);
+}
+
 /*
 * Copyright (c) 2015-2021, Julien Olivain <ju.o@free.fr>
 * All rights reserved.
