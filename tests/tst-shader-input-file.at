@@ -11,6 +11,13 @@ AT_CHECK_PPM_HISTOGRAM([output-00000.ppm], [dnl
 ])
 AT_CLEANUP
 
+AT_SETUP([option -F multiple])
+AT_KEYWORDS([option shader-file])
+AT_CHECK([glslsandbox-player -W64 -H64 -F "${abs_testdatadir}/TestColor.frag" -F "${abs_testdatadir}/6.0.frag" -w0 -f1],
+         [1], [ignore], [stderr])
+AT_CHECK([grep -E -q "^ERROR: -F option can be passed only once\." stderr])
+AT_CLEANUP
+
 AT_SETUP([option -F syntax-error])
 AT_KEYWORDS([option shader-file syntax-error])
 AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -F "${abs_testdatadir}/syntax-error.frag"],
