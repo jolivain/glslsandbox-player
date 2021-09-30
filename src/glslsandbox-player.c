@@ -126,6 +126,7 @@ load_file(const char *path)
   ret = fseek(fp, 0, SEEK_END);
   if (ret != 0) {
     fprintf(stderr, "ERROR: fseek(): error %i: %s\n", errno, strerror(errno));
+    fclose(fp);
     return (NULL);
   }
 
@@ -135,6 +136,7 @@ load_file(const char *path)
   file_content = malloc(fsize + 1);
   if (file_content == NULL) {
     fprintf(stderr, "ERROR: malloc(): error %i: %s\n", errno, strerror(errno));
+    fclose(fp);
     return (NULL);
   }
 
@@ -146,6 +148,7 @@ load_file(const char *path)
       fprintf(stderr, "ERROR: fread(): partial read: expected %u bytes, read %u\n",
               (unsigned int)fsize, (unsigned int)sret);
     free(file_content);
+    fclose(fp);
     return (NULL);
   }
 
