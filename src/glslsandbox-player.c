@@ -1226,6 +1226,10 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
       break ;
 
     case 'F':
+      if (ctx->user_shader != NULL) {
+        fprintf(stderr, "ERROR: -F option can be passed only once.\n");
+        exit(EXIT_FAILURE);
+      }
       ctx->user_shader = load_file(optarg);
       if (ctx->user_shader == NULL) {
         fprintf(stderr, "ERROR while loading file %s\n", optarg);
