@@ -552,7 +552,7 @@ __xgles_glViewport(const char *file, int line, GLint x, GLint y, GLsizei width, 
 #endif /* defined(XGLES_STRICT) */
 
 /*
-* Copyright (c) 2015-2021, Julien Olivain <ju.o@free.fr>
+* Copyright (c) 2015-2022, Julien Olivain <ju.o@free.fr>
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
