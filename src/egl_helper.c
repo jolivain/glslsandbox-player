@@ -153,11 +153,11 @@ __xegl_eglGetPlatformDisplay(const char *file, int line,
   EGLDisplay ret;
 
   ret = eglGetPlatformDisplay(platform, native_display, attrib_list);
-  __xegl_check_error(file, line, "eglGetPlatformDisplayEXT");
+  __xegl_check_error(file, line, "eglGetPlatformDisplay");
 
   if (ret == EGL_NO_DISPLAY) {
     fprintf(stderr,
-            "%s:%i: eglGetPlatformDisplayEXT(): returned EGL_NO_DISPLAY\n",
+            "%s:%i: eglGetPlatformDisplay(): returned EGL_NO_DISPLAY\n",
             file, line);
     __xegl_on_error();
   }
