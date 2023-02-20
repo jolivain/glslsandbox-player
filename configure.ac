@@ -84,7 +84,7 @@ AS_IF([test "x$enable_strict_gles" = "xyes"], [
 ])
 
 PKG_CHECK_MODULES([egl], [egl >= 1])
-PKG_CHECK_MODULES([glesv2], [glesv2 >= 1])
+PKG_CHECK_MODULES([glesv2], [glesv2])
 
 AC_CHECK_HEADERS([EGL/eglext.h], [], [],
 [[#include <EGL/egl.h>
