@@ -77,13 +77,13 @@ struct native_gfx_s
   /* struct wl_region *region; */
   struct wl_shell *shell;
   struct wl_shell_surface *shell_surface;
+  int terminate;
 #ifdef ENABLE_WL_XDG
   struct xdg_wm_base *xdg_wm_base;
   struct xdg_surface *xdg_surface;
   struct xdg_toplevel *xdg_toplevel;
   int wait_for_configure;
   int fullscreen;
-  int terminate;
 #endif /* ENABLE_WL_XDG */
 #ifdef ENABLE_WL_IVI
   struct ivi_application *ivi_app;
