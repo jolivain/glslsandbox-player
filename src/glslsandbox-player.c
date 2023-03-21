@@ -152,6 +152,8 @@ load_file(const char *path)
     return (NULL);
   }
 
+  fclose(fp);
+
   file_content[fsize] = '\0';
 
   return (file_content);
