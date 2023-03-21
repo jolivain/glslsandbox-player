@@ -11,7 +11,11 @@
  * See:
  * https://wayland.freedesktop.org/docs/html/
  * https://jan.newmarch.name/Wayland/EGL/
- * https://cgit.freedesktop.org/wayland/weston/tree/clients/simple-egl.c
+ * https://gitlab.freedesktop.org/wayland/weston/-/blob/main/clients/simple-egl.c
+ *
+ * See also:
+ * https://wayland-book.com/
+ * https://wayland.app/protocols/
  */
 
 #ifdef HAVE_CONFIG_H
