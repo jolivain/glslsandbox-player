@@ -994,7 +994,7 @@ list_shaders_urls(FILE *fp)
   s = glslsandbox_shaders_g;
   for (i = 0; s[i].nick != NULL; ++i) {
     snprintf(id, sizeof (id), "%i.%i", s[i].id, s[i].rev);
-    fprintf(fp, "http://glslsandbox.com/e#%-14s\t%s\n", id, s[i].nick);
+    fprintf(fp, "https://glslsandbox.com/e#%-14s\t%s\n", id, s[i].nick);
   }
 }
 
@@ -2167,7 +2167,7 @@ main(int argc, char *argv[])
               glslsandbox_shaders_g[ctx->run_shader].id,
               glslsandbox_shaders_g[ctx->run_shader].rev,
               ctx->run_shader);
-      fprintf(stderr, "Available online at: http://glslsandbox.com/e#%i.%i\n",
+      fprintf(stderr, "Available online at: https://glslsandbox.com/e#%i.%i\n",
               glslsandbox_shaders_g[ctx->run_shader].id,
               glslsandbox_shaders_g[ctx->run_shader].rev);
       fprintf(stderr, "PLEASE make sure to check original license and "

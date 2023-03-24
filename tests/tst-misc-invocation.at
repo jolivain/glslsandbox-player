@@ -28,7 +28,7 @@ dnl --------------------------------------------------------
 AT_SETUP([show-url])
 AT_KEYWORDS([show-url])
 AT_CHECK([glslsandbox-player -W64 -H64 -w0 -f1 -S 2DColorCircles], [0], [ignore], [stderr])
-AT_CHECK([grep -F -q "Available online at: http://glslsandbox.com/e#7070.6" stderr])
+AT_CHECK([grep -F -q "Available online at: https://glslsandbox.com/e#7070.6" stderr])
 AT_CLEANUP
 
 
