@@ -7,7 +7,7 @@ Quick Start
 -----------
 
   GLSL Sandbox standalone player allow one to run and render (most of)
-nice shaders available online on the http://glslsandbox.com/ website,
+nice shaders available online on the https://glslsandbox.com/ website,
 but without the need of an Internet connection, a web browser or any
 of its dependencies. Instead, the only requirement of
 glslsandbox-player is a working EGL and GLESv2 libraries.
@@ -50,7 +50,7 @@ or:
 Introduction
 ------------
 
-  The http://glslsandbox.com/ website (and all its shaders) is using
+  The https://glslsandbox.com/ website (and all its shaders) is using
 WebGL (See https://www.khronos.org/webgl/) and JavaScript for the
 rendering which are now available in common web browsers. Those web
 browsers are generally using X11. All of this pulls a lot of
@@ -109,7 +109,7 @@ being tested. This is why a relevant selection of shader suited for
 your driver and GPU would be better that a bare dump of the whole
 glslsandbox.com site.
 
-  The original player at http://glslsandbox.com/ is interactive, and
+  The original player at https://glslsandbox.com/ is interactive, and
 reacts to user mouse interactions. The glslsandbox-player instead can
 emulates mouse movements by updating the shader uniforms and varying.
 
@@ -117,7 +117,7 @@ emulates mouse movements by updating the shader uniforms and varying.
 Supported glslsandbox Features
 ------------------------------
 
-  The supported features of the original http://glslsandbox.com/
+  The supported features of the original https://glslsandbox.com/
 shader player are:
 
 - the `time` float uniform is set to the number of seconds since the
@@ -135,7 +135,7 @@ shader player are:
 - the `surfacePosition` vec2 varying, which define the viewport of the
   quad surface to be rendered (default is -1,-1 for lower left corner,
   1,1 for the upper right). This varying is used for the pan/zoom
-  feature of the mouse (in the original http://glslsandbox.com/
+  feature of the mouse (in the original https://glslsandbox.com/
   player). In glslsandbox-player, this varying is updated with cyclic
   movements of pan/zoom.
 
@@ -326,7 +326,7 @@ the program. For this purpose, two demo scripts are provided
 `scripts/run-demo.sh` and `scripts/run-demo-random.sh`.
 
   The script `scripts/run-url.sh` is also provided to show how to run
-a shader directly from the http://glslsandbox.com/ website that was
+a shader directly from the https://glslsandbox.com/ website that was
 not embedded in the binary at compilation time.
 
   Since glslsandbox-player could use a lot of resources (CPU time or
@@ -395,7 +395,7 @@ Additional Features not Present in GLSL Sandbox
 
   For testing purposes, a feature for loading PNG textures is added to
 glslsandbox-player. This feature is not in the original
-http://glslsandbox.com/ site.
+https://glslsandbox.com/ site.
 
   Using the `-0 <file.png>` to `-7 <file.png>` command line option
 will load the `file.png` file and bind it to the texture unit
@@ -451,7 +451,7 @@ validate all its options and features.
 
   In case of automated build, it's advised to use the shader list
 including test shaders only, to reduce the load on
-http://glslsandbox.com/ servers. In that case, use the configure
+https://glslsandbox.com/ servers. In that case, use the configure
 command:
 
     ./configure --enable-testing --with-shader-list=shader-tests.list
@@ -622,7 +622,7 @@ then:
     qapitrace glslsandbox-player.trace
 
 For more details, refer to apitrace documentation:
-http://apitrace.github.io/
+https://apitrace.github.io/
 
 
 Notes on X11 Native Windowing
@@ -912,7 +912,7 @@ systems. However, it's possible to use it on a Microsoft Windows
 system. Since few vendor drivers are providing EGL/GLES2 drivers on
 desktops, and most drivers are for DirectX, it's possible workaround
 those limitation using the Google Angle project:
-http://angleproject.org/
+https://angleproject.org/
 
 One can follow instructions from Google Angle to compile a program to
 use it. A project will need to be created to compile
@@ -1000,7 +1000,7 @@ glslsandbox-player includes a minimal support for the Apple Cocoa OS X
 Native Windowing. Since OpenGL and OpenGL ES support was deprecated in
 iOS and OS X in favor of the Apple Metal API, it's possible to
 workaround those limitation using the Google Angle project:
-http://angleproject.org/
+https://angleproject.org/
 
 In the following instructions, we assume we will work from a new empty
 directory. Adjust to your actual environment.
@@ -1418,16 +1418,16 @@ differences. Standard tools are good starting points (coreutils,
 ImageMagick and GraphicsMagick, netpbm-progs, ...)
 
 ImageMagick examples to compare rendering:
-http://www.imagemagick.org/Usage/compare/
-http://www.imagemagick.org/script/compare.php
+https://www.imagemagick.org/Usage/compare/
+https://www.imagemagick.org/script/compare.php
 
 GraphicsMagick equivalent:
 http://www.graphicsmagick.org/compare.html
 
 Relevant Netpbm programs:
-http://netpbm.sourceforge.net/doc/directory.html
-http://netpbm.sourceforge.net/doc/pamarith.html
-http://netpbm.sourceforge.net/doc/ppmhist.html
+https://netpbm.sourceforge.net/doc/directory.html
+https://netpbm.sourceforge.net/doc/pamarith.html
+https://netpbm.sourceforge.net/doc/ppmhist.html
 
 For visually comparing two PPM images (`img1.ppm` and `img2.ppm`),
 producing the result in `img1-img2-diff.png`:
@@ -1546,7 +1546,7 @@ window. Emulating a 'vmware' will workaround the issue (i.e. `qemu-kvm
 suggestions and interesting discussions. Thanks to Marouen Ghodhbane
 for the initial Wayland EGL support. Thanks to Petr Cach and Santiago
 Mejia for the QNX support. Finally, many, many thanks to all
-http://glslsandbox.com/ authors and all its contributors.
+https://glslsandbox.com/ authors and all its contributors.
 
   This glslsandbox-player code is distributed under the 2-Clause BSD
 License. See the LICENSE file for details.
