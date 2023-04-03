@@ -51,13 +51,14 @@ Introduction
 ------------
 
   The https://glslsandbox.com/ website (and all its shaders) is using
-WebGL (See https://www.khronos.org/webgl/) and JavaScript for the
-rendering which are now available in common web browsers. Those web
-browsers are generally using X11. All of this pulls a lot of
-dependencies, which generally requires a full desktop system. It also
-require a working Internet connection. Since WebGL 1.0 is based on
-OpenGL ES 2.0, it's relatively straightforward to run those shaders
-directly on an OpenGL ES 2.0 driver.
+WebGL 1.0 (see https://www.khronos.org/webgl/) and JavaScript for the
+rendering. WebGL is now available in common web browsers. Those web
+browsers are generally using X11 or Wayland. Those graphical
+environments has a lot of dependencies, which generally requires a
+full desktop system. A web browser also require a working Internet
+connection. Since WebGL 1.0 is based on OpenGL ES 2.0, it's relatively
+straightforward to run those shaders directly on an OpenGL ES 2.0
+driver.
 
   The goal of this program is to stress OpenGL ES 2.0 and greater
 drivers (and its online shader compiler) on very restricted embedded
