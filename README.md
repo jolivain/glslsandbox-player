@@ -16,7 +16,7 @@ glslsandbox-player is a working EGL and GLESv2 libraries.
 
 Install dependencies:
 
-For Ubuntu from 14.04 to 20.04 LTS:
+For Ubuntu from 14.04 to 22.04 LTS:
 
     sudo apt-get install \
       pkg-config \
