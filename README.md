@@ -1486,19 +1486,20 @@ number of nanosecond. The current time can be shown in that format
 with the command `date +%s` for one-second resolution, or `date
 +%s.%N` for a nano-second resolution.
 
-  Distributing this time origin to slaves can be done for example via
-HTTP, using the following simple shell scripts and Busybox httpd.
+  Distributing this time origin from a clock leader host to many clock
+follower hosts can be done for example via HTTP, using the following
+simple shell scripts and Busybox httpd.
 
-  On the master host:
+  On the clock leader host:
 
-    GLSLSANDBOX_RUN_DIR=/tmp/glslsandbox-master
+    GLSLSANDBOX_RUN_DIR=/tmp/glslsandbox-leader
     mkdir -p "${GLSLSANDBOX_RUN_DIR}"
     date +%s > "${GLSLSANDBOX_RUN_DIR}/origin.txt"
     busybox httpd -p 8080 -h "${GLSLSANDBOX_RUN_DIR}"
 
-  On rendering slaves:
+  On the clock follower hosts:
 
-    TIME_ORIGIN="$(wget -q -O - masterhost:8080/origin.txt | grep -m1 -o '[0-9.]*')"
+    TIME_ORIGIN="$(wget -q -O - clockleaderhost:8080/origin.txt | grep -m1 -o '[0-9.]*')"
     glslsandbox-player \
         -q -t30 -S MandelZoom2 -W320 -H240 \
         -o "${TIME_ORIGIN}"
